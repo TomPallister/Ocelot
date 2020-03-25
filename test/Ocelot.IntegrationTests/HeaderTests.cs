@@ -34,13 +34,15 @@ namespace Ocelot.IntegrationTests
         public HeaderTests()
         {
             _httpClient = new HttpClient();
-            _ocelotBaseUrl = "http://localhost:5010";
+            var port = RandomPortFinder.GetRandomPort();
+            _ocelotBaseUrl = $"http://localhost:{port}";
             _httpClient.BaseAddress = new Uri(_ocelotBaseUrl);
         }
 
         [Fact]
         public void should_pass_remote_ip_address_if_as_x_forwarded_for_header()
         {
+            var port = RandomPortFinder.GetRandomPort();
             var configuration = new FileConfiguration
             {
                 ReRoutes = new List<FileReRoute>
@@ -54,7 +56,7 @@ namespace Ocelot.IntegrationTests
                             new FileHostAndPort
                             {
                                 Host = "localhost",
-                                Port = 6773,
+                                Port = port,
                             }
                         },
                         UpstreamPathTemplate = "/",
@@ -71,7 +73,7 @@ namespace Ocelot.IntegrationTests
                 }
             };
 
-            this.Given(x => GivenThereIsAServiceRunningOn("http://localhost:6773", 200, "X-Forwarded-For"))
+            this.Given(x => GivenThereIsAServiceRunningOn($"http://localhost:{port}", 200, "X-Forwarded-For"))
                 .And(x => GivenThereIsAConfiguration(configuration))
                 .And(x => GivenOcelotIsRunning())
                 .When(x => WhenIGetUrlOnTheApiGateway("/"))
