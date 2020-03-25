@@ -124,7 +124,7 @@ namespace Ocelot.Configuration.Creator
                 .WithClaimsToDownstreamPath(claimsToDownstreamPath)
                 .WithRequestIdKey(requestIdKey)
                 .WithIsCached(fileReRouteOptions.IsCached)
-                .WithCacheOptions(new CacheOptions(fileReRoute.FileCacheOptions.TtlSeconds, region))
+                .WithCacheOptions(new CacheOptions(fileReRoute.FileCacheOptions.TtlSeconds, region, fileReRoute.FileCacheOptions.Header))
                 .WithDownstreamScheme(fileReRoute.DownstreamScheme)
                 .WithLoadBalancerOptions(lbOptions)
                 .WithDownstreamAddresses(downstreamAddresses)

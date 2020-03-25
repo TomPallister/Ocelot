@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 using Ocelot.Cache;
 using Ocelot.Middleware;
 using Shouldly;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using Ocelot.Request.Middleware;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -17,9 +20,10 @@ namespace Ocelot.UnitTests.Cache
         {
             _cacheKeyGenerator = new CacheKeyGenerator();
             _cacheKeyGenerator = new CacheKeyGenerator();
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://some.url/blah?abcd=123");
             _downstreamContext = new DownstreamContext(new DefaultHttpContext())
             {
-                DownstreamRequest = new Ocelot.Request.Middleware.DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "https://some.url/blah?abcd=123"))
+                DownstreamRequest = new DownstreamRequest(httpRequestMessage)
             };
         }
 
@@ -33,7 +37,7 @@ namespace Ocelot.UnitTests.Cache
         private void GivenCacheKeyFromContext(DownstreamContext context)
         {
             string generatedCacheKey = _cacheKeyGenerator.GenerateRequestCacheKey(context);
-            string cachekey = MD5Helper.GenerateMd5("GET-https://some.url/blah?abcd=123");
+            string cachekey = MD5Helper.GenerateMd5($"GET-https://some.url/blah?abcd=123");
             generatedCacheKey.ShouldBe(cachekey);
         }
     }

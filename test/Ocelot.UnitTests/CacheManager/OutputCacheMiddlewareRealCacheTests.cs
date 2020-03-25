@@ -10,7 +10,9 @@
     using Ocelot.Configuration.Builder;
     using Ocelot.Logging;
     using Ocelot.Middleware;
+    using Ocelot.Request.Middleware;
     using Shouldly;
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -42,7 +44,8 @@
             _cacheManager = new OcelotCacheManagerCache<CachedResponse>(cacheManagerOutputCache);
             _cacheKeyGenerator = new CacheKeyGenerator();
             _downstreamContext = new DownstreamContext(new DefaultHttpContext());
-            _downstreamContext.DownstreamRequest = new Ocelot.Request.Middleware.DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "https://some.url/blah?abcd=123"));
+            var downstreamRequest = new DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "https://some.url/blah?abcd=123"));
+            _downstreamContext.DownstreamRequest = downstreamRequest;
             _next = context => Task.CompletedTask;
             _middleware = new OutputCacheMiddleware(_next, _loggerFactory.Object, _cacheManager, _cacheKeyGenerator);
         }
@@ -71,7 +74,7 @@
 
         private void ThenTheContentTypeHeaderIsCached()
         {
-            string cacheKey = MD5Helper.GenerateMd5("GET-https://some.url/blah?abcd=123");
+            string cacheKey = MD5Helper.GenerateMd5($"GET-https://some.url/blah?abcd=123");
             var result = _cacheManager.Get(cacheKey, "kanken");
             var header = result.ContentHeaders["Content-Type"];
             header.First().ShouldBe("application/json");
@@ -86,7 +89,7 @@
         {
             var reRoute = new DownstreamReRouteBuilder()
                 .WithIsCached(true)
-                .WithCacheOptions(new CacheOptions(100, "kanken"))
+                .WithCacheOptions(new CacheOptions(100, "kanken", null))
                 .WithUpstreamHttpMethod(new List<string> { "Get" })
                 .Build();
 
