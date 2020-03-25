@@ -13,6 +13,6 @@
 
         public string Region { get; private set; }
 
-        public string Header { get; set; }
+        public string Header { get; private set; }
     }
 }
