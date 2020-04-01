@@ -7,6 +7,7 @@ namespace Ocelot.DependencyInjection
     using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
+    using System.Dynamic;
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -51,7 +52,10 @@ namespace Ocelot.DependencyInjection
                 .Where(fi => reg.IsMatch(fi.Name) && (fi.Name != excludeConfigName))
                 .ToList();
 
-            var fileConfiguration = new FileConfiguration();
+            dynamic fileConfiguration = new ExpandoObject();
+            fileConfiguration.GlobalConfiguration = new ExpandoObject();
+            fileConfiguration.Aggregates = new List<object>();
+            fileConfiguration.ReRoutes = new List<object>();
 
             foreach (var file in files)
             {
@@ -62,15 +66,15 @@ namespace Ocelot.DependencyInjection
 
                 var lines = File.ReadAllText(file.FullName);
 
-                var config = JsonConvert.DeserializeObject<FileConfiguration>(lines);
+                dynamic config = JsonConvert.DeserializeObject<ExpandoObject>(lines);
 
                 if (file.Name.Equals(globalConfigFile, StringComparison.OrdinalIgnoreCase))
                 {
-                    fileConfiguration.GlobalConfiguration = config.GlobalConfiguration;
+                    TryAddSection(fileConfiguration, config, nameof(FileConfiguration.GlobalConfiguration));
                 }
 
-                fileConfiguration.Aggregates.AddRange(config.Aggregates);
-                fileConfiguration.ReRoutes.AddRange(config.ReRoutes);
+                TryAddSection(fileConfiguration, config, nameof(FileConfiguration.Aggregates));
+                TryAddSection(fileConfiguration, config, nameof(FileConfiguration.ReRoutes));
             }
 
             var json = JsonConvert.SerializeObject(fileConfiguration);
@@ -80,6 +84,27 @@ namespace Ocelot.DependencyInjection
             builder.AddJsonFile(primaryConfigFile, false, false);
 
             return builder;
+        }
+
+        private static void TryAddSection(ExpandoObject mergedConfig, ExpandoObject config, string sectionName)
+        {
+            var configAsDict = config as IDictionary<string, object>;
+            var mergedConfigAsDict = mergedConfig as IDictionary<string, object>;
+            if (configAsDict.ContainsKey(sectionName) && mergedConfigAsDict.ContainsKey(sectionName))
+            {
+                var mergedSectionAsExpando = mergedConfigAsDict[sectionName] as ExpandoObject;
+                if (mergedSectionAsExpando != null)
+                {
+                    mergedConfigAsDict[sectionName] = configAsDict[sectionName];                    
+                }
+                else
+                {
+                    var mergedSectionAsList = mergedConfigAsDict[sectionName] as List<object>;
+                    var sectionAsList = configAsDict[sectionName] as List<object>;
+
+                    mergedSectionAsList.AddRange(sectionAsList);
+                }
+            }
         }
     }
 }
