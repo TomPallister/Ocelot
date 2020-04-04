@@ -1,0 +1,20 @@
+{
+  "ReRoutes": [
+    {
+      "DownstreamPathTemplate": "/{global}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 54001
+        }
+      ],
+      "UpstreamPathTemplate": "/{global}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "somethingmore": "something"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://api.test.com"
+  }
+}

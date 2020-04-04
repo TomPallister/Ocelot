@@ -1,0 +1,17 @@
+{
+  "ReRoutes": [
+    {
+      "DownstreamPathTemplate": "/b/{action}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 54001
+        }
+      ],
+      "UpstreamPathTemplate": "/b/{action}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "MyCustomProperty":  "bbb"
+    }
+  ]
+}

@@ -12,6 +12,22 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <CodeAnalysisRuleSet>..\..\codeanalysis.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="MergeConfiguration\ocelot.global.json" />
+    <None Remove="MergeConfiguration\ocelot.xservices.json" />
+    <None Remove="MergeConfiguration\ocelot.yservices.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="MergeConfiguration\ocelot.global.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MergeConfiguration\ocelot.xservices.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="MergeConfiguration\ocelot.yservices.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.product.json">
