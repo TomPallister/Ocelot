@@ -75,7 +75,29 @@ Then in your ocelot.json add the following to proxy a ReRoute using SignalR. Not
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     }
  ]
-}
+   }
+
+If you are using secured web sockets, use the "wss" scheme.
+
+.. code-block:: json
+
+   {
+  "ReRoutes": [
+    {
+      "DownstreamPathTemplate": "/{catchAll}",
+      "DownstreamScheme": "wss",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 50000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/{catchAll}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
+    }
+ ]
+   }
+
 
 With this configuration set Ocelot will match any SignalR traffic that comes in on / and proxy it to localhost:5001/ws. To make this clearer
 Ocelot will receive messages from the upstream client, proxy these to the downstream service, receive messages from the downstream service and 
