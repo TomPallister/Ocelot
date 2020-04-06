@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace Ocelot.DownstreamUrlCreator.Middleware
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Web;
 
     public class DownstreamUrlCreatorMiddleware : OcelotMiddleware
     {
@@ -55,20 +58,20 @@ namespace Ocelot.DownstreamUrlCreator.Middleware
                 if (ContainsQueryString(dsPath))
                 {
                     context.DownstreamRequest.AbsolutePath = GetPath(dsPath);
-
                     if (string.IsNullOrEmpty(context.DownstreamRequest.Query))
                     {
                         context.DownstreamRequest.Query = GetQueryString(dsPath);
                     }
                     else
                     {
-                        context.DownstreamRequest.Query += GetQueryString(dsPath).Replace('?', '&');
+                        var newQueryString = GetQueryString(dsPath).Replace('?', '&');
+                        newQueryString = MergeQueryStringsWithoutDuplicateValues(context.DownstreamRequest.Query, newQueryString);
+                        context.DownstreamRequest.Query = "?" + newQueryString;
                     }
                 }
                 else
                 {
                     RemoveQueryStringParametersThatHaveBeenUsedInTemplate(context);
-
                     context.DownstreamRequest.AbsolutePath = dsPath.Value;
                 }
             }
@@ -76,6 +79,35 @@ namespace Ocelot.DownstreamUrlCreator.Middleware
             Logger.LogDebug($"Downstream url is {context.DownstreamRequest}");
 
             await _next.Invoke(context);
+        }
+
+
+        private static string MergeQueryStringsWithoutDuplicateValues(string queryString, string newQueryString)
+        {
+            var queries = HttpUtility.ParseQueryString(queryString);
+            var newQueries = HttpUtility.ParseQueryString(newQueryString);
+
+            var dict = new Dictionary<string, string>();
+            foreach (var key in newQueries.AllKeys)
+            {
+                if (!string.IsNullOrEmpty(key))
+                {
+                    dict.Add(key, newQueries[key]);
+
+                }
+            }
+
+            foreach (var key in queries.AllKeys)
+            {
+                if (string.IsNullOrEmpty(key) || dict.ContainsValue(queries[key]))
+                {
+                    continue;
+                }
+
+                dict.Add(key, queries[key]);
+            }
+
+            return string.Join("&", dict.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)));
         }
 
         private static void RemoveQueryStringParametersThatHaveBeenUsedInTemplate(DownstreamContext context)
