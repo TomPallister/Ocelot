@@ -6,7 +6,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 54001
+          "Port": 24012
         }
       ],
       "UpstreamPathTemplate": "/{global}",

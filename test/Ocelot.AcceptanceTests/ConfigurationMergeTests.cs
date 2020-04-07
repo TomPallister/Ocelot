@@ -1,39 +1,28 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Ocelot.Configuration.File;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Shouldly;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using TestStack.BDDfy;
 using Xunit;
 
 namespace Ocelot.AcceptanceTests
 {
     public class ConfigurationMergeTests
-    {
-        private Steps _steps;
+    {        
         private IWebHostBuilder _webHostBuilder;
         private TestServer _ocelotServer;
-        private HttpClient _ocelotClient;
-
-        public ConfigurationMergeTests()
-        {
-            _steps = new Steps();
-        }
 
         [Fact]
         public void should_merge_reroutes_custom_properties()
         {
             this.Given(x => GivenOcelotIsRunningWithMultipleConfigs())
-                .And(x => ThenConfigContentShouldBeMerged())
+                .And(x => ThenConfigContentShouldBeMergedWithReRoutesCustomProperties())
                 .BDDfy();
         }
 
@@ -63,10 +52,10 @@ namespace Ocelot.AcceptanceTests
 
             _ocelotServer = new TestServer(_webHostBuilder);
 
-            _ocelotClient = _ocelotServer.CreateClient();
+            var ocelotClient = _ocelotServer.CreateClient();
         }
 
-        private void ThenConfigContentShouldBeMerged()
+        private void ThenConfigContentShouldBeMergedWithReRoutesCustomProperties()
         {
             var mergedConfigFileName = "ocelot.json";
             File.Exists(mergedConfigFileName).ShouldBeTrue();
@@ -76,19 +65,28 @@ namespace Ocelot.AcceptanceTests
             config[nameof(FileConfiguration.ReRoutes)].ShouldNotBeNull();
             config[nameof(FileConfiguration.ReRoutes)].Children().Count().ShouldBe(3);
 
-            var routeWithCustomProperty = config[nameof(FileConfiguration.ReRoutes)].Children().SingleOrDefault(c => c["CustomStrategyProperty"] != null);
-            routeWithCustomProperty.ShouldNotBeNull();
-            var customProperty = routeWithCustomProperty["CustomStrategyProperty"];
-            customProperty["GET"].ShouldNotBeNull();
-            customProperty["GET"].Children().Count().ShouldBe(1);
-            customProperty["GET"].Children().FirstOrDefault().ShouldBe("SomeCustomStrategyMethodA");
-            customProperty["POST"].ShouldNotBeNull();
-            customProperty["POST"].Children().Count().ShouldBe(1);
-            customProperty["POST"].Children().FirstOrDefault().ShouldBe("SomeCustomStrategyMethodB");
+            var routeWithCustomPropertyX = config[nameof(FileConfiguration.ReRoutes)].Children()
+                .SingleOrDefault(c => c["CustomStrategyProperty"] != null);
+            routeWithCustomPropertyX.ShouldNotBeNull();
+            var customPropertyX = routeWithCustomPropertyX["CustomStrategyProperty"];
+            customPropertyX["GET"].ShouldNotBeNull();
+            customPropertyX["GET"].Children().Count().ShouldBe(1);
+            customPropertyX["GET"].Children().FirstOrDefault().ShouldBe("SomeCustomStrategyMethodA");
+            customPropertyX["POST"].ShouldNotBeNull();
+            customPropertyX["POST"].Children().Count().ShouldBe(1);
+            customPropertyX["POST"].Children().FirstOrDefault().ShouldBe("SomeCustomStrategyMethodB");
 
-            var routeWithCustomProperty2 = config[nameof(FileConfiguration.ReRoutes)].Children().SingleOrDefault(c => c["somethingmore"] != null);
-            routeWithCustomProperty2.ShouldNotBeNull();
-            routeWithCustomProperty2["somethingmore"].ShouldBe("something");
+            var routeWithCustomPropertyGlobal = config[nameof(FileConfiguration.ReRoutes)].Children()
+                .SingleOrDefault(c => c["somethingmore"] != null);
+            routeWithCustomPropertyGlobal.ShouldNotBeNull();
+            routeWithCustomPropertyGlobal["somethingmore"].ShouldBe("something");
+
+            var routeWithCustomPropertyY = config[nameof(FileConfiguration.ReRoutes)].Children()
+                .SingleOrDefault(c => c["MyCustomProperty"] != null);
+            routeWithCustomPropertyY.ShouldNotBeNull();
+            routeWithCustomPropertyY["MyCustomProperty"].ShouldBeAssignableTo(typeof(JArray));
+            routeWithCustomPropertyY["MyCustomProperty"].Count().ShouldBe(1);
+            routeWithCustomPropertyY["MyCustomProperty"].First().ShouldBe("myValue");
         }
     }
 }

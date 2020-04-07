@@ -6,12 +6,12 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 54001
+          "Port": 34234
         }
       ],
       "UpstreamPathTemplate": "/b/{action}",
       "UpstreamHttpMethod": [ "Get" ],
-      "MyCustomProperty":  "bbb"
+      "MyCustomProperty": [ "myValue" ]
     }
   ]
 }
