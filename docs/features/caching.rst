@@ -17,6 +17,7 @@ This will give you access to the Ocelot cache manager extension methods.
 The second thing you need to do something like the following to your ConfigureServices..
 
 .. code-block:: csharp
+using Ocelot.Cache.CacheManager;
 
     s.AddOcelot()
         .AddCacheManager(x =>
