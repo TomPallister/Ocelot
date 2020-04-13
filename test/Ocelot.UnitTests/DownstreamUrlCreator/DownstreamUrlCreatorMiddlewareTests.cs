@@ -345,8 +345,8 @@
                 .And(x => GivenTheServiceProviderConfigIs(config))
                 .And(x => x.GivenTheUrlReplacerWillReturn("/Authorized/1?server=2"))
                 .When(x => x.WhenICallTheMiddleware())
-                .Then(x => x.ThenTheDownstreamRequestUriIs("http://localhost:5000/Authorized/1?refreshToken=2288356cfb1338fdc5ff4ca558ec785118dfe1ff2864340937da8226863ff66d&server=2"))
-                .And(x => ThenTheQueryStringIs("?refreshToken=2288356cfb1338fdc5ff4ca558ec785118dfe1ff2864340937da8226863ff66d&server=2"))
+                .Then(x => x.ThenTheDownstreamRequestUriIs("http://localhost:5000/Authorized/1?server=2&refreshToken=2288356cfb1338fdc5ff4ca558ec785118dfe1ff2864340937da8226863ff66d"))
+                .And(x => ThenTheQueryStringIs("?server=2&refreshToken=2288356cfb1338fdc5ff4ca558ec785118dfe1ff2864340937da8226863ff66d"))
                 .BDDfy();
         }
 
