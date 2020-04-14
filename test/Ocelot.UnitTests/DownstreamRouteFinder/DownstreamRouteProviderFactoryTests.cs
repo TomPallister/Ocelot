@@ -30,6 +30,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
             services.AddSingleton<IQoSOptionsCreator, QoSOptionsCreator>();
             services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteFinder>();
             services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteCreator>();
+            services.AddSingleton<IDownstreamServiceFinder, DownstreamServiceFinder>();
             var provider = services.BuildServiceProvider();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
