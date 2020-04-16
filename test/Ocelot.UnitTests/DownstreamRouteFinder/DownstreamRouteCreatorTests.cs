@@ -39,7 +39,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
             _qosOptionsCreator
                 .Setup(x => x.Create(It.IsAny<QoSOptions>(), It.IsAny<string>(), It.IsAny<List<string>>()))
                 .Returns(_qoSOptions);
-            _creator = new DownstreamRouteCreator(_qosOptionsCreator.Object);
+            _creator = new DownstreamRouteCreator(_qosOptionsCreator.Object, new DownstreamServiceFinder());
         }
 
         [Fact]
