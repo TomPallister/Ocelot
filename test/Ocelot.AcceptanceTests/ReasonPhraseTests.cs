@@ -11,9 +11,6 @@ namespace Ocelot.AcceptanceTests
     public class ReasonPhraseTests : IDisposable
     {
         private readonly Steps _steps;
-        private string _contentType;
-        private long? _contentLength;
-        private bool _contentTypeHeaderExists;
         private readonly ServiceHandler _serviceHandler;
 
         public ReasonPhraseTests()

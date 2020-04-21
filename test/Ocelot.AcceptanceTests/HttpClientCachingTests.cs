@@ -15,7 +15,6 @@ namespace Ocelot.AcceptanceTests
     public class HttpClientCachingTests : IDisposable
     {
         private readonly Steps _steps;
-        private string _downstreamPath;
         private readonly ServiceHandler _serviceHandler;
 
         public HttpClientCachingTests()
