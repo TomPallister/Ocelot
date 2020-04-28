@@ -179,7 +179,7 @@
             _ridkCreator.Setup(x => x.Create(It.IsAny<FileReRoute>(), It.IsAny<FileGlobalConfiguration>())).Returns(_requestId);
             _rrkCreator.Setup(x => x.Create(It.IsAny<FileReRoute>())).Returns(_rrk);
             _utpCreator.Setup(x => x.Create(It.IsAny<IReRoute>())).Returns(_upt);
-            _aoCreator.Setup(x => x.Create(It.IsAny<FileReRoute>())).Returns(_ao);
+            _aoCreator.Setup(x => x.Create(It.IsAny<FileAuthenticationOptions>(), It.IsAny<FileAuthenticationOptions>())).Returns(_ao);
             _cthCreator.Setup(x => x.Create(It.IsAny<Dictionary<string, string>>())).Returns(_ctt);
             _qosoCreator.Setup(x => x.Create(It.IsAny<FileQoSOptions>(), It.IsAny<string>(), It.IsAny<List<string>>())).Returns(_qoso);
             _rloCreator.Setup(x => x.Create(It.IsAny<FileRateLimitRule>(), It.IsAny<FileGlobalConfiguration>())).Returns(_rlo);
@@ -266,7 +266,7 @@
             _ridkCreator.Verify(x => x.Create(fileReRoute, globalConfig), Times.Once);
             _rrkCreator.Verify(x => x.Create(fileReRoute), Times.Once);
             _utpCreator.Verify(x => x.Create(fileReRoute), Times.Exactly(2));
-            _aoCreator.Verify(x => x.Create(fileReRoute), Times.Once);
+            _aoCreator.Verify(x => x.Create(fileReRoute.AuthenticationOptions, globalConfig.AuthenticationOptions), Times.Once);
             _cthCreator.Verify(x => x.Create(fileReRoute.AddHeadersToRequest), Times.Once);
             _cthCreator.Verify(x => x.Create(fileReRoute.AddClaimsToRequest), Times.Once);
             _cthCreator.Verify(x => x.Create(fileReRoute.AddQueriesToRequest), Times.Once);

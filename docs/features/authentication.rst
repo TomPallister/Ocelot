@@ -45,6 +45,8 @@ will not start up, if there is then the ReRoute will use that provider when it e
 
 If a ReRoute is authenticated Ocelot will invoke whatever scheme is associated with it while executing the authentication middleware. If the request fails authentication Ocelot returns a http status code 401.
 
+If you want to configure AuthenticationOptions the same for all ReRoutes, do it in GlobalConfiguration the same way as for ReRoute. If there are AuthenticationOptions configured both for GlobalConfiguration and ReRoute, the ReRoute section has priority.
+
 JWT Tokens
 ^^^^^^^^^^
 
