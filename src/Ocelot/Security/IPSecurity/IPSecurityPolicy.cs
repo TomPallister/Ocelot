@@ -8,9 +8,10 @@ namespace Ocelot.Security.IPSecurity
 {
     public class IPSecurityPolicy : ISecurityPolicy
     {
+
         public async Task<Response> Security(DownstreamContext context)
         {
-            IPAddress clientIp = context.HttpContext.Connection.RemoteIpAddress;
+            var clientIp = context.HttpContext.GetClientIpAddress();
             SecurityOptions securityOptions = context.DownstreamReRoute.SecurityOptions;
             if (securityOptions == null)
             {
@@ -19,7 +20,7 @@ namespace Ocelot.Security.IPSecurity
 
             if (securityOptions.IPBlockedList != null)
             {
-                if (securityOptions.IPBlockedList.Exists(f => f == clientIp.ToString()))
+                if (securityOptions.IPBlockedList.Exists(f => f == clientIp))
                 {
                     var error = new UnauthenticatedError($" This request rejects access to {clientIp.ToString()} IP");
                     return new ErrorResponse(error);
@@ -28,7 +29,7 @@ namespace Ocelot.Security.IPSecurity
 
             if (securityOptions.IPAllowedList != null && securityOptions.IPAllowedList.Count > 0)
             {
-                if (!securityOptions.IPAllowedList.Exists(f => f == clientIp.ToString()))
+                if (!securityOptions.IPAllowedList.Exists(f => f == clientIp))
                 {
                     var error = new UnauthenticatedError($"{clientIp.ToString()} does not allow access, the request is invalid");
                     return new ErrorResponse(error);

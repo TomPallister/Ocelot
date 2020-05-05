@@ -64,11 +64,19 @@
                 return;
             }
 
-            cached = await CreateCachedResponse(context.DownstreamResponse);
+            if (context.DownstreamResponse.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                cached = await CreateCachedResponse(context.DownstreamResponse);
 
-            _outputCache.Add(downStreamRequestCacheKey, cached, TimeSpan.FromSeconds(context.DownstreamReRoute.CacheOptions.TtlSeconds), context.DownstreamReRoute.CacheOptions.Region);
+                _outputCache.Add(downStreamRequestCacheKey, cached, TimeSpan.FromSeconds(context.DownstreamReRoute.CacheOptions.TtlSeconds), context.DownstreamReRoute.CacheOptions.Region);
 
-            Logger.LogDebug($"finished response added to cache for {downstreamUrlKey}");
+                Logger.LogDebug($"finished response added to cache for {downstreamUrlKey}");
+            }
+            else
+            {
+
+                Logger.LogDebug($"http request failed,  could not create cache for {downstreamUrlKey}");
+            }
         }
 
         private void SetHttpResponseMessageThisRequest(DownstreamContext context,
