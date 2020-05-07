@@ -112,7 +112,7 @@ moment but could be changed.
 Custom Load Balancers
 ^^^^^^^^^^^^^^^^^^^^
 
-`DavidLievrouw <https://github.com/DavidLievrouw`_ implemented a way to provide Ocelot with custom load balancer in `PR 1155 <https://github.com/ThreeMammals/Ocelot/pull/1155`_.
+`DavidLievrouw <https://github.com/DavidLievrouw>`_ implemented a way to provide Ocelot with custom load balancer in `PR 1155 <https://github.com/ThreeMammals/Ocelot/pull/1155>`_.
 
 In order to create and use a custom load balancer you can do the following. Below we setup a basic load balancing config and not the Type is CustomLoadBalancer this is the name of a class we will
 setup to do load balancing.
