@@ -28,7 +28,7 @@
         {
             _hostingEnvironment = new Mock<IWebHostEnvironment>();
             // Clean up config files before each test
-            var subConfigFiles = new DirectoryInfo(".").GetFiles("ocelot.*.json");
+            var subConfigFiles = new DirectoryInfo(".").GetFiles("ocelot*.json");
 
             foreach (var config in subConfigFiles)
             {
@@ -46,12 +46,13 @@
         }
 
         [Fact]
-        public void should_merge_files()
+        public void should_merge_files_to_file()
         {
             this.Given(_ => GivenMultipleConfigurationFiles("", false))
                 .And(_ => GivenTheEnvironmentIs(null))
                 .When(_ => WhenIAddOcelotConfiguration())
                 .Then(_ => ThenTheConfigsAreMerged())
+                .And(_ => TheOcelotJsonFileExists("", true))
                 .BDDfy();
         }
 
@@ -73,6 +74,17 @@
             this.Given(_ => GivenMultipleConfigurationFiles(configFolder, false))
                 .When(_ => WhenIAddOcelotConfigurationWithSpecificFolder(configFolder))
                 .Then(_ => ThenTheConfigsAreMerged())
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_merge_files_to_memory()
+        {
+            this.Given(_ => GivenMultipleConfigurationFiles("", false))
+                .And(_ => GivenTheEnvironmentIs(null))
+                .When(_ => WhenIAddOcelotConfigurationWithSpesificMergeTarget(MergeOcelotJson.ToMemory))
+                .Then(_ => ThenTheConfigsAreMerged())
+                .And(_ => TheOcelotJsonFileExists("", false))
                 .BDDfy();
         }
 
@@ -267,6 +279,15 @@
             _configRoot = builder.Build();
         }
 
+        private void WhenIAddOcelotConfigurationWithSpesificMergeTarget(MergeOcelotJson mergeOcelotJson)
+        {
+            IConfigurationBuilder builder = new ConfigurationBuilder();
+
+            builder.AddOcelot(_hostingEnvironment.Object, mergeOcelotJson);
+
+            _configRoot = builder.Build();
+        }
+
         private void ThenTheConfigsAreMerged()
         {
             var fc = (FileConfiguration)_configRoot.Get(typeof(FileConfiguration));
@@ -329,6 +350,12 @@
         private void ThenTheResultIs(string expected)
         {
             _result.ShouldBe(expected);
+        }
+
+        private void TheOcelotJsonFileExists(string folder, bool expected)
+        {
+            var primaryConfigFile = Path.Combine(folder, "ocelot.json");
+            File.Exists(primaryConfigFile).ShouldBe(expected);
         }
     }
 }

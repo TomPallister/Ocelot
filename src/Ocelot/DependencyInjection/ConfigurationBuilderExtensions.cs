@@ -9,6 +9,7 @@ namespace Ocelot.DependencyInjection
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     public static class ConfigurationBuilderExtensions
@@ -36,8 +37,35 @@ namespace Ocelot.DependencyInjection
 
         public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, string folder, IWebHostEnvironment env)
         {
-            const string primaryConfigFile = "ocelot.json";
+            return builder.AddOcelot(folder, env, MergeOcelotJson.ToFile);
+        }
 
+        public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, IWebHostEnvironment env, MergeOcelotJson mergeOcelotJson)
+        {
+            return builder.AddOcelot(".", env, mergeOcelotJson);
+        }
+
+        public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, string folder, IWebHostEnvironment env, MergeOcelotJson mergeOcelotJson)
+        {
+            var json = GetMergedOcelotJson(folder, env);
+
+            if (mergeOcelotJson == MergeOcelotJson.ToFile)
+            {
+                File.WriteAllText(primaryConfigFile, json);
+                builder.AddJsonFile(primaryConfigFile, false, false);
+            }
+            else if (mergeOcelotJson == MergeOcelotJson.ToMemory)
+            { 
+                builder.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(json)));
+            }
+
+            return builder;
+        }
+
+        const string primaryConfigFile = "ocelot.json";
+
+        private static string GetMergedOcelotJson(string folder, IWebHostEnvironment env)
+        {
             const string globalConfigFile = "ocelot.global.json";
 
             const string subConfigPattern = @"^ocelot\.(.*?)\.json$";
@@ -73,13 +101,7 @@ namespace Ocelot.DependencyInjection
                 fileConfiguration.ReRoutes.AddRange(config.ReRoutes);
             }
 
-            var json = JsonConvert.SerializeObject(fileConfiguration);
-
-            File.WriteAllText(primaryConfigFile, json);
-
-            builder.AddJsonFile(primaryConfigFile, false, false);
-
-            return builder;
+            return JsonConvert.SerializeObject(fileConfiguration);
         }
     }
 }
