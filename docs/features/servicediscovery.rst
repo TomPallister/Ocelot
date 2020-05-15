@@ -25,7 +25,7 @@ Then add the following to your ConfigureServices method.
 The following is required in the GlobalConfiguration. The Provider is required and if you do not specify a host and port the Consul default
 will be used.
 
-Please note the Scheme option defauls to HTTP. It was added in this `PR <https://github.com/ThreeMammals/Ocelot/pull/1154>`_. It defaults to HTTP to not introduce a breaking change.
+Please note the Scheme option defaults to HTTP. It was added in this `PR <https://github.com/ThreeMammals/Ocelot/pull/1154>`_. It defaults to HTTP to not introduce a breaking change.
 
 .. code-block:: json
 
