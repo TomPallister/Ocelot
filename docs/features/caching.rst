@@ -42,5 +42,6 @@ If you want to add your own caching method implement the following interfaces an
 
 ``IOcelotCache<FileConfiguration>`` this is for caching the file configuration if you are calling something remote to get your config such as Consul.
 
+thanks Mohsen Rajabi, PR `1167 <https://github.com/ThreeMammals/Ocelot/pull/1167>`_ add IMemoryCache Asp Core.
 Please dig into the Ocelot source code to find more. I would really appreciate it if anyone wants to implement Redis, memcache etc..
 
