@@ -6,13 +6,13 @@
 
     public static class EurekaProviderFactory
     {
-        public static ServiceDiscoveryFinderDelegate Get = (provider, config, reRoute) =>
+        public static ServiceDiscoveryFinderDelegate Get = (provider, config, route) =>
         {
             var client = provider.GetService<IDiscoveryClient>();
 
             if (config.Type?.ToLower() == "eureka" && client != null)
             {
-                return new Eureka(reRoute.ServiceName, client);
+                return new Eureka(route.ServiceName, client);
             }
 
             return null;

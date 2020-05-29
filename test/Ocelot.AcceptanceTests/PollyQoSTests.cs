@@ -29,9 +29,9 @@
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -70,9 +70,9 @@
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -111,9 +111,9 @@
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -157,16 +157,16 @@
         }
 
         [Fact]
-        public void open_circuit_should_not_effect_different_reRoute()
+        public void open_circuit_should_not_effect_different_route()
         {
             var port1 = RandomPortFinder.GetRandomPort();
             var port2 = RandomPortFinder.GetRandomPort();
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -187,7 +187,7 @@
                             DurationOfBreak = 1000
                         }
                     },
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",

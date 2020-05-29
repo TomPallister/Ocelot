@@ -4,6 +4,7 @@ namespace Ocelot.Requester
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Collections.Generic;
+    using System.Net.Http;
 
     public class HttpExeptionToErrorMapper : IExceptionToErrorMapper
     {
@@ -26,6 +27,11 @@ namespace Ocelot.Requester
             if (type == typeof(OperationCanceledException) || type.IsSubclassOf(typeof(OperationCanceledException)))
             {
                 return new RequestCanceledError(exception.Message);
+            }
+
+            if (type == typeof(HttpRequestException))
+            {
+                return new ConnectionToDownstreamServiceError(exception);
             }
 
             return new UnableToCompleteRequestError(exception);

@@ -1,52 +1,54 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Moq;
-using Ocelot.Configuration;
-using Ocelot.Configuration.Builder;
-using Ocelot.DownstreamRouteFinder;
-using Ocelot.DownstreamRouteFinder.UrlMatcher;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using Ocelot.PathManipulation;
-using Ocelot.PathManipulation.Middleware;
-using Ocelot.Request.Middleware;
-using Ocelot.Responses;
-using Ocelot.Values;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using TestStack.BDDfy;
-using Xunit;
-
 namespace Ocelot.UnitTests.DownstreamPathManipulation
 {
+    using Ocelot.DownstreamPathManipulation.Middleware;
+    using Ocelot.Infrastructure.RequestData;
+    using Moq;
+    using Ocelot.Configuration;
+    using Ocelot.Configuration.Builder;
+    using Ocelot.DownstreamRouteFinder;
+    using Ocelot.DownstreamRouteFinder.UrlMatcher;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using Ocelot.PathManipulation;
+    using Ocelot.Request.Middleware;
+    using Ocelot.Responses;
+    using Ocelot.Values;
+    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
+    using TestStack.BDDfy;
+    using Xunit;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+
     public class ClaimsToDownstreamPathMiddlewareTests
     {
         private readonly Mock<IChangeDownstreamPathTemplate> _changePath;
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
         private ClaimsToDownstreamPathMiddleware _middleware;
-        private DownstreamContext _downstreamContext;
-        private OcelotRequestDelegate _next;
+        private RequestDelegate _next;
+        private HttpContext _httpContext;
 
         public ClaimsToDownstreamPathMiddlewareTests()
         {
-            _downstreamContext = new DownstreamContext(new DefaultHttpContext());
+            _httpContext = new DefaultHttpContext();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<ClaimsToDownstreamPathMiddleware>()).Returns(_logger.Object);
             _next = context => Task.CompletedTask;
             _changePath = new Mock<IChangeDownstreamPathTemplate>();
-            _downstreamContext.DownstreamRequest = new DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "http://test.com"));
+            _httpContext.Items.UpsertDownstreamRequest(new DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "http://test.com")));
             _middleware = new ClaimsToDownstreamPathMiddleware(_next, _loggerFactory.Object, _changePath.Object);
         }
 
         [Fact]
         public void should_call_add_queries_correctly()
         {
-            var downstreamRoute = new DownstreamRoute(new List<PlaceholderNameAndValue>(),
-                new ReRouteBuilder()
-                    .WithDownstreamReRoute(new DownstreamReRouteBuilder()
+            var downstreamRoute = new Ocelot.DownstreamRouteFinder.DownstreamRouteHolder(new List<PlaceholderNameAndValue>(),
+                new RouteBuilder()
+                    .WithDownstreamRoute(new DownstreamRouteBuilder()
                         .WithDownstreamPathTemplate("any old string")
                         .WithClaimsToDownstreamPath(new List<ClaimToThing>
                         {
@@ -67,7 +69,7 @@ namespace Ocelot.UnitTests.DownstreamPathManipulation
 
         private void WhenICallTheMiddleware()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
         private void GivenTheChangeDownstreamPathReturnsOk()
@@ -87,14 +89,15 @@ namespace Ocelot.UnitTests.DownstreamPathManipulation
                 .Verify(x => x.ChangeDownstreamPath(
                     It.IsAny<List<ClaimToThing>>(),
                     It.IsAny<IEnumerable<Claim>>(),
-                    _downstreamContext.DownstreamReRoute.DownstreamPathTemplate,
-                    _downstreamContext.TemplatePlaceholderNameAndValues), Times.Once);
+                    _httpContext.Items.DownstreamRoute().DownstreamPathTemplate,
+                    _httpContext.Items.TemplatePlaceholderNameAndValues()), Times.Once);
         }
 
-        private void GivenTheDownStreamRouteIs(DownstreamRoute downstreamRoute)
+        private void GivenTheDownStreamRouteIs(Ocelot.DownstreamRouteFinder.DownstreamRouteHolder downstreamRoute)
         {
-            _downstreamContext.TemplatePlaceholderNameAndValues = downstreamRoute.TemplatePlaceholderNameAndValues;
-            _downstreamContext.DownstreamReRoute = downstreamRoute.ReRoute.DownstreamReRoute[0];
+            _httpContext.Items.UpsertTemplatePlaceholderNameAndValues(downstreamRoute.TemplatePlaceholderNameAndValues);
+
+            _httpContext.Items.UpsertDownstreamRoute(downstreamRoute.Route.DownstreamRoute[0]);
         }
 
     }

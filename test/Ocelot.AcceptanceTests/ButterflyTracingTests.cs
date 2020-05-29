@@ -39,9 +39,9 @@ namespace Ocelot.AcceptanceTests
             int port2 = RandomPortFinder.GetRandomPort();
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/values",
                             DownstreamScheme = "http",
@@ -60,7 +60,7 @@ namespace Ocelot.AcceptanceTests
                                 UseTracing = true
                             }
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/values",
                             DownstreamScheme = "http",
@@ -111,9 +111,9 @@ namespace Ocelot.AcceptanceTests
             int port = RandomPortFinder.GetRandomPort();
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/values",
                             DownstreamScheme = "http",

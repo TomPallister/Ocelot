@@ -7,6 +7,8 @@ namespace Ocelot.Headers
     using Ocelot.Responses;
     using System.Collections.Generic;
     using System.Linq;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class HttpResponseHeaderReplacer : IHttpResponseHeaderReplacer
     {
@@ -17,10 +19,10 @@ namespace Ocelot.Headers
             _placeholders = placeholders;
         }
 
-        public Response Replace(DownstreamContext context, List<HeaderFindAndReplace> fAndRs)
+        public Response Replace(HttpContext httpContext, List<HeaderFindAndReplace> fAndRs)
         {
-            var response = context.DownstreamResponse;
-            var request = context.DownstreamRequest;
+            var response = httpContext.Items.DownstreamResponse();
+            var request = httpContext.Items.DownstreamRequest();
 
             foreach (var f in fAndRs)
             {

@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ocelot" Version="13.5.1" />
-    <PackageReference Include="Ocelot.Provider.Eureka" Version="13.5.1" />
-    <PackageReference Include="Ocelot.Provider.Polly" Version="13.5.1" />
+    <PackageReference Include="Ocelot" Version="14.0.9" />
+    <PackageReference Include="Ocelot.Provider.Eureka" Version="14.0.9" />
+    <PackageReference Include="Ocelot.Provider.Polly" Version="14.0.9" />
   </ItemGroup>
 
 </Project>

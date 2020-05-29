@@ -6,9 +6,9 @@ namespace Ocelot.Configuration.Creator
 {
     public class DownstreamAddressesCreator : IDownstreamAddressesCreator
     {
-        public List<DownstreamHostAndPort> Create(FileReRoute reRoute)
+        public List<DownstreamHostAndPort> Create(FileRoute route)
         {
-            return reRoute.DownstreamHostAndPorts.Select(hostAndPort => new DownstreamHostAndPort(hostAndPort.Host, hostAndPort.Port)).ToList();
+            return route.DownstreamHostAndPorts.Select(hostAndPort => new DownstreamHostAndPort(hostAndPort.Host, hostAndPort.Port)).ToList();
         }
     }
 }

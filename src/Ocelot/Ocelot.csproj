@@ -9,7 +9,6 @@
     <PackageId>Ocelot</PackageId>
     <PackageTags>API Gateway;.NET core</PackageTags>
     <PackageProjectUrl>https://github.com/ThreeMammals/Ocelot</PackageProjectUrl>
-    <PackageProjectUrl>https://github.com/ThreeMammals/Ocelot</PackageProjectUrl>
     <PackageIconUrl>http://threemammals.com/images/ocelot_logo.png</PackageIconUrl>
     <RuntimeIdentifiers>win10-x64;osx.10.11-x64;osx.10.12-x64;win7-x64</RuntimeIdentifiers>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -25,13 +24,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="8.5.0" />
-    <PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.0.0">
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+    <PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.3">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66">
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.164">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>

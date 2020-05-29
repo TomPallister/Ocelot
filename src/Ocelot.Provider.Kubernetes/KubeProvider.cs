@@ -6,57 +6,52 @@ using Ocelot.Values;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ocelot.Provider.Kubernetes.KubeApiClientExtensions;
 
 namespace Ocelot.Provider.Kubernetes
 {
-    public class Kube : IServiceDiscoveryProvider
+    public class KubernetesServiceDiscoveryProvider : IServiceDiscoveryProvider
     {
-        private KubeRegistryConfiguration kubeRegistryConfiguration;
-        private IOcelotLogger logger;
-        private IKubeApiClient kubeApi;
+        private readonly KubeRegistryConfiguration _kubeRegistryConfiguration;
+        private readonly IOcelotLogger _logger;
+        private readonly IKubeApiClient _kubeApi;
 
-        public Kube(KubeRegistryConfiguration kubeRegistryConfiguration, IOcelotLoggerFactory factory, IKubeApiClient kubeApi)
+        public KubernetesServiceDiscoveryProvider(KubeRegistryConfiguration kubeRegistryConfiguration, IOcelotLoggerFactory factory, IKubeApiClient kubeApi)
         {
-            this.kubeRegistryConfiguration = kubeRegistryConfiguration;
-            this.logger = factory.CreateLogger<Kube>();
-            this.kubeApi = kubeApi;
+            _kubeRegistryConfiguration = kubeRegistryConfiguration;
+            _logger = factory.CreateLogger<KubernetesServiceDiscoveryProvider>();
+            _kubeApi = kubeApi;
         }
-
 
         public async Task<List<Service>> Get()
         {
-            var service = await kubeApi.ServicesV1().Get(kubeRegistryConfiguration.KeyOfServiceInK8s, kubeRegistryConfiguration.KubeNamespace);
+            var endpoint = await _kubeApi
+                .ResourceClient(client => new EndPointClientV1(client))
+                .Get(_kubeRegistryConfiguration.KeyOfServiceInK8s, _kubeRegistryConfiguration.KubeNamespace);
+
             var services = new List<Service>();
-            if (IsValid(service))
+            if (endpoint != null && endpoint.Subsets.Any())
             {
-                services.Add(BuildService(service));
+                services.AddRange(BuildServices(endpoint));
             }
             else
             {
-                logger.LogWarning($"namespace:{kubeRegistryConfiguration.KubeNamespace }service:{kubeRegistryConfiguration.KeyOfServiceInK8s} Unable to use ,it is invalid. Address must contain host only e.g. localhost and port must be greater than 0");
+                _logger.LogWarning($"namespace:{_kubeRegistryConfiguration.KubeNamespace }service:{_kubeRegistryConfiguration.KeyOfServiceInK8s} Unable to use ,it is invalid. Address must contain host only e.g. localhost and port must be greater than 0");
             }
             return services;
         }
 
-        private bool IsValid(ServiceV1 service)
+        private List<Service> BuildServices(EndpointsV1 endpoint)
         {
-            if (string.IsNullOrEmpty(service.Spec.ClusterIP) || service.Spec.Ports.Count <= 0)
+            var services = new List<Service>();
+
+            foreach (var subset in endpoint.Subsets)
             {
-                return false;
+                services.AddRange(subset.Addresses.Select(address => new Service(endpoint.Metadata.Name,
+                    new ServiceHostAndPort(address.Ip, subset.Ports.First().Port),
+                    endpoint.Metadata.Uid, string.Empty, Enumerable.Empty<string>())));
             }
-
-            return true;
-        }
-
-        private Service BuildService(ServiceV1 serviceEntry)
-        {
-            var servicePort = serviceEntry.Spec.Ports.FirstOrDefault();
-            return new Service(
-                serviceEntry.Metadata.Name,
-                new ServiceHostAndPort(serviceEntry.Spec.ClusterIP, servicePort.Port),
-                serviceEntry.Metadata.Uid,
-                string.Empty,
-                Enumerable.Empty<string>());
+            return services;
         }
     }
 }

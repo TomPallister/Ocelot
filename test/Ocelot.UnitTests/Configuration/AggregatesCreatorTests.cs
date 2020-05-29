@@ -17,8 +17,8 @@ namespace Ocelot.UnitTests.Configuration
         private readonly AggregatesCreator _creator;
         private readonly Mock<IUpstreamTemplatePatternCreator> _utpCreator;
         private FileConfiguration _fileConfiguration;
-        private List<ReRoute> _reRoutes;
-        private List<ReRoute> _result;
+        private List<Route> _routes;
+        private List<Route> _result;
         private UpstreamPathTemplate _aggregate1Utp;
         private UpstreamPathTemplate _aggregate2Utp;
 
@@ -33,18 +33,18 @@ namespace Ocelot.UnitTests.Configuration
         {
             var fileConfig = new FileConfiguration
             {
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                 {
-                    new FileAggregateReRoute
+                    new FileAggregateRoute
                     {
-                        ReRouteKeys = new List<string>{"key1"}
+                        RouteKeys = new List<string>{"key1"}
                     }
                 }
             };
-            var reRoutes = new List<ReRoute>();
+            var routes = new List<Route>();
 
             this.Given(_ => GivenThe(fileConfig))
-                .And(_ => GivenThe(reRoutes))
+                .And(_ => GivenThe(routes))
                 .When(_ => WhenICreate())
                 .Then(_ => TheUtpCreatorIsNotCalled())
                 .And(_ => ThenTheResultIsNotNull())
@@ -57,37 +57,37 @@ namespace Ocelot.UnitTests.Configuration
         {
             var fileConfig = new FileConfiguration
             {
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                 {
-                    new FileAggregateReRoute
+                    new FileAggregateRoute
                     {
-                        ReRouteKeys = new List<string>{"key1", "key2"},
+                        RouteKeys = new List<string>{"key1", "key2"},
                         UpstreamHost = "hosty",
                         UpstreamPathTemplate = "templatey",
                         Aggregator = "aggregatory",
-                        ReRouteIsCaseSensitive = true
+                        RouteIsCaseSensitive = true
                     },
-                    new FileAggregateReRoute
+                    new FileAggregateRoute
                     {
-                        ReRouteKeys = new List<string>{"key3", "key4"},
+                        RouteKeys = new List<string>{"key3", "key4"},
                         UpstreamHost = "hosty",
                         UpstreamPathTemplate = "templatey",
                         Aggregator = "aggregatory",
-                        ReRouteIsCaseSensitive = true
+                        RouteIsCaseSensitive = true
                     }
                 }
             };
 
-            var reRoutes = new List<ReRoute>
+            var routes = new List<Route>
             {
-                new ReRouteBuilder().WithDownstreamReRoute(new DownstreamReRouteBuilder().WithKey("key1").Build()).Build(),
-                new ReRouteBuilder().WithDownstreamReRoute(new DownstreamReRouteBuilder().WithKey("key2").Build()).Build(),
-                new ReRouteBuilder().WithDownstreamReRoute(new DownstreamReRouteBuilder().WithKey("key3").Build()).Build(),
-                new ReRouteBuilder().WithDownstreamReRoute(new DownstreamReRouteBuilder().WithKey("key4").Build()).Build()
+                new RouteBuilder().WithDownstreamRoute(new DownstreamRouteBuilder().WithKey("key1").Build()).Build(),
+                new RouteBuilder().WithDownstreamRoute(new DownstreamRouteBuilder().WithKey("key2").Build()).Build(),
+                new RouteBuilder().WithDownstreamRoute(new DownstreamRouteBuilder().WithKey("key3").Build()).Build(),
+                new RouteBuilder().WithDownstreamRoute(new DownstreamRouteBuilder().WithKey("key4").Build()).Build()
             };
 
             this.Given(_ => GivenThe(fileConfig))
-                .And(_ => GivenThe(reRoutes))
+                .And(_ => GivenThe(routes))
                 .And(_ => GivenTheUtpCreatorReturns())
                 .When(_ => WhenICreate())
                 .Then(_ => ThenTheUtpCreatorIsCalledCorrectly())
@@ -104,15 +104,15 @@ namespace Ocelot.UnitTests.Configuration
             _result[0].UpstreamHost.ShouldBe(_fileConfiguration.Aggregates[0].UpstreamHost);
             _result[0].UpstreamTemplatePattern.ShouldBe(_aggregate1Utp);
             _result[0].Aggregator.ShouldBe(_fileConfiguration.Aggregates[0].Aggregator);
-            _result[0].DownstreamReRoute.ShouldContain(x => x == _reRoutes[0].DownstreamReRoute[0]);
-            _result[0].DownstreamReRoute.ShouldContain(x => x == _reRoutes[1].DownstreamReRoute[0]);
+            _result[0].DownstreamRoute.ShouldContain(x => x == _routes[0].DownstreamRoute[0]);
+            _result[0].DownstreamRoute.ShouldContain(x => x == _routes[1].DownstreamRoute[0]);
 
             _result[1].UpstreamHttpMethod.ShouldContain(x => x == HttpMethod.Get);
             _result[1].UpstreamHost.ShouldBe(_fileConfiguration.Aggregates[1].UpstreamHost);
             _result[1].UpstreamTemplatePattern.ShouldBe(_aggregate2Utp);
             _result[1].Aggregator.ShouldBe(_fileConfiguration.Aggregates[1].Aggregator);
-            _result[1].DownstreamReRoute.ShouldContain(x => x == _reRoutes[2].DownstreamReRoute[0]);
-            _result[1].DownstreamReRoute.ShouldContain(x => x == _reRoutes[3].DownstreamReRoute[0]);
+            _result[1].DownstreamRoute.ShouldContain(x => x == _routes[2].DownstreamRoute[0]);
+            _result[1].DownstreamRoute.ShouldContain(x => x == _routes[3].DownstreamRoute[0]);
         }
 
         private void ThenTheUtpCreatorIsCalledCorrectly()
@@ -126,7 +126,7 @@ namespace Ocelot.UnitTests.Configuration
             _aggregate1Utp = new UpstreamPathTemplateBuilder().Build();
             _aggregate2Utp = new UpstreamPathTemplateBuilder().Build();
 
-            _utpCreator.SetupSequence(x => x.Create(It.IsAny<IReRoute>()))
+            _utpCreator.SetupSequence(x => x.Create(It.IsAny<IRoute>()))
                 .Returns(_aggregate1Utp)
                 .Returns(_aggregate2Utp);
         }
@@ -143,7 +143,7 @@ namespace Ocelot.UnitTests.Configuration
 
         private void TheUtpCreatorIsNotCalled()
         {
-            _utpCreator.Verify(x => x.Create(It.IsAny<FileAggregateReRoute>()), Times.Never);
+            _utpCreator.Verify(x => x.Create(It.IsAny<FileAggregateRoute>()), Times.Never);
         }
 
         private void GivenThe(FileConfiguration fileConfiguration)
@@ -151,14 +151,14 @@ namespace Ocelot.UnitTests.Configuration
             _fileConfiguration = fileConfiguration;
         }
 
-        private void GivenThe(List<ReRoute> reRoutes)
+        private void GivenThe(List<Route> routes)
         {
-            _reRoutes = reRoutes;
+            _routes = routes;
         }
 
         private void WhenICreate()
         {
-            _result = _creator.Create(_fileConfiguration, _reRoutes);
+            _result = _creator.Create(_fileConfiguration, _routes);
         }
     }
 }

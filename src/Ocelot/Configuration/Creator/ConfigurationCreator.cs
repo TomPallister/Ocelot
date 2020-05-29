@@ -32,7 +32,7 @@ namespace Ocelot.Configuration.Creator
             _versionCreator = versionCreator;
         }
 
-        public InternalConfiguration Create(FileConfiguration fileConfiguration, List<ReRoute> reRoutes)
+        public InternalConfiguration Create(FileConfiguration fileConfiguration, List<Route> routes)
         {
             var serviceProviderConfiguration = _serviceProviderConfigCreator.Create(fileConfiguration.GlobalConfiguration);
 
@@ -46,7 +46,7 @@ namespace Ocelot.Configuration.Creator
 
             var version = _versionCreator.Create(fileConfiguration.GlobalConfiguration.DownstreamHttpVersion);
 
-            return new InternalConfiguration(reRoutes,
+            return new InternalConfiguration(routes,
                 adminPath,
                 serviceProviderConfiguration,
                 fileConfiguration.GlobalConfiguration.RequestIdKey,

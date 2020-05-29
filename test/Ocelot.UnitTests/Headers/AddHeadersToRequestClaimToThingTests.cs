@@ -150,7 +150,7 @@ namespace Ocelot.UnitTests.Headers
         private class AnyError : Error
         {
             public AnyError()
-                : base("blahh", OcelotErrorCode.UnknownError)
+                : base("blahh", OcelotErrorCode.UnknownError, 404)
             {
             }
         }

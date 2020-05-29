@@ -1,10 +1,7 @@
 Caching
 =======
 
-Ocelot supports some very rudimentary caching at the moment provider by 
-the `CacheManager <https://github.com/MichaCo/CacheManager>`_ project. This is an amazing project
-that is solving a lot of caching problems. I would reccomend using this package to 
-cache with Ocelot. 
+Ocelot supports some very rudimentary caching at the moment provider by the `CacheManager <https://github.com/MichaCo/CacheManager>`_ project. This is an amazing project that is solving a lot of caching problems. I would reccomend using this package to cache with Ocelot. 
 
 The following example shows how to add CacheManager to Ocelot so that you can do output caching. 
 
@@ -24,7 +21,7 @@ The second thing you need to do something like the following to your ConfigureSe
             x.WithDictionaryHandle();
         })
 
-Finally in order to use caching on a route in your ReRoute configuration add this setting.
+Finally in order to use caching on a route in your Route configuration add this setting.
 
 .. code-block:: json
 
@@ -32,19 +29,14 @@ Finally in order to use caching on a route in your ReRoute configuration add thi
 
 In this example ttl seconds is set to 15 which means the cache will expire after 15 seconds.
 
-If you look at the example `here <https://github.com/ThreeMammals/Ocelot/blob/master/test/Ocelot.ManualTest/Program.cs>`_ you can see how the cache manager 
-is setup and then passed into the Ocelot AddCacheManager configuration method. You can use any settings supported by 
-the CacheManager package and just pass them in.
+If you look at the example `here <https://github.com/ThreeMammals/Ocelot/blob/master/test/Ocelot.ManualTest/Program.cs>`_ you can see how the cache manager is setup and then passed into the Ocelot AddCacheManager configuration method. You can use any settings supported by the CacheManager package and just pass them in.
 
-Anyway Ocelot currently supports caching on the URL of the downstream service 
-and setting a TTL in seconds to expire the cache. You can also clear the cache for a region
-by calling Ocelot's administration API.
+Anyway Ocelot currently supports caching on the URL of the downstream service and setting a TTL in seconds to expire the cache. You can also clear the cache for a region by calling Ocelot's administration API.
 
 Your own caching
 ^^^^^^^^^^^^^^^^
 
-If you want to add your own caching method implement the following interfaces and register them in DI 
-e.g. ``services.AddSingleton<IOcelotCache<CachedResponse>, MyCache>()``
+If you want to add your own caching method implement the following interfaces and register them in DI e.g. ``services.AddSingleton<IOcelotCache<CachedResponse>, MyCache>()``
 
 ``IOcelotCache<CachedResponse>`` this is for output caching.
 

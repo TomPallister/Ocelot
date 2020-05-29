@@ -1,44 +1,47 @@
-﻿using Ocelot.Logging;
-using Ocelot.Middleware;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace Ocelot.Security.Middleware
+﻿namespace Ocelot.Security.Middleware
 {
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+
     public class SecurityMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
-        private readonly IOcelotLogger _logger;
+        private readonly RequestDelegate _next;
         private readonly IEnumerable<ISecurityPolicy> _securityPolicies;
 
-        public SecurityMiddleware(IOcelotLoggerFactory loggerFactory,
-            IEnumerable<ISecurityPolicy> securityPolicies,
-            OcelotRequestDelegate next)
+        public SecurityMiddleware(RequestDelegate next, 
+            IOcelotLoggerFactory loggerFactory,
+            IEnumerable<ISecurityPolicy> securityPolicies
+            )
             : base(loggerFactory.CreateLogger<SecurityMiddleware>())
         {
-            _logger = loggerFactory.CreateLogger<SecurityMiddleware>();
             _securityPolicies = securityPolicies;
             _next = next;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+
             if (_securityPolicies != null)
             {
-                foreach (var policie in _securityPolicies)
+                foreach (var policy in _securityPolicies)
                 {
-                    var result = await policie.Security(context);
+                    var result = await policy.Security(downstreamRoute, httpContext);
                     if (!result.IsError)
                     {
                         continue;
                     }
 
-                    this.SetPipelineError(context, result.Errors);
+                    httpContext.Items.UpsertErrors(result.Errors);
                     return;
                 }
             }
 
-            await _next.Invoke(context);
+            await _next.Invoke(httpContext);
         }
     }
 }

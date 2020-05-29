@@ -5,7 +5,7 @@ Thanks to `@catcherwong article <http://www.c-sharpcorner.com/article/building-a
 
 Ocelot supports rate limiting of upstream requests so that your downstream services do not become overloaded. This feature was added by @geffzhang on GitHub! Thanks very much.
 
-OK so to get rate limiting working for a ReRoute you need to add the following json to it. 
+OK so to get rate limiting working for a Route you need to add the following json to it. 
 
 .. code-block:: json
 
