@@ -40,7 +40,7 @@
             var downstreamRequest = httpContext.Items.DownstreamRequest();
 
             var downstreamUrlKey = $"{downstreamRequest.Method}-{downstreamRequest.OriginalString}";
-            string downStreamRequestCacheKey = _cacheGenerator.GenerateRequestCacheKey(downstreamRequest);
+            string downStreamRequestCacheKey = _cacheGenerator.GenerateRequestCacheKey(downstreamRequest, downstreamRoute);
 
             Logger.LogDebug($"Started checking cache for {downstreamUrlKey}");
 
