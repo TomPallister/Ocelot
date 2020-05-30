@@ -35,7 +35,7 @@ namespace Ocelot.Authentication.Middleware
                     $"{httpContext.Request.Path} is an authenticated route. {MiddlewareName} checking if client is authenticated");
 
                 var token = httpContext.Request.Headers
-                    .First(r => r.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefault(r => r.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase));
 
                 var cacheKey = $"identityToken.{token}";
 
