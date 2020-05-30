@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
@@ -73,7 +74,7 @@ namespace Ocelot.UnitTests.Authentication
                 _httpContext.Response.Body = stream;
                 return Task.CompletedTask;
             };
-            _middleware = new AuthenticationMiddleware(_next, _factory.Object);
+            _middleware = new AuthenticationMiddleware(_next, _factory.Object, new MemoryCache(new MemoryCacheOptions()));
             _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
