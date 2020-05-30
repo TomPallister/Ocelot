@@ -47,7 +47,7 @@ namespace Ocelot.Authentication.Middleware
 
                     userClaim = result.Principal;
 
-                    _memoryCache.Set(cacheKey, userClaim, TimeSpan.FromMinutes(10));
+                    _memoryCache.Set(cacheKey, userClaim, TimeSpan.FromMinutes(5));
                 }
 
                 httpContext.User = userClaim;

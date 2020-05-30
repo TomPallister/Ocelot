@@ -1,3 +1,6 @@
+using Microsoft.Extensions.Caching.Memory;
+using Ocelot.Cache;
+
 namespace Ocelot.UnitTests.Configuration
 {
     using Microsoft.AspNetCore.Hosting;
@@ -39,7 +42,8 @@ namespace Ocelot.UnitTests.Configuration
             _hostingEnvironment.Setup(he => he.EnvironmentName).Returns(_environmentName);
             _changeTokenSource = new Mock<IOcelotConfigurationChangeTokenSource>(MockBehavior.Strict);
             _changeTokenSource.Setup(m => m.Activate());
-            _repo = new DiskFileConfigurationRepository(_hostingEnvironment.Object, _changeTokenSource.Object);
+            var aspMemoryCache = new AspMemoryCache<FileConfiguration>(new MemoryCache(new MemoryCacheOptions()));
+            _repo = new DiskFileConfigurationRepository(_hostingEnvironment.Object, _changeTokenSource.Object, aspMemoryCache);
         }
 
         [Fact]
@@ -122,7 +126,8 @@ namespace Ocelot.UnitTests.Configuration
         {
             _environmentName = null;
             _hostingEnvironment.Setup(he => he.EnvironmentName).Returns(_environmentName);
-            _repo = new DiskFileConfigurationRepository(_hostingEnvironment.Object, _changeTokenSource.Object);
+            var aspMemoryCache = new AspMemoryCache<FileConfiguration>(new MemoryCache(new MemoryCacheOptions()));
+            _repo = new DiskFileConfigurationRepository(_hostingEnvironment.Object, _changeTokenSource.Object, aspMemoryCache);
         }
 
         private void GivenIHaveAConfiguration(FileConfiguration fileConfiguration)

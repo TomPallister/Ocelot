@@ -77,7 +77,7 @@
 
             if (result.Response)
             {
-                _cache.AddAndDelete(_configurationKey, ocelotConfiguration, TimeSpan.FromSeconds(3), _configurationKey);
+                _cache.AddAndDelete(_configurationKey, ocelotConfiguration, TimeSpan.FromSeconds(5), _configurationKey);
 
                 return new OkResponse();
             }
