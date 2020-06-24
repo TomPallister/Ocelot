@@ -1,0 +1,27 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/xservice.svc/serviceMethodA/byNumber/{number}",
+      "UpstreamPathTemplate": "/gw/serviceMethodA/byNumber/{number}",
+      "UpstreamHttpMethod": [
+        "Get",
+        "Post"
+      ],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "host",
+          "Port": 80
+        }
+      ],
+      "CustomStrategyProperty": {
+        "GET": [
+          "SomeCustomStrategyMethodA"
+        ],
+        "POST": [
+          "SomeCustomStrategyMethodB"
+        ]
+      }
+    }
+  ]
+}

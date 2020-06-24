@@ -1,0 +1,17 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/b/{action}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 34234
+        }
+      ],
+      "UpstreamPathTemplate": "/b/{action}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "MyCustomProperty": [ "myValue" ]
+    }
+  ]
+}

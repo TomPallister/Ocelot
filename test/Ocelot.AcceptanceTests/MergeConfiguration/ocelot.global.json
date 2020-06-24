@@ -1,0 +1,20 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/{global}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 24012
+        }
+      ],
+      "UpstreamPathTemplate": "/{global}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "somethingmore": "something"
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://api.test.com"
+  }
+}
