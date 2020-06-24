@@ -8,6 +8,6 @@
 
     public interface IRequestMapper
     {
-        Task<Response<HttpRequestMessage>> Map(HttpRequest request, DownstreamReRoute downstreamReRoute);
+        Task<Response<HttpRequestMessage>> Map(HttpRequest request, DownstreamRoute downstreamRoute);
     }
 }

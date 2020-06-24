@@ -16,54 +16,54 @@
     {
         private readonly List<ServiceDiscoveryFinderDelegate> _serviceDiscoveryFinderDelegates;
 
-        public FileConfigurationFluentValidator(IServiceProvider provider, ReRouteFluentValidator reRouteFluentValidator, FileGlobalConfigurationFluentValidator fileGlobalConfigurationFluentValidator)
+        public FileConfigurationFluentValidator(IServiceProvider provider, RouteFluentValidator routeFluentValidator, FileGlobalConfigurationFluentValidator fileGlobalConfigurationFluentValidator)
         {
             _serviceDiscoveryFinderDelegates = provider
                 .GetServices<ServiceDiscoveryFinderDelegate>()
                 .ToList();
 
-            RuleForEach(configuration => configuration.ReRoutes)
-                .SetValidator(reRouteFluentValidator);
+            RuleForEach(configuration => configuration.Routes)
+                .SetValidator(routeFluentValidator);
 
             RuleFor(configuration => configuration.GlobalConfiguration)
                 .SetValidator(fileGlobalConfigurationFluentValidator);
 
-            RuleForEach(configuration => configuration.ReRoutes)
-                .Must((config, reRoute) => IsNotDuplicateIn(reRoute, config.ReRoutes))
-                .WithMessage((config, reRoute) => $"{nameof(reRoute)} {reRoute.UpstreamPathTemplate} has duplicate");
+            RuleForEach(configuration => configuration.Routes)
+                .Must((config, route) => IsNotDuplicateIn(route, config.Routes))
+                .WithMessage((config, route) => $"{nameof(route)} {route.UpstreamPathTemplate} has duplicate");
 
-            RuleForEach(configuration => configuration.ReRoutes)
-                .Must((config, reRoute) => HaveServiceDiscoveryProviderRegistered(reRoute, config.GlobalConfiguration.ServiceDiscoveryProvider))
-                .WithMessage((config, reRoute) => $"Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
+            RuleForEach(configuration => configuration.Routes)
+                .Must((config, route) => HaveServiceDiscoveryProviderRegistered(route, config.GlobalConfiguration.ServiceDiscoveryProvider))
+                .WithMessage((config, route) => $"Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
 
-            RuleForEach(configuration => configuration.ReRoutes)
-                .Must((config, reRoute) => IsPlaceholderNotDuplicatedIn(reRoute.UpstreamPathTemplate))
-                .WithMessage((config, reRoute) => $"{nameof(reRoute)} {reRoute.UpstreamPathTemplate} has duplicated placeholder");
+            RuleForEach(configuration => configuration.Routes)
+                .Must((config, route) => IsPlaceholderNotDuplicatedIn(route.UpstreamPathTemplate))
+                .WithMessage((config, route) => $"{nameof(route)} {route.UpstreamPathTemplate} has duplicated placeholder");
 
             RuleFor(configuration => configuration.GlobalConfiguration.ServiceDiscoveryProvider)
                 .Must(HaveServiceDiscoveryProviderRegistered)
-                .WithMessage((config, reRoute) => $"Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
+                .WithMessage((config, route) => $"Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
 
-            RuleForEach(configuration => configuration.ReRoutes)
-                .Must((config, reRoute) => IsNotDuplicateIn(reRoute, config.Aggregates))
-                .WithMessage((config, reRoute) => $"{nameof(reRoute)} {reRoute.UpstreamPathTemplate} has duplicate aggregate");
+            RuleForEach(configuration => configuration.Routes)
+                .Must((config, route) => IsNotDuplicateIn(route, config.Aggregates))
+                .WithMessage((config, route) => $"{nameof(route)} {route.UpstreamPathTemplate} has duplicate aggregate");
 
             RuleForEach(configuration => configuration.Aggregates)
-                .Must((config, aggregateReRoute) => IsNotDuplicateIn(aggregateReRoute, config.Aggregates))
+                .Must((config, aggregateRoute) => IsNotDuplicateIn(aggregateRoute, config.Aggregates))
                 .WithMessage((config, aggregate) => $"{nameof(aggregate)} {aggregate.UpstreamPathTemplate} has duplicate aggregate");
 
             RuleForEach(configuration => configuration.Aggregates)
-                .Must((config, aggregateReRoute) => AllReRoutesForAggregateExist(aggregateReRoute, config.ReRoutes))
-                .WithMessage((config, aggregateReRoute) => $"ReRoutes for {nameof(aggregateReRoute)} {aggregateReRoute.UpstreamPathTemplate} either do not exist or do not have correct ServiceName property");
+                .Must((config, aggregateRoute) => AllRoutesForAggregateExist(aggregateRoute, config.Routes))
+                .WithMessage((config, aggregateRoute) => $"Routes for {nameof(aggregateRoute)} {aggregateRoute.UpstreamPathTemplate} either do not exist or do not have correct ServiceName property");
 
             RuleForEach(configuration => configuration.Aggregates)
-                .Must((config, aggregateReRoute) => DoesNotContainReRoutesWithSpecificRequestIdKeys(aggregateReRoute, config.ReRoutes))
-                .WithMessage((config, aggregateReRoute) => $"{nameof(aggregateReRoute)} {aggregateReRoute.UpstreamPathTemplate} contains ReRoute with specific RequestIdKey, this is not possible with Aggregates");
+                .Must((config, aggregateRoute) => DoesNotContainRoutesWithSpecificRequestIdKeys(aggregateRoute, config.Routes))
+                .WithMessage((config, aggregateRoute) => $"{nameof(aggregateRoute)} {aggregateRoute.UpstreamPathTemplate} contains Route with specific RequestIdKey, this is not possible with Aggregates");
         }
 
-        private bool HaveServiceDiscoveryProviderRegistered(FileReRoute reRoute, FileServiceDiscoveryProvider serviceDiscoveryProvider)
+        private bool HaveServiceDiscoveryProviderRegistered(FileRoute route, FileServiceDiscoveryProvider serviceDiscoveryProvider)
         {
-            if (string.IsNullOrEmpty(reRoute.ServiceName))
+            if (string.IsNullOrEmpty(route.ServiceName))
             {
                 return true;
             }
@@ -107,11 +107,11 @@
             return new OkResponse<ConfigurationValidationResult>(result);
         }
 
-        private bool AllReRoutesForAggregateExist(FileAggregateReRoute fileAggregateReRoute, List<FileReRoute> reRoutes)
+        private bool AllRoutesForAggregateExist(FileAggregateRoute fileAggregateRoute, List<FileRoute> routes)
         {
-            var reRoutesForAggregate = reRoutes.Where(r => fileAggregateReRoute.ReRouteKeys.Contains(r.Key));
+            var routesForAggregate = routes.Where(r => fileAggregateRoute.RouteKeys.Contains(r.Key));
 
-            return reRoutesForAggregate.Count() == fileAggregateReRoute.ReRouteKeys.Count;
+            return routesForAggregate.Count() == fileAggregateRoute.RouteKeys.Count;
         }
 
         private bool IsPlaceholderNotDuplicatedIn(string upstreamPathTemplate)
@@ -122,34 +122,34 @@
             return upstreamPathPlaceholders.Count() == upstreamPathPlaceholders.Distinct().Count();
         }
 
-        private static bool DoesNotContainReRoutesWithSpecificRequestIdKeys(FileAggregateReRoute fileAggregateReRoute,
-            List<FileReRoute> reRoutes)
+        private static bool DoesNotContainRoutesWithSpecificRequestIdKeys(FileAggregateRoute fileAggregateRoute,
+            List<FileRoute> routes)
         {
-            var reRoutesForAggregate = reRoutes.Where(r => fileAggregateReRoute.ReRouteKeys.Contains(r.Key));
+            var routesForAggregate = routes.Where(r => fileAggregateRoute.RouteKeys.Contains(r.Key));
 
-            return reRoutesForAggregate.All(r => string.IsNullOrEmpty(r.RequestIdKey));
+            return routesForAggregate.All(r => string.IsNullOrEmpty(r.RequestIdKey));
         }
 
-        private static bool IsNotDuplicateIn(FileReRoute reRoute,
-            List<FileReRoute> reRoutes)
+        private static bool IsNotDuplicateIn(FileRoute route,
+            List<FileRoute> routes)
         {
-            var matchingReRoutes = reRoutes
-                .Where(r => r.UpstreamPathTemplate == reRoute.UpstreamPathTemplate
-                            && r.UpstreamHost == reRoute.UpstreamHost)
+            var matchingRoutes = routes
+                .Where(r => r.UpstreamPathTemplate == route.UpstreamPathTemplate
+                            && r.UpstreamHost == route.UpstreamHost)
                 .ToList();
 
-            if (matchingReRoutes.Count == 1)
+            if (matchingRoutes.Count == 1)
             {
                 return true;
             }
 
-            var allowAllVerbs = matchingReRoutes.Any(x => x.UpstreamHttpMethod.Count == 0);
+            var allowAllVerbs = matchingRoutes.Any(x => x.UpstreamHttpMethod.Count == 0);
 
-            var duplicateAllowAllVerbs = matchingReRoutes.Count(x => x.UpstreamHttpMethod.Count == 0) > 1;
+            var duplicateAllowAllVerbs = matchingRoutes.Count(x => x.UpstreamHttpMethod.Count == 0) > 1;
 
-            var specificVerbs = matchingReRoutes.Any(x => x.UpstreamHttpMethod.Count != 0);
+            var specificVerbs = matchingRoutes.Any(x => x.UpstreamHttpMethod.Count != 0);
 
-            var duplicateSpecificVerbs = matchingReRoutes.SelectMany(x => x.UpstreamHttpMethod).GroupBy(x => x.ToLower()).SelectMany(x => x.Skip(1)).Any();
+            var duplicateSpecificVerbs = matchingRoutes.SelectMany(x => x.UpstreamHttpMethod).GroupBy(x => x.ToLower()).SelectMany(x => x.Skip(1)).Any();
 
             if (duplicateAllowAllVerbs || duplicateSpecificVerbs || (allowAllVerbs && specificVerbs))
             {
@@ -159,26 +159,26 @@
             return true;
         }
 
-        private static bool IsNotDuplicateIn(FileReRoute reRoute,
-            List<FileAggregateReRoute> aggregateReRoutes)
+        private static bool IsNotDuplicateIn(FileRoute route,
+            List<FileAggregateRoute> aggregateRoutes)
         {
-            var duplicate = aggregateReRoutes
-                .Any(a => a.UpstreamPathTemplate == reRoute.UpstreamPathTemplate
-                            && a.UpstreamHost == reRoute.UpstreamHost
-                            && reRoute.UpstreamHttpMethod.Select(x => x.ToLower()).Contains("get"));
+            var duplicate = aggregateRoutes
+                .Any(a => a.UpstreamPathTemplate == route.UpstreamPathTemplate
+                            && a.UpstreamHost == route.UpstreamHost
+                            && route.UpstreamHttpMethod.Select(x => x.ToLower()).Contains("get"));
 
             return !duplicate;
         }
 
-        private static bool IsNotDuplicateIn(FileAggregateReRoute reRoute,
-            List<FileAggregateReRoute> aggregateReRoutes)
+        private static bool IsNotDuplicateIn(FileAggregateRoute route,
+            List<FileAggregateRoute> aggregateRoutes)
         {
-            var matchingReRoutes = aggregateReRoutes
-                .Where(r => r.UpstreamPathTemplate == reRoute.UpstreamPathTemplate
-                            && r.UpstreamHost == reRoute.UpstreamHost)
+            var matchingRoutes = aggregateRoutes
+                .Where(r => r.UpstreamPathTemplate == route.UpstreamPathTemplate
+                            && r.UpstreamHost == route.UpstreamHost)
                 .ToList();
 
-            return matchingReRoutes.Count <= 1;
+            return matchingRoutes.Count <= 1;
         }
     }
 }

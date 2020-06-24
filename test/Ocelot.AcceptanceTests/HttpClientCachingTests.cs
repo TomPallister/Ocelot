@@ -31,9 +31,9 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -73,9 +73,9 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -90,7 +90,7 @@ namespace Ocelot.AcceptanceTests
                         UpstreamPathTemplate = "/",
                         UpstreamHttpMethod = new List<string> { "Get" },
                     },
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/two",
                         DownstreamScheme = "http",
@@ -143,19 +143,19 @@ namespace Ocelot.AcceptanceTests
 
         public class FakeHttpClientCache : IHttpClientCache
         {
-            private readonly ConcurrentDictionary<DownstreamReRoute, IHttpClient> _httpClientsCache;
+            private readonly ConcurrentDictionary<DownstreamRoute, IHttpClient> _httpClientsCache;
 
             public FakeHttpClientCache()
             {
-                _httpClientsCache = new ConcurrentDictionary<DownstreamReRoute, IHttpClient>();
+                _httpClientsCache = new ConcurrentDictionary<DownstreamRoute, IHttpClient>();
             }
 
-            public void Set(DownstreamReRoute key, IHttpClient client, TimeSpan expirationTime)
+            public void Set(DownstreamRoute key, IHttpClient client, TimeSpan expirationTime)
             {
                 _httpClientsCache.AddOrUpdate(key, client, (k, oldValue) => client);
             }
 
-            public IHttpClient Get(DownstreamReRoute key)
+            public IHttpClient Get(DownstreamRoute key)
             {
                 //todo handle error?
                 return _httpClientsCache.TryGetValue(key, out var client) ? client : null;

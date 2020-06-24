@@ -22,6 +22,11 @@ namespace Ocelot.Responder
                 return 403;
             }
 
+            if (errors.Any(e => e.Code == OcelotErrorCode.QuotaExceededError))
+            {
+                return errors.Single(e => e.Code == OcelotErrorCode.QuotaExceededError).HttpStatusCode;
+            }
+
             if (errors.Any(e => e.Code == OcelotErrorCode.RequestTimedOutError))
             {
                 return 503;

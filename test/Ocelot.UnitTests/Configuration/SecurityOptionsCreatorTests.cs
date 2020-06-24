@@ -10,7 +10,7 @@ namespace Ocelot.UnitTests.Configuration
 {
     public class SecurityOptionsCreatorTests
     {
-        private FileReRoute _fileReRoute;
+        private FileRoute _fileRoute;
         private FileGlobalConfiguration _fileGlobalConfig;
         private SecurityOptions _result;
         private ISecurityOptionsCreator _creator;
@@ -25,7 +25,7 @@ namespace Ocelot.UnitTests.Configuration
         {
             var ipAllowedList = new List<string>() { "127.0.0.1", "192.168.1.1" };
             var ipBlockedList = new List<string>() { "127.0.0.1", "192.168.1.1" };
-            var fileReRoute = new FileReRoute
+            var fileRoute = new FileRoute
             {
                 SecurityOptions = new FileSecurityOptions()
                 {
@@ -36,20 +36,20 @@ namespace Ocelot.UnitTests.Configuration
 
             var expected = new SecurityOptions(ipAllowedList, ipBlockedList);
 
-            this.Given(x => x.GivenThe(fileReRoute))
+            this.Given(x => x.GivenThe(fileRoute))
               .When(x => x.WhenICreate())
               .Then(x => x.ThenTheResultIs(expected))
               .BDDfy();
         }
 
-        private void GivenThe(FileReRoute reRoute)
+        private void GivenThe(FileRoute route)
         {
-            _fileReRoute = reRoute;
+            _fileRoute = route;
         }
 
         private void WhenICreate()
         {
-            _result = _creator.Create(_fileReRoute.SecurityOptions);
+            _result = _creator.Create(_fileRoute.SecurityOptions);
         }
 
         private void ThenTheResultIs(SecurityOptions expected)

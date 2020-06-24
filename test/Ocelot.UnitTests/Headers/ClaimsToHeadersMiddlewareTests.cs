@@ -1,16 +1,16 @@
-﻿using Ocelot.Middleware;
-
-namespace Ocelot.UnitTests.Headers
+﻿namespace Ocelot.UnitTests.Headers
 {
     using Microsoft.AspNetCore.Http;
     using Moq;
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using Ocelot.DownstreamRouteFinder;
+    using Ocelot.DownstreamRouteFinder.Middleware;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
     using Ocelot.Headers;
     using Ocelot.Headers.Middleware;
     using Ocelot.Logging;
+    using Ocelot.Middleware;
     using Ocelot.Request.Middleware;
     using Ocelot.Responses;
     using System.Collections.Generic;
@@ -22,31 +22,31 @@ namespace Ocelot.UnitTests.Headers
     public class ClaimsToHeadersMiddlewareTests
     {
         private readonly Mock<IAddHeadersToRequest> _addHeaders;
-        private Response<DownstreamRoute> _downstreamRoute;
+        private Response<Ocelot.DownstreamRouteFinder.DownstreamRouteHolder> _downstreamRoute;
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
         private ClaimsToHeadersMiddleware _middleware;
-        private DownstreamContext _downstreamContext;
-        private OcelotRequestDelegate _next;
+        private RequestDelegate _next;
+        private HttpContext _httpContext;
 
         public ClaimsToHeadersMiddlewareTests()
         {
+            _httpContext = new DefaultHttpContext();
             _addHeaders = new Mock<IAddHeadersToRequest>();
-            _downstreamContext = new DownstreamContext(new DefaultHttpContext());
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<ClaimsToHeadersMiddleware>()).Returns(_logger.Object);
             _next = context => Task.CompletedTask;
             _middleware = new ClaimsToHeadersMiddleware(_next, _loggerFactory.Object, _addHeaders.Object);
-            _downstreamContext.DownstreamRequest = new DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "http://test.com"));
+            _httpContext.Items.UpsertDownstreamRequest(new DownstreamRequest(new HttpRequestMessage(HttpMethod.Get, "http://test.com")));
         }
 
         [Fact]
         public void should_call_add_headers_to_request_correctly()
         {
-            var downstreamRoute = new DownstreamRoute(new List<PlaceholderNameAndValue>(),
-                new ReRouteBuilder()
-                    .WithDownstreamReRoute(new DownstreamReRouteBuilder()
+            var downstreamRoute = new Ocelot.DownstreamRouteFinder.DownstreamRouteHolder(new List<PlaceholderNameAndValue>(),
+                new RouteBuilder()
+                    .WithDownstreamRoute(new DownstreamRouteBuilder()
                             .WithDownstreamPathTemplate("any old string")
                             .WithClaimsToHeaders(new List<ClaimToThing>
                             {
@@ -66,14 +66,16 @@ namespace Ocelot.UnitTests.Headers
 
         private void WhenICallTheMiddleware()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
-        private void GivenTheDownStreamRouteIs(DownstreamRoute downstreamRoute)
+        private void GivenTheDownStreamRouteIs(Ocelot.DownstreamRouteFinder.DownstreamRouteHolder downstreamRoute)
         {
-            _downstreamRoute = new OkResponse<DownstreamRoute>(downstreamRoute);
-            _downstreamContext.TemplatePlaceholderNameAndValues = downstreamRoute.TemplatePlaceholderNameAndValues;
-            _downstreamContext.DownstreamReRoute = downstreamRoute.ReRoute.DownstreamReRoute[0];
+            _downstreamRoute = new OkResponse<Ocelot.DownstreamRouteFinder.DownstreamRouteHolder>(downstreamRoute);
+
+            _httpContext.Items.UpsertTemplatePlaceholderNameAndValues(downstreamRoute.TemplatePlaceholderNameAndValues);
+
+            _httpContext.Items.UpsertDownstreamRoute(downstreamRoute.Route.DownstreamRoute[0]);
         }
 
         private void GivenTheAddHeadersToDownstreamRequestReturnsOk()
@@ -92,7 +94,7 @@ namespace Ocelot.UnitTests.Headers
                 .Verify(x => x.SetHeadersOnDownstreamRequest(
                     It.IsAny<List<ClaimToThing>>(),
                     It.IsAny<IEnumerable<System.Security.Claims.Claim>>(),
-                    _downstreamContext.DownstreamRequest), Times.Once);
+                    _httpContext.Items.DownstreamRequest()), Times.Once);
         }
     }
 }

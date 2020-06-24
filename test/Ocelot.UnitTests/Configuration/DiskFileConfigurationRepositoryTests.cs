@@ -48,7 +48,7 @@ namespace Ocelot.UnitTests.Configuration
             var config = FakeFileConfigurationForGet();
 
             this.Given(_ => GivenTheConfigurationIs(config))
-                .When(_ => WhenIGetTheReRoutes())
+                .When(_ => WhenIGetTheRoutes())
                 .Then(_ => ThenTheFollowingIsReturned(config))
                 .BDDfy();
         }
@@ -60,7 +60,7 @@ namespace Ocelot.UnitTests.Configuration
 
             this.Given(_ => GivenTheEnvironmentNameIsUnavailable())
                 .And(_ => GivenTheConfigurationIs(config))
-                .When(_ => WhenIGetTheReRoutes())
+                .When(_ => WhenIGetTheRoutes())
                 .Then(_ => ThenTheFollowingIsReturned(config))
                 .BDDfy();
         }
@@ -143,19 +143,19 @@ namespace Ocelot.UnitTests.Configuration
             _result.GlobalConfiguration.ServiceDiscoveryProvider.Host.ShouldBe(expecteds.GlobalConfiguration.ServiceDiscoveryProvider.Host);
             _result.GlobalConfiguration.ServiceDiscoveryProvider.Port.ShouldBe(expecteds.GlobalConfiguration.ServiceDiscoveryProvider.Port);
 
-            for (var i = 0; i < _result.ReRoutes.Count; i++)
+            for (var i = 0; i < _result.Routes.Count; i++)
             {
-                for (int j = 0; j < _result.ReRoutes[i].DownstreamHostAndPorts.Count; j++)
+                for (int j = 0; j < _result.Routes[i].DownstreamHostAndPorts.Count; j++)
                 {
-                    var result = _result.ReRoutes[i].DownstreamHostAndPorts[j];
-                    var expected = expecteds.ReRoutes[i].DownstreamHostAndPorts[j];
+                    var result = _result.Routes[i].DownstreamHostAndPorts[j];
+                    var expected = expecteds.Routes[i].DownstreamHostAndPorts[j];
 
                     result.Host.ShouldBe(expected.Host);
                     result.Port.ShouldBe(expected.Port);
                 }
 
-                _result.ReRoutes[i].DownstreamPathTemplate.ShouldBe(expecteds.ReRoutes[i].DownstreamPathTemplate);
-                _result.ReRoutes[i].DownstreamScheme.ShouldBe(expecteds.ReRoutes[i].DownstreamScheme);
+                _result.Routes[i].DownstreamPathTemplate.ShouldBe(expecteds.Routes[i].DownstreamPathTemplate);
+                _result.Routes[i].DownstreamScheme.ShouldBe(expecteds.Routes[i].DownstreamScheme);
             }
         }
 
@@ -189,7 +189,7 @@ namespace Ocelot.UnitTests.Configuration
             resultText.ShouldBe(expectedText);
         }
 
-        private void WhenIGetTheReRoutes()
+        private void WhenIGetTheRoutes()
         {
             _result = _repo.Get().Result.Data;
         }
@@ -201,19 +201,19 @@ namespace Ocelot.UnitTests.Configuration
             _result.GlobalConfiguration.ServiceDiscoveryProvider.Host.ShouldBe(expecteds.GlobalConfiguration.ServiceDiscoveryProvider.Host);
             _result.GlobalConfiguration.ServiceDiscoveryProvider.Port.ShouldBe(expecteds.GlobalConfiguration.ServiceDiscoveryProvider.Port);
 
-            for (var i = 0; i < _result.ReRoutes.Count; i++)
+            for (var i = 0; i < _result.Routes.Count; i++)
             {
-                for (int j = 0; j < _result.ReRoutes[i].DownstreamHostAndPorts.Count; j++)
+                for (int j = 0; j < _result.Routes[i].DownstreamHostAndPorts.Count; j++)
                 {
-                    var result = _result.ReRoutes[i].DownstreamHostAndPorts[j];
-                    var expected = expecteds.ReRoutes[i].DownstreamHostAndPorts[j];
+                    var result = _result.Routes[i].DownstreamHostAndPorts[j];
+                    var expected = expecteds.Routes[i].DownstreamHostAndPorts[j];
 
                     result.Host.ShouldBe(expected.Host);
                     result.Port.ShouldBe(expected.Port);
                 }
 
-                _result.ReRoutes[i].DownstreamPathTemplate.ShouldBe(expecteds.ReRoutes[i].DownstreamPathTemplate);
-                _result.ReRoutes[i].DownstreamScheme.ShouldBe(expecteds.ReRoutes[i].DownstreamScheme);
+                _result.Routes[i].DownstreamPathTemplate.ShouldBe(expecteds.Routes[i].DownstreamPathTemplate);
+                _result.Routes[i].DownstreamScheme.ShouldBe(expecteds.Routes[i].DownstreamScheme);
             }
         }
 
@@ -224,9 +224,9 @@ namespace Ocelot.UnitTests.Configuration
 
         private FileConfiguration FakeFileConfigurationForSet()
         {
-            var reRoutes = new List<FileReRoute>
+            var routes = new List<FileRoute>
             {
-                new FileReRoute
+                new FileRoute
                 {
                     DownstreamHostAndPorts = new List<FileHostAndPort>
                     {
@@ -254,15 +254,15 @@ namespace Ocelot.UnitTests.Configuration
             return new FileConfiguration
             {
                 GlobalConfiguration = globalConfiguration,
-                ReRoutes = reRoutes
+                Routes = routes
             };
         }
 
         private FileConfiguration FakeFileConfigurationForGet()
         {
-            var reRoutes = new List<FileReRoute>
+            var routes = new List<FileRoute>
             {
-                new FileReRoute
+                new FileRoute
                 {
                     DownstreamHostAndPorts = new List<FileHostAndPort>
                     {
@@ -290,7 +290,7 @@ namespace Ocelot.UnitTests.Configuration
             return new FileConfiguration
             {
                 GlobalConfiguration = globalConfiguration,
-                ReRoutes = reRoutes
+                Routes = routes
             };
         }
 

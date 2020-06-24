@@ -3,10 +3,8 @@
 Service Discovery
 =================
 
-Ocelot allows you to specify a service discovery provider and will use this to find the host and port 
-for the downstream service Ocelot is forwarding a request to. At the moment this is only supported in the
-GlobalConfiguration section which means the same service discovery provider will be used for all ReRoutes
-you specify a ServiceName for at ReRoute level. 
+Ocelot allows you to specify a service discovery provider and will use this to find the host and port for the downstream service Ocelot is forwarding a request to. At the moment this is only supported in the
+GlobalConfiguration section which means the same service discovery provider will be used for all Routes you specify a ServiceName for at Route level. 
 
 Consul
 ^^^^^^
@@ -36,11 +34,9 @@ Please note the Scheme option defauls to HTTP. It was added in this `PR <https:/
         "Type": "Consul"
     }
 
-In the future we can add a feature that allows ReRoute specfic configuration. 
+In the future we can add a feature that allows Route specfic configuration. 
 
-In order to tell Ocelot a ReRoute is to use the service discovery provider for its host and port you must add the 
-ServiceName and load balancer you wish to use when making requests downstream. At the moment Ocelot has a RoundRobin
-and LeastConnection algorithm you can use. If no load balancer is specified Ocelot will not load balance requests.
+In order to tell Ocelot a Route is to use the service discovery provider for its host and port you must add the ServiceName and load balancer you wish to use when making requests downstream. At the moment Ocelot has a RoundRobin and LeastConnection algorithm you can use. If no load balancer is specified Ocelot will not load balance requests.
 
 .. code-block:: json
 
@@ -72,9 +68,7 @@ The polling interval is in milliseconds and tells Ocelot how often to call Consu
 
 Please note there are tradeoffs here. If you poll Consul it is possible Ocelot will not know if a service is down depending on your polling interval and you might get more errors than if you get the latest services per request. This really depends on how volatile your services are. I doubt it will matter for most people and polling may give a tiny performance improvement over calling Consul per request (as sidecar agent). If you are calling a remote Consul agent then polling will be a good performance improvement.
 
-Your services need to be added to Consul something like below (C# style but hopefully this make sense)...The only important thing to note
-is not to add http or https to the Address field. I have been contacted before about not accepting scheme in Address and accepting scheme
-in address. After reading `this <https://www.consul.io/docs/agent/services.html>`_ I don't think the scheme should be in there.
+Your services need to be added to Consul something like below (C# style but hopefully this make sense)...The only important thing to note is not to add http or https to the Address field. I have been contacted before about not accepting scheme in Address and accepting scheme in address. After reading `this <https://www.consul.io/docs/agent/services.html>`_ I don't think the scheme should be in there.
 
 .. code-block: csharp
 
@@ -116,9 +110,7 @@ Ocelot will add this token to the Consul client that it uses to make requests an
 Eureka
 ^^^^^^
 
-This feature was requested as part of `Issue 262 <https://github.com/ThreeMammals/Ocelot/issues/262>`_ . to add support for Netflix's 
-Eureka service discovery provider. The main reason for this is it is a key part of  `Steeltoe <https://steeltoe.io/>`_ which is something
-to do with `Pivotal <https://pivotal.io/platform>`_! Anyway enough of the background.
+This feature was requested as part of `Issue 262 <https://github.com/ThreeMammals/Ocelot/issues/262>`_ . to add support for Netflix's Eureka service discovery provider. The main reason for this is it is a key part of  `Steeltoe <https://steeltoe.io/>`_ which is something to do with `Pivotal <https://pivotal.io/platform>`_! Anyway enough of the background.
 
 The first thing you need to do is install the NuGet package that provides Eureka support in Ocelot.
 
@@ -153,10 +145,7 @@ And following the guide `Here <https://steeltoe.io/docs/steeltoe-discovery/>`_ y
 
 I am told that if shouldRegisterWithEureka is false then shouldFetchRegistry will defaut to true so you don't need it explicitly but left it in there.
 
-Ocelot will now register all the necessary services when it starts up and if you have the json above will register itself with 
-Eureka. One of the services polls Eureka every 30 seconds (default) and gets the latest service state and persists this in memory.
-When Ocelot asks for a given service it is retrieved from memory so performance is not a big problem. Please note that this code
-is provided by the Pivotal.Discovery.Client NuGet package so big thanks to them for all the hard work.
+Ocelot will now register all the necessary services when it starts up and if you have the json above will register itself with Eureka. One of the services polls Eureka every 30 seconds (default) and gets the latest service state and persists this in memory. When Ocelot asks for a given service it is retrieved from memory so performance is not a big problem. Please note that this code is provided by the Pivotal.Discovery.Client NuGet package so big thanks to them for all the hard work.
 
 Ocelot will use the scheme (http/https) set in Eureka if these values are not provided in ocelot.json
 
@@ -168,16 +157,16 @@ This feature was requested in `issue 340 <https://github.com/ThreeMammals/Ocelot
 An example of this would be calling Ocelot with a url like https://api.mywebsite.com/product/products. Ocelot will take the first segment of 
 the path which is product and use it as a key to look up the service in Consul. If Consul returns a service Ocelot will request it on whatever host and port comes back from Consul plus the remaining path segments in this case products thus making the downstream call http://hostfromconsul:portfromconsul/products. Ocelot will apprend any query string to the downstream url as normal.
 
-In order to enable dynamic routing you need to have 0 ReRoutes in your config. At the moment you cannot mix dynamic and configuration ReRoutes. In addition to this you need to specify the Service Discovery provider details as outlined above and the downstream http/https scheme as DownstreamScheme.
+In order to enable dynamic routing you need to have 0 Routes in your config. At the moment you cannot mix dynamic and configuration Routes. In addition to this you need to specify the Service Discovery provider details as outlined above and the downstream http/https scheme as DownstreamScheme.
 
-In addition to that you can set RateLimitOptions, QoSOptions, LoadBalancerOptions and HttpHandlerOptions, DownstreamScheme (You might want to call Ocelot on https but talk to private services over http) that will be applied to all of the dynamic ReRoutes.
+In addition to that you can set RateLimitOptions, QoSOptions, LoadBalancerOptions and HttpHandlerOptions, DownstreamScheme (You might want to call Ocelot on https but talk to private services over http) that will be applied to all of the dynamic Routes.
 
 The config might look something like 
 
 .. code-block:: json
 
     {
-        "ReRoutes": [],
+        "Routes": [],
         "Aggregates": [],
         "GlobalConfiguration": {
             "RequestIdKey": null,
@@ -215,12 +204,12 @@ The config might look something like
         }
     }
 
-Ocelot also allows you to set DynamicReRoutes which lets you set rate limiting rules per downstream service. This is useful if you have for example a product and search service and you want to rate limit one more than the other. An example of this would be as follows.
+Ocelot also allows you to set DynamicRoutes which lets you set rate limiting rules per downstream service. This is useful if you have for example a product and search service and you want to rate limit one more than the other. An example of this would be as follows.
 
 .. code-block:: json
 
     {
-        "DynamicReRoutes": [
+        "DynamicRoutes": [
             {
             "ServiceName": "product",
             "RateLimitRule": {
@@ -250,6 +239,6 @@ Ocelot also allows you to set DynamicReRoutes which lets you set rate limiting r
         }
     }
 
-This configuration means that if you have a request come into Ocelot on /product/* then dynamic routing will kick in and ocelot will use the rate limiting set against the product service in the DynamicReRoutes section.
+This configuration means that if you have a request come into Ocelot on /product/* then dynamic routing will kick in and ocelot will use the rate limiting set against the product service in the DynamicRoutes section.
 
 Please take a look through all of the docs to understand these options.

@@ -223,9 +223,9 @@
 
         private FileConfiguration FakeFileConfiguration()
         {
-            var reRoutes = new List<FileReRoute>
+            var routes = new List<FileRoute>
             {
-                new FileReRoute
+                new FileRoute
                 {
                     DownstreamHostAndPorts = new List<FileHostAndPort>
                     {
@@ -253,7 +253,7 @@
             return new FileConfiguration
             {
                 GlobalConfiguration = globalConfiguration,
-                ReRoutes = reRoutes
+                Routes = routes
             };
         }
     }

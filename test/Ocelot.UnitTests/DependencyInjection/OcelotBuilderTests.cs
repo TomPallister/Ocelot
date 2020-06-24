@@ -1,9 +1,3 @@
-using System.Threading.Tasks;
-using Ocelot.LoadBalancer.LoadBalancers;
-using Ocelot.Middleware;
-using Ocelot.Responses;
-using Ocelot.Values;
-
 namespace Ocelot.UnitTests.DependencyInjection
 {
     using Microsoft.AspNetCore.Hosting;
@@ -13,7 +7,7 @@ namespace Ocelot.UnitTests.DependencyInjection
     using Ocelot.Configuration.Setter;
     using Ocelot.DependencyInjection;
     using Ocelot.Infrastructure;
-    using Ocelot.Middleware.Multiplexer;
+    using Ocelot.Multiplexer;
     using Ocelot.Requester;
     using Ocelot.UnitTests.Requester;
     using Shouldly;
@@ -22,9 +16,14 @@ namespace Ocelot.UnitTests.DependencyInjection
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
+    using Microsoft.AspNetCore.Http;
     using TestStack.BDDfy;
     using Xunit;
-    using static Ocelot.UnitTests.Middleware.UserDefinedResponseAggregatorTests;
+    using System.Threading.Tasks;
+    using Ocelot.LoadBalancer.LoadBalancers;
+    using Ocelot.Responses;
+    using Ocelot.Values;
+    using static Ocelot.UnitTests.Multiplexing.UserDefinedResponseAggregatorTests;
 
     public class OcelotBuilderTests
     {
@@ -185,7 +184,7 @@ namespace Ocelot.UnitTests.DependencyInjection
         public void should_add_custom_load_balancer_creators_by_factory_method_with_arguments()
         {
             this.Given(x => WhenISetUpOcelotServices())
-                .When(x => _ocelotBuilder.AddCustomLoadBalancer((reroute, discoveryProvider) => new FakeCustomLoadBalancer()))
+                .When(x => _ocelotBuilder.AddCustomLoadBalancer((route, discoveryProvider) => new FakeCustomLoadBalancer()))
                 .Then(x => ThenTheProviderIsRegisteredAndReturnsBothBuiltInAndCustomLoadBalancerCreators())
                 .BDDfy();
         }
@@ -204,7 +203,7 @@ namespace Ocelot.UnitTests.DependencyInjection
         public void should_add_custom_load_balancer_creators()
         {
             this.Given(x => WhenISetUpOcelotServices())
-                .When(x => _ocelotBuilder.AddCustomLoadBalancer((provider, reroute, discoveryProvider) => new FakeCustomLoadBalancer()))
+                .When(x => _ocelotBuilder.AddCustomLoadBalancer((provider, route, discoveryProvider) => new FakeCustomLoadBalancer()))
                 .Then(x => ThenTheProviderIsRegisteredAndReturnsBothBuiltInAndCustomLoadBalancerCreators())
                 .BDDfy();
         }
@@ -388,7 +387,7 @@ namespace Ocelot.UnitTests.DependencyInjection
 
         private class FakeCustomLoadBalancer : ILoadBalancer
         {
-            public Task<Response<ServiceHostAndPort>> Lease(DownstreamContext context)
+            public Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
             {
                 // Not relevant for these tests
                 throw new NotImplementedException();

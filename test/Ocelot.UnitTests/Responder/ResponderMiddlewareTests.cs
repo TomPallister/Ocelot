@@ -11,8 +11,10 @@ namespace Ocelot.UnitTests.Responder
     using Ocelot.Responder.Middleware;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Ocelot.Infrastructure.RequestData;
     using TestStack.BDDfy;
     using Xunit;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class ResponderMiddlewareTests
     {
@@ -21,14 +23,14 @@ namespace Ocelot.UnitTests.Responder
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
         private readonly ResponderMiddleware _middleware;
-        private readonly DownstreamContext _downstreamContext;
-        private OcelotRequestDelegate _next;
+        private RequestDelegate _next;
+        private HttpContext _httpContext;
 
         public ResponderMiddlewareTests()
         {
+            _httpContext = new DefaultHttpContext();
             _responder = new Mock<IHttpResponder>();
             _codeMapper = new Mock<IErrorsToHttpStatusCodeMapper>();
-            _downstreamContext = new DownstreamContext(new DefaultHttpContext());
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<ResponderMiddleware>()).Returns(_logger.Object);
@@ -57,12 +59,12 @@ namespace Ocelot.UnitTests.Responder
 
         private void WhenICallTheMiddleware()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
         private void GivenTheHttpResponseMessageIs(DownstreamResponse response)
         {
-            _downstreamContext.DownstreamResponse = response;
+            _httpContext.Items.UpsertDownstreamResponse(response);
         }
 
         private void ThenThereAreNoErrors()
@@ -72,7 +74,7 @@ namespace Ocelot.UnitTests.Responder
 
         private void GivenThereArePipelineErrors(Error error)
         {
-            _downstreamContext.Errors.Add(error);
+            _httpContext.Items.SetError(error);
         }
     }
 }

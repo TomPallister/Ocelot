@@ -31,9 +31,8 @@ Next you must add the handlers to Ocelot's container like below...
             .AddDelegatingHandler<FakeHandler>()
             .AddDelegatingHandler<FakeHandlerTwo>()
 
-Both of these Add methods have a default parameter called global which is set to false. If it is false then the intent of 
-the DelegatingHandler is to be applied to specific ReRoutes via ocelot.json (more on that later). If it is set to true
-then it becomes a global handler and will be applied to all ReRoutes.
+Both of these Add methods have a default parameter called global which is set to false. If it is false then the intent of the DelegatingHandler is to be applied to specific Routes via ocelot.json (more on that later). If it is set to true
+then it becomes a global handler and will be applied to all Routes.
 
 e.g.
 
@@ -44,8 +43,7 @@ As below...
     services.AddOcelot()
             .AddDelegatingHandler<FakeHandler>(true)
 
-Finally if you want ReRoute specific DelegatingHandlers or to order your specific and / or global (more on this later) DelegatingHandlers
-then you must add the following json to the specific ReRoute in ocelot.json. The names in the array must match the class names of your
+Finally if you want Route specific DelegatingHandlers or to order your specific and / or global (more on this later) DelegatingHandlers then you must add the following json to the specific Route in ocelot.json. The names in the array must match the class names of your
 DelegatingHandlers for Ocelot to match them together.
 
 .. code-block:: json

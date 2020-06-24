@@ -1,13 +1,14 @@
-﻿using Ocelot.Middleware;
-using Ocelot.Responses;
-using Ocelot.Values;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Ocelot.LoadBalancer.LoadBalancers
+﻿namespace Ocelot.LoadBalancer.LoadBalancers
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.Middleware;
+    using Ocelot.Responses;
+    using Ocelot.Values;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class NoLoadBalancer : ILoadBalancer
     {
         private readonly Func<Task<List<Service>>> _services;
@@ -17,7 +18,7 @@ namespace Ocelot.LoadBalancer.LoadBalancers
             _services = services;
         }
 
-        public async Task<Response<ServiceHostAndPort>> Lease(DownstreamContext downstreamContext)
+        public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
         {
             var services = await _services();
 

@@ -8,19 +8,19 @@
     public class DelegateInvokingLoadBalancerCreator<T> : ILoadBalancerCreator
         where T : ILoadBalancer
     {
-        private readonly Func<DownstreamReRoute, IServiceDiscoveryProvider, ILoadBalancer> _creatorFunc;
+        private readonly Func<DownstreamRoute, IServiceDiscoveryProvider, ILoadBalancer> _creatorFunc;
 
         public DelegateInvokingLoadBalancerCreator(
-            Func<DownstreamReRoute, IServiceDiscoveryProvider, ILoadBalancer> creatorFunc)
+            Func<DownstreamRoute, IServiceDiscoveryProvider, ILoadBalancer> creatorFunc)
         {
             _creatorFunc = creatorFunc;
         }
 
-        public Response<ILoadBalancer> Create(DownstreamReRoute reRoute, IServiceDiscoveryProvider serviceProvider)
+        public Response<ILoadBalancer> Create(DownstreamRoute route, IServiceDiscoveryProvider serviceProvider)
         {
             try
             {
-                return new OkResponse<ILoadBalancer>(_creatorFunc(reRoute, serviceProvider));
+                return new OkResponse<ILoadBalancer>(_creatorFunc(route, serviceProvider));
 
             }
             catch (Exception e)

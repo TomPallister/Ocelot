@@ -6,7 +6,7 @@
 
     public interface ILoadBalancerCreator
     {
-        Response<ILoadBalancer> Create(DownstreamReRoute reRoute, IServiceDiscoveryProvider serviceProvider);
+        Response<ILoadBalancer> Create(DownstreamRoute route, IServiceDiscoveryProvider serviceProvider);
         string Type { get; }
     }
 }

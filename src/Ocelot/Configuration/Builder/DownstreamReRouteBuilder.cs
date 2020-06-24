@@ -7,7 +7,7 @@ using System.Net.Http;
 
 namespace Ocelot.Configuration.Builder
 {
-    public class DownstreamReRouteBuilder
+    public class DownstreamRouteBuilder
     {
         private AuthenticationOptions _authenticationOptions;
         private string _loadBalancerKey;
@@ -45,7 +45,7 @@ namespace Ocelot.Configuration.Builder
         private string _downstreamHttpMethod;
         private Version _downstreamHttpVersion;
 
-        public DownstreamReRouteBuilder()
+        public DownstreamRouteBuilder()
         {
             _downstreamAddresses = new List<DownstreamHostAndPort>();
             _delegatingHandlers = new List<string>();
@@ -53,219 +53,219 @@ namespace Ocelot.Configuration.Builder
             _addHeadersToUpstream = new List<AddHeader>();
         }
 
-        public DownstreamReRouteBuilder WithDownstreamAddresses(List<DownstreamHostAndPort> downstreamAddresses)
+        public DownstreamRouteBuilder WithDownstreamAddresses(List<DownstreamHostAndPort> downstreamAddresses)
         {
             _downstreamAddresses.AddRange(downstreamAddresses);
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDownStreamHttpMethod(string method)
+        public DownstreamRouteBuilder WithDownStreamHttpMethod(string method)
         {
             _downstreamHttpMethod = method;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithLoadBalancerOptions(LoadBalancerOptions loadBalancerOptions)
+        public DownstreamRouteBuilder WithLoadBalancerOptions(LoadBalancerOptions loadBalancerOptions)
         {
             _loadBalancerOptions = loadBalancerOptions;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDownstreamScheme(string downstreamScheme)
+        public DownstreamRouteBuilder WithDownstreamScheme(string downstreamScheme)
         {
             _downstreamScheme = downstreamScheme;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDownstreamPathTemplate(string input)
+        public DownstreamRouteBuilder WithDownstreamPathTemplate(string input)
         {
             _downstreamPathTemplate = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithUpstreamPathTemplate(UpstreamPathTemplate input)
+        public DownstreamRouteBuilder WithUpstreamPathTemplate(UpstreamPathTemplate input)
         {
             _upstreamTemplatePattern = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithUpstreamHttpMethod(List<string> input)
+        public DownstreamRouteBuilder WithUpstreamHttpMethod(List<string> input)
         {
             _upstreamHttpMethod = (input.Count == 0) ? new List<HttpMethod>() : input.Select(x => new HttpMethod(x.Trim())).ToList();
             return this;
         }
 
-        public DownstreamReRouteBuilder WithIsAuthenticated(bool input)
+        public DownstreamRouteBuilder WithIsAuthenticated(bool input)
         {
             _isAuthenticated = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithIsAuthorised(bool input)
+        public DownstreamRouteBuilder WithIsAuthorised(bool input)
         {
             _isAuthorised = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithRequestIdKey(string input)
+        public DownstreamRouteBuilder WithRequestIdKey(string input)
         {
             _requestIdHeaderKey = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithClaimsToHeaders(List<ClaimToThing> input)
+        public DownstreamRouteBuilder WithClaimsToHeaders(List<ClaimToThing> input)
         {
             _claimsToHeaders = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithClaimsToClaims(List<ClaimToThing> input)
+        public DownstreamRouteBuilder WithClaimsToClaims(List<ClaimToThing> input)
         {
             _claimToClaims = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithRouteClaimsRequirement(Dictionary<string, string> input)
+        public DownstreamRouteBuilder WithRouteClaimsRequirement(Dictionary<string, string> input)
         {
             _routeClaimRequirement = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithClaimsToQueries(List<ClaimToThing> input)
+        public DownstreamRouteBuilder WithClaimsToQueries(List<ClaimToThing> input)
         {
             _claimToQueries = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithClaimsToDownstreamPath(List<ClaimToThing> input)
+        public DownstreamRouteBuilder WithClaimsToDownstreamPath(List<ClaimToThing> input)
         {
             _claimToDownstreamPath = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithIsCached(bool input)
+        public DownstreamRouteBuilder WithIsCached(bool input)
         {
             _isCached = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithCacheOptions(CacheOptions input)
+        public DownstreamRouteBuilder WithCacheOptions(CacheOptions input)
         {
             _fileCacheOptions = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithQosOptions(QoSOptions input)
+        public DownstreamRouteBuilder WithQosOptions(QoSOptions input)
         {
             _qosOptions = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithLoadBalancerKey(string loadBalancerKey)
+        public DownstreamRouteBuilder WithLoadBalancerKey(string loadBalancerKey)
         {
             _loadBalancerKey = loadBalancerKey;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithAuthenticationOptions(AuthenticationOptions authenticationOptions)
+        public DownstreamRouteBuilder WithAuthenticationOptions(AuthenticationOptions authenticationOptions)
         {
             _authenticationOptions = authenticationOptions;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithEnableRateLimiting(bool input)
+        public DownstreamRouteBuilder WithEnableRateLimiting(bool input)
         {
             _enableRateLimiting = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithRateLimitOptions(RateLimitOptions input)
+        public DownstreamRouteBuilder WithRateLimitOptions(RateLimitOptions input)
         {
             _rateLimitOptions = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithHttpHandlerOptions(HttpHandlerOptions input)
+        public DownstreamRouteBuilder WithHttpHandlerOptions(HttpHandlerOptions input)
         {
             _httpHandlerOptions = input;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithUseServiceDiscovery(bool useServiceDiscovery)
+        public DownstreamRouteBuilder WithUseServiceDiscovery(bool useServiceDiscovery)
         {
             _useServiceDiscovery = useServiceDiscovery;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithServiceName(string serviceName)
+        public DownstreamRouteBuilder WithServiceName(string serviceName)
         {
             _serviceName = serviceName;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithServiceNamespace(string serviceNamespace)
+        public DownstreamRouteBuilder WithServiceNamespace(string serviceNamespace)
         {
             _serviceNamespace = serviceNamespace;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithUpstreamHeaderFindAndReplace(List<HeaderFindAndReplace> upstreamHeaderFindAndReplace)
+        public DownstreamRouteBuilder WithUpstreamHeaderFindAndReplace(List<HeaderFindAndReplace> upstreamHeaderFindAndReplace)
         {
             _upstreamHeaderFindAndReplace = upstreamHeaderFindAndReplace;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDownstreamHeaderFindAndReplace(List<HeaderFindAndReplace> downstreamHeaderFindAndReplace)
+        public DownstreamRouteBuilder WithDownstreamHeaderFindAndReplace(List<HeaderFindAndReplace> downstreamHeaderFindAndReplace)
         {
             _downstreamHeaderFindAndReplace = downstreamHeaderFindAndReplace;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithKey(string key)
+        public DownstreamRouteBuilder WithKey(string key)
         {
             _key = key;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDelegatingHandlers(List<string> delegatingHandlers)
+        public DownstreamRouteBuilder WithDelegatingHandlers(List<string> delegatingHandlers)
         {
             _delegatingHandlers = delegatingHandlers;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithAddHeadersToDownstream(List<AddHeader> addHeadersToDownstream)
+        public DownstreamRouteBuilder WithAddHeadersToDownstream(List<AddHeader> addHeadersToDownstream)
         {
             _addHeadersToDownstream = addHeadersToDownstream;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithAddHeadersToUpstream(List<AddHeader> addHeadersToUpstream)
+        public DownstreamRouteBuilder WithAddHeadersToUpstream(List<AddHeader> addHeadersToUpstream)
         {
             _addHeadersToUpstream = addHeadersToUpstream;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDangerousAcceptAnyServerCertificateValidator(bool dangerousAcceptAnyServerCertificateValidator)
+        public DownstreamRouteBuilder WithDangerousAcceptAnyServerCertificateValidator(bool dangerousAcceptAnyServerCertificateValidator)
         {
             _dangerousAcceptAnyServerCertificateValidator = dangerousAcceptAnyServerCertificateValidator;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithSecurityOptions(SecurityOptions securityOptions)
+        public DownstreamRouteBuilder WithSecurityOptions(SecurityOptions securityOptions)
         {
             _securityOptions = securityOptions;
             return this;
         }
 
-        public DownstreamReRouteBuilder WithDownstreamHttpVersion(Version downstreamHttpVersion)
+        public DownstreamRouteBuilder WithDownstreamHttpVersion(Version downstreamHttpVersion)
         {
             _downstreamHttpVersion = downstreamHttpVersion;
             return this;
         }
 
-        public DownstreamReRoute Build()
+        public DownstreamRoute Build()
         {
-            return new DownstreamReRoute(
+            return new DownstreamRoute(
                 _key,
                 _upstreamTemplatePattern,
                 _upstreamHeaderFindAndReplace,

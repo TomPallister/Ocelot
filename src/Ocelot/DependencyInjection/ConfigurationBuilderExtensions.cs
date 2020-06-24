@@ -1,6 +1,6 @@
 namespace Ocelot.DependencyInjection
 {
-    using Configuration.File;
+    using Ocelot.Configuration.File;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Configuration.Memory;
@@ -70,7 +70,7 @@ namespace Ocelot.DependencyInjection
                 }
 
                 fileConfiguration.Aggregates.AddRange(config.Aggregates);
-                fileConfiguration.ReRoutes.AddRange(config.ReRoutes);
+                fileConfiguration.Routes.AddRange(config.Routes);
             }
 
             var json = JsonConvert.SerializeObject(fileConfiguration);

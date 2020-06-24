@@ -14,7 +14,7 @@
     {
         private readonly CookieStickySessionsCreator _creator;
         private readonly Mock<IServiceDiscoveryProvider> _serviceProvider;
-        private DownstreamReRoute _reRoute;
+        private DownstreamRoute _route;
         private Response<ILoadBalancer> _loadBalancer;
         private string _typeName;
 
@@ -27,11 +27,11 @@
         [Fact]
         public void should_return_instance_of_expected_load_balancer_type()
         {
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithLoadBalancerOptions(new LoadBalancerOptions("myType", "myKey", 1000))
                 .Build();
 
-            this.Given(x => x.GivenAReRoute(reRoute))
+            this.Given(x => x.GivenARoute(route))
                 .When(x => x.WhenIGetTheLoadBalancer())
                 .Then(x => x.ThenTheLoadBalancerIsReturned<CookieStickySessions>())
                 .BDDfy();
@@ -45,14 +45,14 @@
                 .BDDfy();
         }
 
-        private void GivenAReRoute(DownstreamReRoute reRoute)
+        private void GivenARoute(DownstreamRoute route)
         {
-            _reRoute = reRoute;
+            _route = route;
         }
 
         private void WhenIGetTheLoadBalancer()
         {
-            _loadBalancer = _creator.Create(_reRoute, _serviceProvider.Object);
+            _loadBalancer = _creator.Create(_route, _serviceProvider.Object);
         }
         
         private void WhenIGetTheLoadBalancerTypeName()

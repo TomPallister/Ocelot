@@ -1,5 +1,5 @@
 {
-  "ReRoutes": [
+  "Routes": [
     {
       "DownstreamPathTemplate": "/",
       "UpstreamPathTemplate": "/",
@@ -18,7 +18,7 @@
       "AddQueriesToRequest": {},
       "RequestIdKey": null,
       "FileCacheOptions": { "TtlSeconds": 0 },
-      "ReRouteIsCaseSensitive": false,
+      "RouteIsCaseSensitive": false,
       "ServiceName": null,
       "DownstreamScheme": "http",
       "DownstreamHost": "localhost",

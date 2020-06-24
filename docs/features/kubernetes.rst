@@ -30,14 +30,13 @@ You can replicate a Permissive. Using RBAC role bindings.
 .. code-block::bash
 kubectl create clusterrolebinding permissive-binding  --clusterrole=cluster-admin  --user=admin  --user=kubelet --group=system:serviceaccounts
 
-The following example shows how to set up a ReRoute that will work in kubernetes. The most important thing is the ServiceName which is made up of the 
-kubernetes service name. We also need to set up the ServiceDiscoveryProvider in GlobalConfiguration. The example here shows a typical configuration. 
+The following example shows how to set up a Route that will work in kubernetes. The most important thing is the ServiceName which is made up of the kubernetes service name. We also need to set up the ServiceDiscoveryProvider in GlobalConfiguration. The example here shows a typical configuration. 
 
 
 .. code-block:: json
 
     {
-  "ReRoutes": [
+  "Routes": [
     {
       "DownstreamPathTemplate": "/api/values",
       "DownstreamScheme": "http",
@@ -75,16 +74,15 @@ You use Ocelot to poll kubernetes for latest service information rather than per
 
 The polling interval is in milliseconds and tells Ocelot how often to call kubernetes for changes in service configuration.
 
-Please note there are tradeoffs here. If you poll kubernetes it is possible Ocelot will not know if a service is down depending on your polling interval and you might get more errors than if you get the latest services per request. This really depends on how volatile your services are. I doubt it will matter for most people and polling may give a tiny performance improvement over calling kubernetes per request. 
-There is no way for Ocelot to work these out for you. 
+Please note there are tradeoffs here. If you poll kubernetes it is possible Ocelot will not know if a service is down depending on your polling interval and you might get more errors than if you get the latest services per request. This really depends on how volatile your services are. I doubt it will matter for most people and polling may give a tiny performance improvement over calling kubernetes per request. There is no way for Ocelot to work these out for you. 
 
-If your downstream service resides in a different namespace you can override the global setting at the ReRoute level by specifying a ServiceNamespace.
+If your downstream service resides in a different namespace you can override the global setting at the Route level by specifying a ServiceNamespace.
 
 
 .. code-block:: json
 
     {
-      "ReRoutes": [
+      "Routes": [
         {
           "DownstreamPathTemplate": "/api/values",
           "DownstreamScheme": "http",

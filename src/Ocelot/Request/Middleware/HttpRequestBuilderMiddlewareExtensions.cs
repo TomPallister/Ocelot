@@ -1,10 +1,10 @@
-using Ocelot.Middleware.Pipeline;
-
 namespace Ocelot.Request.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class HttpRequestBuilderMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseDownstreamRequestInitialiser(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseDownstreamRequestInitialiser(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<DownstreamRequestInitialiserMiddleware>();
         }

@@ -44,7 +44,7 @@ namespace Ocelot.AcceptanceTests
             }
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?)");
+            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?)");
         }
 
         [Fact]
@@ -52,9 +52,9 @@ namespace Ocelot.AcceptanceTests
         {
             var invalidConfig = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -87,7 +87,7 @@ namespace Ocelot.AcceptanceTests
             }
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?,Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?)");
+            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?,Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?)");
         }
 
         [Fact]
@@ -95,9 +95,9 @@ namespace Ocelot.AcceptanceTests
         {
             var invalidConfig = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -136,7 +136,7 @@ namespace Ocelot.AcceptanceTests
             }
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?)");
+            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?)");
         }
 
         [Fact]
@@ -144,9 +144,9 @@ namespace Ocelot.AcceptanceTests
         {
             var invalidConfig = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -182,7 +182,7 @@ namespace Ocelot.AcceptanceTests
             }
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?)");
+            exception.Message.ShouldBe("One or more errors occurred. (Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?)");
         }
 
         [Fact]
@@ -190,9 +190,9 @@ namespace Ocelot.AcceptanceTests
         {
             var invalidConfig = new FileConfiguration()
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         UpstreamPathTemplate = "api",
                         DownstreamPathTemplate = "test"

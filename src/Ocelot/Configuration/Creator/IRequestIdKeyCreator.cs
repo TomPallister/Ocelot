@@ -4,6 +4,6 @@ namespace Ocelot.Configuration.Creator
 {
     public interface IRequestIdKeyCreator
     {
-        string Create(FileReRoute fileReRoute, FileGlobalConfiguration globalConfiguration);
+        string Create(FileRoute fileRoute, FileGlobalConfiguration globalConfiguration);
     }
 }

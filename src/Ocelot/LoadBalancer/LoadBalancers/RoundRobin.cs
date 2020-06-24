@@ -6,6 +6,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
 
     public class RoundRobin : ILoadBalancer
     {
@@ -19,7 +20,7 @@
             _services = services;
         }
 
-        public async Task<Response<ServiceHostAndPort>> Lease(DownstreamContext downstreamContext)
+        public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
         {
             var services = await _services();
             lock (_lock)

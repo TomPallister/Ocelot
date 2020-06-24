@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Ocelot.Middleware.Pipeline;
-
-namespace Ocelot.Cache.Middleware
+﻿namespace Ocelot.Cache.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class OutputCacheMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseOutputCacheMiddleware(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseOutputCacheMiddleware(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<OutputCacheMiddleware>();
         }

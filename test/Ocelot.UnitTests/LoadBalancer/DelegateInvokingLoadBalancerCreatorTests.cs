@@ -14,19 +14,21 @@ using Xunit;
 
 namespace Ocelot.UnitTests.LoadBalancer
 {
+    using Microsoft.AspNetCore.Http;
+
     public class DelegateInvokingLoadBalancerCreatorTests
     {
         private DelegateInvokingLoadBalancerCreator<FakeLoadBalancer> _creator;
-        private Func<DownstreamReRoute, IServiceDiscoveryProvider, ILoadBalancer> _creatorFunc;
+        private Func<DownstreamRoute, IServiceDiscoveryProvider, ILoadBalancer> _creatorFunc;
         private readonly Mock<IServiceDiscoveryProvider> _serviceProvider;
-        private DownstreamReRoute _reRoute;
+        private DownstreamRoute _route;
         private Response<ILoadBalancer> _loadBalancer;
         private string _typeName;
 
         public DelegateInvokingLoadBalancerCreatorTests()
         {
-            _creatorFunc = (reRoute, serviceDiscoveryProvider) =>
-                new FakeLoadBalancer(reRoute, serviceDiscoveryProvider);
+            _creatorFunc = (route, serviceDiscoveryProvider) =>
+                new FakeLoadBalancer(route, serviceDiscoveryProvider);
             _creator = new DelegateInvokingLoadBalancerCreator<FakeLoadBalancer>(_creatorFunc);
             _serviceProvider = new Mock<IServiceDiscoveryProvider>();
         }
@@ -42,10 +44,10 @@ namespace Ocelot.UnitTests.LoadBalancer
         [Fact]
         public void should_return_result_of_specified_creator_func()
         {
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .Build();
 
-            this.Given(x => x.GivenAReRoute(reRoute))
+            this.Given(x => x.GivenARoute(route))
                 .When(x => x.WhenIGetTheLoadBalancer())
                 .Then(x => x.ThenTheLoadBalancerIsReturned<FakeLoadBalancer>())
                 .BDDfy();
@@ -54,10 +56,10 @@ namespace Ocelot.UnitTests.LoadBalancer
         [Fact]
         public void should_return_error()
         {
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .Build();
 
-            this.Given(x => x.GivenAReRoute(reRoute))
+            this.Given(x => x.GivenARoute(route))
                 .And(x => x.GivenTheCreatorFuncThrows())
                 .When(x => x.WhenIGetTheLoadBalancer())
                 .Then(x => x.ThenAnErrorIsReturned())
@@ -66,7 +68,7 @@ namespace Ocelot.UnitTests.LoadBalancer
 
         private void GivenTheCreatorFuncThrows()
         {
-            _creatorFunc = (reRoute, serviceDiscoveryProvider) => throw new Exception();
+            _creatorFunc = (route, serviceDiscoveryProvider) => throw new Exception();
 
             _creator = new DelegateInvokingLoadBalancerCreator<FakeLoadBalancer>(_creatorFunc);
         }
@@ -76,14 +78,14 @@ namespace Ocelot.UnitTests.LoadBalancer
             _loadBalancer.IsError.ShouldBeTrue();
         }
 
-        private void GivenAReRoute(DownstreamReRoute reRoute)
+        private void GivenARoute(DownstreamRoute route)
         {
-            _reRoute = reRoute;
+            _route = route;
         }
 
         private void WhenIGetTheLoadBalancer()
         {
-            _loadBalancer = _creator.Create(_reRoute, _serviceProvider.Object);
+            _loadBalancer = _creator.Create(_route, _serviceProvider.Object);
         }
 
         private void WhenIGetTheLoadBalancerTypeName()
@@ -104,16 +106,16 @@ namespace Ocelot.UnitTests.LoadBalancer
 
         private class FakeLoadBalancer : ILoadBalancer
         {
-            public FakeLoadBalancer(DownstreamReRoute reRoute, IServiceDiscoveryProvider serviceDiscoveryProvider)
+            public FakeLoadBalancer(DownstreamRoute downstreamRoute, IServiceDiscoveryProvider serviceDiscoveryProvider)
             {
-                ReRoute = reRoute;
+                DownstreamRoute = downstreamRoute;
                 ServiceDiscoveryProvider = serviceDiscoveryProvider;
             }
 
-            public DownstreamReRoute ReRoute { get; }
+            public DownstreamRoute DownstreamRoute { get; }
             public IServiceDiscoveryProvider ServiceDiscoveryProvider { get; }
 
-            public Task<Response<ServiceHostAndPort>> Lease(DownstreamContext context)
+            public Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
             {
                 throw new NotImplementedException();
             }

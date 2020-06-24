@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3FA7C349-DBE8-4904-A2CE-015B8869CE6C}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		build.cake = build.cake
 		build.ps1 = build.ps1
@@ -80,6 +81,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "basic", "basic", "{ED066001-BAF7-4117-9884-DF591A56347D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "graphql", "graphql", "{C15CD120-5F8D-41DE-9B21-00E3EA77D6C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ocelot.Tracing.OpenTracing", "src\Ocelot.Tracing.OpenTracing\Ocelot.Tracing.OpenTracing.csproj", "{11C622AD-8C0A-4CF4-811B-3DBB76550797}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "open-tracing", "open-tracing", "{731C6A8A-69ED-445C-A132-C638AA93F9C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcelotOpenTracing", "samples\OcelotOpenTracing\OcelotOpenTracing.csproj", "{C9427E78-4281-4F59-A66E-17C0B66550E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -179,6 +186,14 @@ Global
 		{33BE6D88-F188-4E60-83AC-3C4B94D24675}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33BE6D88-F188-4E60-83AC-3C4B94D24675}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33BE6D88-F188-4E60-83AC-3C4B94D24675}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11C622AD-8C0A-4CF4-811B-3DBB76550797}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11C622AD-8C0A-4CF4-811B-3DBB76550797}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11C622AD-8C0A-4CF4-811B-3DBB76550797}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11C622AD-8C0A-4CF4-811B-3DBB76550797}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9427E78-4281-4F59-A66E-17C0B66550E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9427E78-4281-4F59-A66E-17C0B66550E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9427E78-4281-4F59-A66E-17C0B66550E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9427E78-4281-4F59-A66E-17C0B66550E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -213,6 +228,9 @@ Global
 		{1F1F324D-6EA4-4E63-A6A7-C6053F412F1A} = {8FA0CBA0-0338-48EB-B37F-83CA5022237C}
 		{ED066001-BAF7-4117-9884-DF591A56347D} = {8FA0CBA0-0338-48EB-B37F-83CA5022237C}
 		{C15CD120-5F8D-41DE-9B21-00E3EA77D6C1} = {8FA0CBA0-0338-48EB-B37F-83CA5022237C}
+		{11C622AD-8C0A-4CF4-811B-3DBB76550797} = {5CFB79B7-C9DC-45A4-9A75-625D92471702}
+		{731C6A8A-69ED-445C-A132-C638AA93F9C7} = {8FA0CBA0-0338-48EB-B37F-83CA5022237C}
+		{C9427E78-4281-4F59-A66E-17C0B66550E5} = {731C6A8A-69ED-445C-A132-C638AA93F9C7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21476EFF-778A-4F97-8A56-D1AF1CEC0C48}

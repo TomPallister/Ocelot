@@ -128,9 +128,9 @@ namespace Ocelot.IntegrationTests
                         Host = "127.0.0.1",
                     }
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -150,7 +150,7 @@ namespace Ocelot.IntegrationTests
                             Region = "Geoff"
                         }
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -191,9 +191,9 @@ namespace Ocelot.IntegrationTests
                 GlobalConfiguration = new FileGlobalConfiguration
                 {
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -208,7 +208,7 @@ namespace Ocelot.IntegrationTests
                         UpstreamHttpMethod = new List<string> { "get" },
                         UpstreamPathTemplate = "/"
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -231,9 +231,9 @@ namespace Ocelot.IntegrationTests
                 GlobalConfiguration = new FileGlobalConfiguration
                 {
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -248,7 +248,7 @@ namespace Ocelot.IntegrationTests
                         UpstreamHttpMethod = new List<string> { "get" },
                         UpstreamPathTemplate = "/"
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -286,9 +286,9 @@ namespace Ocelot.IntegrationTests
             var configuration = new FileConfiguration
             {
                 GlobalConfiguration = new FileGlobalConfiguration(),
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -339,16 +339,16 @@ namespace Ocelot.IntegrationTests
         }
 
         [Fact]
-        public void should_get_file_configuration_edit_and_post_updated_version_redirecting_reroute()
+        public void should_get_file_configuration_edit_and_post_updated_version_redirecting_route()
         {
             var fooPort = 47689;
             var barPort = 27654;
 
             var initialConfiguration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -371,9 +371,9 @@ namespace Ocelot.IntegrationTests
                 GlobalConfiguration = new FileGlobalConfiguration
                 {
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -420,9 +420,9 @@ namespace Ocelot.IntegrationTests
                 GlobalConfiguration = new FileGlobalConfiguration
                 {
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -441,7 +441,7 @@ namespace Ocelot.IntegrationTests
                             TtlSeconds = 10
                         }
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -665,20 +665,20 @@ namespace Ocelot.IntegrationTests
             response.GlobalConfiguration.ServiceDiscoveryProvider.Host.ShouldBe(expecteds.GlobalConfiguration.ServiceDiscoveryProvider.Host);
             response.GlobalConfiguration.ServiceDiscoveryProvider.Port.ShouldBe(expecteds.GlobalConfiguration.ServiceDiscoveryProvider.Port);
 
-            for (var i = 0; i < response.ReRoutes.Count; i++)
+            for (var i = 0; i < response.Routes.Count; i++)
             {
-                for (var j = 0; j < response.ReRoutes[i].DownstreamHostAndPorts.Count; j++)
+                for (var j = 0; j < response.Routes[i].DownstreamHostAndPorts.Count; j++)
                 {
-                    var result = response.ReRoutes[i].DownstreamHostAndPorts[j];
-                    var expected = expecteds.ReRoutes[i].DownstreamHostAndPorts[j];
+                    var result = response.Routes[i].DownstreamHostAndPorts[j];
+                    var expected = expecteds.Routes[i].DownstreamHostAndPorts[j];
                     result.Host.ShouldBe(expected.Host);
                     result.Port.ShouldBe(expected.Port);
                 }
 
-                response.ReRoutes[i].DownstreamPathTemplate.ShouldBe(expecteds.ReRoutes[i].DownstreamPathTemplate);
-                response.ReRoutes[i].DownstreamScheme.ShouldBe(expecteds.ReRoutes[i].DownstreamScheme);
-                response.ReRoutes[i].UpstreamPathTemplate.ShouldBe(expecteds.ReRoutes[i].UpstreamPathTemplate);
-                response.ReRoutes[i].UpstreamHttpMethod.ShouldBe(expecteds.ReRoutes[i].UpstreamHttpMethod);
+                response.Routes[i].DownstreamPathTemplate.ShouldBe(expecteds.Routes[i].DownstreamPathTemplate);
+                response.Routes[i].DownstreamScheme.ShouldBe(expecteds.Routes[i].DownstreamScheme);
+                response.Routes[i].UpstreamPathTemplate.ShouldBe(expecteds.Routes[i].UpstreamPathTemplate);
+                response.Routes[i].UpstreamHttpMethod.ShouldBe(expecteds.Routes[i].UpstreamHttpMethod);
             }
         }
 

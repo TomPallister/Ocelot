@@ -127,7 +127,7 @@ namespace Ocelot.UnitTests.Controllers
 
         private class FakeError : Error
         {
-            public FakeError() : base(string.Empty, OcelotErrorCode.CannotAddDataError)
+            public FakeError() : base(string.Empty, OcelotErrorCode.CannotAddDataError, 404)
             {
             }
         }

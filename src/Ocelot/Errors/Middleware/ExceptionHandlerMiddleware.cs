@@ -1,102 +1,89 @@
 namespace Ocelot.Errors.Middleware
 {
-    using Configuration;
-    using Ocelot.Configuration.Repository;
-    using Ocelot.Infrastructure.Extensions;
+    using Ocelot.Configuration;
     using Ocelot.Infrastructure.RequestData;
     using Ocelot.Logging;
     using Ocelot.Middleware;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     /// <summary>
-    /// Catches all unhandled exceptions thrown by middleware, logs and returns a 500
+    /// Catches all unhandled exceptions thrown by middleware, logs and returns a 500.
     /// </summary>
     public class ExceptionHandlerMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
-        private readonly IInternalConfigurationRepository _configRepo;
+        private readonly RequestDelegate _next;
         private readonly IRequestScopedDataRepository _repo;
 
-        public ExceptionHandlerMiddleware(OcelotRequestDelegate next,
+        public ExceptionHandlerMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
-            IInternalConfigurationRepository configRepo,
             IRequestScopedDataRepository repo)
                 : base(loggerFactory.CreateLogger<ExceptionHandlerMiddleware>())
         {
-            _configRepo = configRepo;
-            _repo = repo;
             _next = next;
+            _repo = repo;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
             try
             {
-                context.HttpContext.RequestAborted.ThrowIfCancellationRequested();
+                httpContext.RequestAborted.ThrowIfCancellationRequested();
 
-                //try and get the global request id and set it for logs...
-                //should this basically be immutable per request...i guess it should!
-                //first thing is get config
-                var configuration = _configRepo.Get();
+                var internalConfiguration = httpContext.Items.IInternalConfiguration();
 
-                if (configuration.IsError)
-                {
-                    throw new Exception($"{MiddlewareName} setting pipeline errors. IOcelotConfigurationProvider returned {configuration.Errors.ToErrorString()}");
-                }
-
-                TrySetGlobalRequestId(context, configuration.Data);
-
-                context.Configuration = configuration.Data;
+                TrySetGlobalRequestId(httpContext, internalConfiguration);
 
                 Logger.LogDebug("ocelot pipeline started");
 
-                await _next.Invoke(context);
+                await _next.Invoke(httpContext);
             }
-            catch (OperationCanceledException) when (context.HttpContext.RequestAborted.IsCancellationRequested)
+            catch (OperationCanceledException) when (httpContext.RequestAborted.IsCancellationRequested)
             {
                 Logger.LogDebug("operation canceled");
-                if (!context.HttpContext.Response.HasStarted)
+                if (!httpContext.Response.HasStarted)
                 {
-                    context.HttpContext.Response.StatusCode = 499;
+                    httpContext.Response.StatusCode = 499;
                 }
             }
             catch (Exception e)
             {
                 Logger.LogDebug("error calling middleware");
 
-                var message = CreateMessage(context, e);
+                var message = CreateMessage(httpContext, e);
 
                 Logger.LogError(message, e);
 
-                SetInternalServerErrorOnResponse(context);
+                SetInternalServerErrorOnResponse(httpContext);
             }
 
             Logger.LogDebug("ocelot pipeline finished");
         }
 
-        private void TrySetGlobalRequestId(DownstreamContext context, IInternalConfiguration configuration)
+        private void TrySetGlobalRequestId(HttpContext httpContext, IInternalConfiguration configuration)
         {
             var key = configuration.RequestId;
 
-            if (!string.IsNullOrEmpty(key) && context.HttpContext.Request.Headers.TryGetValue(key, out var upstreamRequestIds))
+            if (!string.IsNullOrEmpty(key) && httpContext.Request.Headers.TryGetValue(key, out var upstreamRequestIds))
             {
-                context.HttpContext.TraceIdentifier = upstreamRequestIds.First();
+                httpContext.TraceIdentifier = upstreamRequestIds.First();
             }
 
-            _repo.Add("RequestId", context.HttpContext.TraceIdentifier);
+            _repo.Add("RequestId", httpContext.TraceIdentifier);
         }
 
-        private void SetInternalServerErrorOnResponse(DownstreamContext context)
+        private void SetInternalServerErrorOnResponse(HttpContext httpContext)
         {
-            if (!context.HttpContext.Response.HasStarted)
+            if (!httpContext.Response.HasStarted)
             {
-                context.HttpContext.Response.StatusCode = 500;
+                httpContext.Response.StatusCode = 500;
             }
         }
 
-        private string CreateMessage(DownstreamContext context, Exception e)
+        private string CreateMessage(HttpContext httpContext, Exception e)
         {
             var message =
                 $"Exception caught in global error handler, exception message: {e.Message}, exception stack: {e.StackTrace}";
@@ -107,7 +94,7 @@ namespace Ocelot.Errors.Middleware
                     $"{message}, inner exception message {e.InnerException.Message}, inner exception stack {e.InnerException.StackTrace}";
             }
 
-            return $"{message} RequestId: {context.HttpContext.TraceIdentifier}";
+            return $"{message} RequestId: {httpContext.TraceIdentifier}";
         }
     }
 }

@@ -24,12 +24,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="8.6.1" />
-    <PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="3.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.1">
+    <PackageReference Include="FluentValidation" Version="8.6.2" />
+    <PackageReference Include="Microsoft.AspNetCore.MiddlewareAnalysis" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="3.1.3">
       <NoWarn>NU1701</NoWarn>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.164">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

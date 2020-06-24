@@ -1,16 +1,18 @@
-﻿using Ocelot.Logging;
-using Ocelot.Middleware;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Ocelot.Headers.Middleware
+﻿namespace Ocelot.Headers.Middleware
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class ClaimsToHeadersMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
         private readonly IAddHeadersToRequest _addHeadersToRequest;
 
-        public ClaimsToHeadersMiddleware(OcelotRequestDelegate next,
+        public ClaimsToHeadersMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IAddHeadersToRequest addHeadersToRequest)
                 : base(loggerFactory.CreateLogger<ClaimsToHeadersMiddleware>())
@@ -19,26 +21,30 @@ namespace Ocelot.Headers.Middleware
             _addHeadersToRequest = addHeadersToRequest;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            if (context.DownstreamReRoute.ClaimsToHeaders.Any())
-            {
-                Logger.LogInformation($"{context.DownstreamReRoute.DownstreamPathTemplate.Value} has instructions to convert claims to headers");
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
 
-                var response = _addHeadersToRequest.SetHeadersOnDownstreamRequest(context.DownstreamReRoute.ClaimsToHeaders, context.HttpContext.User.Claims, context.DownstreamRequest);
+            if (downstreamRoute.ClaimsToHeaders.Any())
+            {
+                Logger.LogInformation($"{downstreamRoute.DownstreamPathTemplate.Value} has instructions to convert claims to headers");
+
+                var downstreamRequest = httpContext.Items.DownstreamRequest();
+
+                var response = _addHeadersToRequest.SetHeadersOnDownstreamRequest(downstreamRoute.ClaimsToHeaders, httpContext.User.Claims, downstreamRequest);
 
                 if (response.IsError)
                 {
                     Logger.LogWarning("Error setting headers on context, setting pipeline error");
 
-                    SetPipelineError(context, response.Errors);
+                    httpContext.Items.UpsertErrors(response.Errors);
                     return;
                 }
 
                 Logger.LogInformation("headers have been set on context");
             }
 
-            await _next.Invoke(context);
+            await _next.Invoke(httpContext);
         }
     }
 }

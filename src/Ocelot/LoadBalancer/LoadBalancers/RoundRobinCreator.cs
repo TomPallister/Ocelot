@@ -6,7 +6,7 @@
 
     public class RoundRobinCreator : ILoadBalancerCreator
     {
-        public Response<ILoadBalancer> Create(DownstreamReRoute reRoute, IServiceDiscoveryProvider serviceProvider)
+        public Response<ILoadBalancer> Create(DownstreamRoute route, IServiceDiscoveryProvider serviceProvider)
         {
             return new OkResponse<ILoadBalancer>(new RoundRobin(async () => await serviceProvider.Get()));
         }

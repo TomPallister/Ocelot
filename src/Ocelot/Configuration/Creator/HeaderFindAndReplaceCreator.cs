@@ -18,12 +18,12 @@ namespace Ocelot.Configuration.Creator
             _placeholders = placeholders;
         }
 
-        public HeaderTransformations Create(FileReRoute fileReRoute)
+        public HeaderTransformations Create(FileRoute fileRoute)
         {
             var upstream = new List<HeaderFindAndReplace>();
             var addHeadersToUpstream = new List<AddHeader>();
 
-            foreach (var input in fileReRoute.UpstreamHeaderTransform)
+            foreach (var input in fileRoute.UpstreamHeaderTransform)
             {
                 if (input.Value.Contains(","))
                 {
@@ -46,7 +46,7 @@ namespace Ocelot.Configuration.Creator
             var downstream = new List<HeaderFindAndReplace>();
             var addHeadersToDownstream = new List<AddHeader>();
 
-            foreach (var input in fileReRoute.DownstreamHeaderTransform)
+            foreach (var input in fileRoute.DownstreamHeaderTransform)
             {
                 if (input.Value.Contains(","))
                 {
