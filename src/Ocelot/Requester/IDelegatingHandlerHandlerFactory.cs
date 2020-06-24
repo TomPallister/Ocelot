@@ -8,6 +8,6 @@ namespace Ocelot.Requester
 
     public interface IDelegatingHandlerHandlerFactory
     {
-        Response<List<Func<DelegatingHandler>>> Get(DownstreamReRoute downstreamReRoute);
+        Response<List<Func<DelegatingHandler>>> Get(DownstreamRoute downstreamRoute);
     }
 }

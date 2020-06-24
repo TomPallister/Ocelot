@@ -3,8 +3,8 @@
     using global::CacheManager.Core;
     using Moq;
     using Ocelot.Cache.CacheManager;
-    using Shouldly;
     using System;
+    using Shouldly;
     using TestStack.BDDfy;
     using Xunit;
 

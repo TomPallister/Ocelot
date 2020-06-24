@@ -11,12 +11,12 @@ namespace Ocelot.Configuration.Creator
         private readonly IConfigurationValidator _configurationValidator;
         private readonly IConfigurationCreator _configCreator;
         private readonly IDynamicsCreator _dynamicsCreator;
-        private readonly IReRoutesCreator _reRoutesCreator;
+        private readonly IRoutesCreator _routesCreator;
         private readonly IAggregatesCreator _aggregatesCreator;
 
         public FileInternalConfigurationCreator(
             IConfigurationValidator configurationValidator,
-            IReRoutesCreator reRoutesCreator,
+            IRoutesCreator routesCreator,
             IAggregatesCreator aggregatesCreator,
             IDynamicsCreator dynamicsCreator,
             IConfigurationCreator configCreator
@@ -25,7 +25,7 @@ namespace Ocelot.Configuration.Creator
             _configCreator = configCreator;
             _dynamicsCreator = dynamicsCreator;
             _aggregatesCreator = aggregatesCreator;
-            _reRoutesCreator = reRoutesCreator;
+            _routesCreator = routesCreator;
             _configurationValidator = configurationValidator;
         }
 
@@ -38,18 +38,18 @@ namespace Ocelot.Configuration.Creator
                 return new ErrorResponse<IInternalConfiguration>(response.Data.Errors);
             }
 
-            var reRoutes = _reRoutesCreator.Create(fileConfiguration);
+            var routes = _routesCreator.Create(fileConfiguration);
 
-            var aggregates = _aggregatesCreator.Create(fileConfiguration, reRoutes);
+            var aggregates = _aggregatesCreator.Create(fileConfiguration, routes);
 
-            var dynamicReRoute = _dynamicsCreator.Create(fileConfiguration);
+            var dynamicRoute = _dynamicsCreator.Create(fileConfiguration);
 
-            var mergedReRoutes = reRoutes
+            var mergedRoutes = routes
                 .Union(aggregates)
-                .Union(dynamicReRoute)
+                .Union(dynamicRoute)
                 .ToList();
 
-            var config = _configCreator.Create(fileConfiguration, mergedReRoutes);
+            var config = _configCreator.Create(fileConfiguration, mergedRoutes);
 
             return new OkResponse<IInternalConfiguration>(config);
         }

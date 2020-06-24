@@ -4,14 +4,16 @@ namespace Ocelot.Request.Middleware
     using Ocelot.Middleware;
     using Ocelot.Request.Creator;
     using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class DownstreamRequestInitialiserMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
         private readonly Mapper.IRequestMapper _requestMapper;
         private readonly IDownstreamRequestCreator _creator;
 
-        public DownstreamRequestInitialiserMiddleware(OcelotRequestDelegate next,
+        public DownstreamRequestInitialiserMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             Mapper.IRequestMapper requestMapper,
             IDownstreamRequestCreator creator)
@@ -22,19 +24,23 @@ namespace Ocelot.Request.Middleware
             _creator = creator;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            var downstreamRequest = await _requestMapper.Map(context.HttpContext.Request, context.DownstreamReRoute);
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
 
-            if (downstreamRequest.IsError)
+            var httpRequestMessage = await _requestMapper.Map(httpContext.Request, downstreamRoute);
+
+            if (httpRequestMessage.IsError)
             {
-                SetPipelineError(context, downstreamRequest.Errors);
+                httpContext.Items.UpsertErrors(httpRequestMessage.Errors);
                 return;
             }
 
-            context.DownstreamRequest = _creator.Create(downstreamRequest.Data);
+            var downstreamRequest = _creator.Create(httpRequestMessage.Data);
 
-            await _next.Invoke(context);
+            httpContext.Items.UpsertDownstreamRequest(downstreamRequest);
+
+            await _next.Invoke(httpContext);
         }
     }
 }

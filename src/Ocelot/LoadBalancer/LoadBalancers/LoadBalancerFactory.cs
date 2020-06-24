@@ -1,47 +1,48 @@
-﻿using Ocelot.Configuration;
-using Ocelot.Infrastructure;
-using Ocelot.Responses;
-using Ocelot.ServiceDiscovery;
-using System.Threading.Tasks;
-
-namespace Ocelot.LoadBalancer.LoadBalancers
+﻿namespace Ocelot.LoadBalancer.LoadBalancers
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Ocelot.Configuration;
+    using Ocelot.Responses;
+    using Ocelot.ServiceDiscovery;
+
     public class LoadBalancerFactory : ILoadBalancerFactory
     {
         private readonly IServiceDiscoveryProviderFactory _serviceProviderFactory;
+        private readonly IEnumerable<ILoadBalancerCreator> _loadBalancerCreators;
 
-        public LoadBalancerFactory(IServiceDiscoveryProviderFactory serviceProviderFactory)
+        public LoadBalancerFactory(IServiceDiscoveryProviderFactory serviceProviderFactory, IEnumerable<ILoadBalancerCreator> loadBalancerCreators)
         {
             _serviceProviderFactory = serviceProviderFactory;
+            _loadBalancerCreators = loadBalancerCreators;
         }
 
-        public async Task<Response<ILoadBalancer>> Get(DownstreamReRoute reRoute, ServiceProviderConfiguration config)
+        public Response<ILoadBalancer> Get(DownstreamRoute route, ServiceProviderConfiguration config)
         {
-            var response = _serviceProviderFactory.Get(config, reRoute);
+            var serviceProviderFactoryResponse = _serviceProviderFactory.Get(config, route);
 
-            if (response.IsError)
+            if (serviceProviderFactoryResponse.IsError)
             {
-                return new ErrorResponse<ILoadBalancer>(response.Errors);
+                return new ErrorResponse<ILoadBalancer>(serviceProviderFactoryResponse.Errors);
             }
 
-            var serviceProvider = response.Data;
+            var serviceProvider = serviceProviderFactoryResponse.Data;
+            var requestedType = route.LoadBalancerOptions?.Type ?? nameof(NoLoadBalancer);
+            var applicableCreator = _loadBalancerCreators.SingleOrDefault(c => c.Type == requestedType);
 
-            switch (reRoute.LoadBalancerOptions?.Type)
+            if (applicableCreator == null)
             {
-                case nameof(RoundRobin):
-                    return new OkResponse<ILoadBalancer>(new RoundRobin(async () => await serviceProvider.Get()));
-
-                case nameof(LeastConnection):
-                    return new OkResponse<ILoadBalancer>(new LeastConnection(async () => await serviceProvider.Get(), reRoute.ServiceName));
-
-                case nameof(CookieStickySessions):
-                    var loadBalancer = new RoundRobin(async () => await serviceProvider.Get());
-                    var bus = new InMemoryBus<StickySession>();
-                    return new OkResponse<ILoadBalancer>(new CookieStickySessions(loadBalancer, reRoute.LoadBalancerOptions.Key, reRoute.LoadBalancerOptions.ExpiryInMs, bus));
-
-                default:
-                    return new OkResponse<ILoadBalancer>(new NoLoadBalancer(async () => await serviceProvider.Get()));
+                return new ErrorResponse<ILoadBalancer>(new CouldNotFindLoadBalancerCreator($"Could not find load balancer creator for Type: {requestedType}, please check your config specified the correct load balancer and that you have registered a class with the same name."));
             }
+
+            var createdLoadBalancerResponse = applicableCreator.Create(route, serviceProvider);
+
+            if (createdLoadBalancerResponse.IsError)
+            {
+                return new ErrorResponse<ILoadBalancer>(createdLoadBalancerResponse.Errors);
+            }
+
+            return new OkResponse<ILoadBalancer>(createdLoadBalancerResponse.Data);
         }
     }
 }

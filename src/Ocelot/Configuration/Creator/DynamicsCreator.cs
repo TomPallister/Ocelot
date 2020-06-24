@@ -16,32 +16,32 @@ namespace Ocelot.Configuration.Creator
             _versionCreator = versionCreator;
         }
 
-        public List<ReRoute> Create(FileConfiguration fileConfiguration)
+        public List<Route> Create(FileConfiguration fileConfiguration)
         {
-            return fileConfiguration.DynamicReRoutes
-                .Select(dynamic => SetUpDynamicReRoute(dynamic, fileConfiguration.GlobalConfiguration))
+            return fileConfiguration.DynamicRoutes
+                .Select(dynamic => SetUpDynamicRoute(dynamic, fileConfiguration.GlobalConfiguration))
                 .ToList();
         }
 
-        private ReRoute SetUpDynamicReRoute(FileDynamicReRoute fileDynamicReRoute, FileGlobalConfiguration globalConfiguration)
+        private Route SetUpDynamicRoute(FileDynamicRoute fileDynamicRoute, FileGlobalConfiguration globalConfiguration)
         {
             var rateLimitOption = _rateLimitOptionsCreator
-                .Create(fileDynamicReRoute.RateLimitRule, globalConfiguration);
+                .Create(fileDynamicRoute.RateLimitRule, globalConfiguration);
 
-            var version = _versionCreator.Create(fileDynamicReRoute.DownstreamHttpVersion);
+            var version = _versionCreator.Create(fileDynamicRoute.DownstreamHttpVersion);
 
-            var downstreamReRoute = new DownstreamReRouteBuilder()
+            var downstreamRoute = new DownstreamRouteBuilder()
                 .WithEnableRateLimiting(rateLimitOption.EnableRateLimiting)
                 .WithRateLimitOptions(rateLimitOption)
-                .WithServiceName(fileDynamicReRoute.ServiceName)
+                .WithServiceName(fileDynamicRoute.ServiceName)
                 .WithDownstreamHttpVersion(version)
                 .Build();
 
-            var reRoute = new ReRouteBuilder()
-                .WithDownstreamReRoute(downstreamReRoute)
+            var route = new RouteBuilder()
+                .WithDownstreamRoute(downstreamRoute)
                 .Build();
 
-            return reRoute;
+            return route;
         }
     }
 }

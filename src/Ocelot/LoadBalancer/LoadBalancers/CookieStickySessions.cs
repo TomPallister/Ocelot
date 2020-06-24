@@ -2,11 +2,12 @@ namespace Ocelot.LoadBalancer.LoadBalancers
 {
     using Ocelot.Infrastructure;
     using Ocelot.Middleware;
-    using Responses;
+    using Ocelot.Responses;
     using System;
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
-    using Values;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.Values;
 
     public class CookieStickySessions : ILoadBalancer
     {
@@ -41,9 +42,9 @@ namespace Ocelot.LoadBalancer.LoadBalancers
             });
         }
 
-        public async Task<Response<ServiceHostAndPort>> Lease(DownstreamContext context)
+        public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
         {
-            var key = context.HttpContext.Request.Cookies[_key];
+            var key = httpContext.Request.Cookies[_key];
 
             lock (_lock)
             {
@@ -61,7 +62,7 @@ namespace Ocelot.LoadBalancer.LoadBalancers
                 }
             }
 
-            var next = await _loadBalancer.Lease(context);
+            var next = await _loadBalancer.Lease(httpContext);
 
             if (next.IsError)
             {

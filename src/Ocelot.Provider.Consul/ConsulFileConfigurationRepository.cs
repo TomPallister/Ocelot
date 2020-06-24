@@ -31,7 +31,7 @@
             _configurationKey = string.IsNullOrWhiteSpace(serviceDiscoveryProvider.ConfigurationKey) ? "InternalConfiguration" :
                 serviceDiscoveryProvider.ConfigurationKey;
 
-            var config = new ConsulRegistryConfiguration(serviceDiscoveryProvider.Host,
+            var config = new ConsulRegistryConfiguration(serviceDiscoveryProvider.Scheme, serviceDiscoveryProvider.Host,
                 serviceDiscoveryProvider.Port, _configurationKey, serviceDiscoveryProvider.Token);
 
             _consul = factory.Get(config);

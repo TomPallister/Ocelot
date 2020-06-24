@@ -66,7 +66,7 @@ namespace Ocelot.UnitTests.Configuration.Validation
 
         private void ThenTheErorrIs()
         {
-            _result.Errors[0].ErrorMessage.ShouldBe("When not using service discovery Host must be set on DownstreamHostAndPorts if you are not using ReRoute.Host or Ocelot cannot find your service!");
+            _result.Errors[0].ErrorMessage.ShouldBe("When not using service discovery Host must be set on DownstreamHostAndPorts if you are not using Route.Host or Ocelot cannot find your service!");
         }
 
         private void ThenTheResultIsInValid()

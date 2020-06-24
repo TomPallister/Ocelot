@@ -6,8 +6,8 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Ocelot" Version="14.0.3" />
-    <PackageReference Include="Ocelot.Administration" Version="14.0.3" />
+    <PackageReference Include="Ocelot" Version="14.0.9" />
+    <PackageReference Include="Ocelot.Administration" Version="14.0.9" />
 
   </ItemGroup>
 </Project>

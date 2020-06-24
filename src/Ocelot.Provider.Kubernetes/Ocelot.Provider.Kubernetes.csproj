@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="KubeClient" Version="2.3.4" />
-    <PackageReference Include="KubeClient.Extensions.DependencyInjection" Version="2.3.4" />
+    <PackageReference Include="KubeClient" Version="2.3.11" />
+    <PackageReference Include="KubeClient.Extensions.DependencyInjection" Version="2.3.11" />
   </ItemGroup>
 
   <ItemGroup>

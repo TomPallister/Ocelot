@@ -5,6 +5,6 @@ namespace Ocelot.Configuration.Creator
 {
     public interface IUpstreamTemplatePatternCreator
     {
-        UpstreamPathTemplate Create(IReRoute reRoute);
+        UpstreamPathTemplate Create(IRoute route);
     }
 }

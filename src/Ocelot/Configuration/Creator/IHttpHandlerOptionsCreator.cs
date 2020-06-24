@@ -7,6 +7,6 @@ namespace Ocelot.Configuration.Creator
     /// </summary>
     public interface IHttpHandlerOptionsCreator
     {
-        HttpHandlerOptions Create(FileHttpHandlerOptions fileReRoute);
+        HttpHandlerOptions Create(FileHttpHandlerOptions fileRoute);
     }
 }

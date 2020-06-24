@@ -18,7 +18,7 @@ namespace Ocelot.Requester.QoS
             _ocelotLoggerFactory = ocelotLoggerFactory;
         }
 
-        public Response<DelegatingHandler> Get(DownstreamReRoute request)
+        public Response<DelegatingHandler> Get(DownstreamRoute request)
         {
             var handler = _serviceProvider.GetService<QosDelegatingHandlerDelegate>();
 

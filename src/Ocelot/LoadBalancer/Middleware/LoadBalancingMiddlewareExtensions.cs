@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Builder;
-using Ocelot.Middleware.Pipeline;
-
 namespace Ocelot.LoadBalancer.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class LoadBalancingMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseLoadBalancingMiddleware(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseLoadBalancingMiddleware(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<LoadBalancingMiddleware>();
         }

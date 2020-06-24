@@ -6,7 +6,7 @@ namespace Ocelot.Configuration
 
     public interface IInternalConfiguration
     {
-        List<ReRoute> ReRoutes { get; }
+        List<Route> Routes { get; }
 
         string AdministrationPath { get; }
 

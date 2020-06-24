@@ -1,10 +1,10 @@
-﻿using Ocelot.Middleware.Pipeline;
-
-namespace Ocelot.RateLimit.Middleware
+﻿namespace Ocelot.RateLimit.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class RateLimitMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseRateLimiting(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseRateLimiting(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<ClientRateLimitMiddleware>();
         }

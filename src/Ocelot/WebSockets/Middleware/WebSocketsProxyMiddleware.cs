@@ -2,25 +2,26 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Modified https://github.com/aspnet/Proxy websockets class to use in Ocelot.
 
-using Microsoft.AspNetCore.Http;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using System;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Ocelot.WebSockets.Middleware
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System;
+    using System.Linq;
+    using System.Net.WebSockets;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class WebSocketsProxyMiddleware : OcelotMiddleware
     {
         private static readonly string[] NotForwardedWebSocketHeaders = new[] { "Connection", "Host", "Upgrade", "Sec-WebSocket-Accept", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version", "Sec-WebSocket-Extensions" };
         private const int DefaultWebSocketBufferSize = 4096;
         private const int StreamCopyBufferSize = 81920;
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
 
-        public WebSocketsProxyMiddleware(OcelotRequestDelegate next,
+        public WebSocketsProxyMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory)
                 : base(loggerFactory.CreateLogger<WebSocketsProxyMiddleware>())
         {
@@ -67,9 +68,10 @@ namespace Ocelot.WebSockets.Middleware
             }
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            await Proxy(context.HttpContext, context.DownstreamRequest.ToUri());
+            var uri = httpContext.Items.DownstreamRequest().ToUri();
+            await Proxy(httpContext, uri);
         }
 
         private async Task Proxy(HttpContext context, string serverEndpoint)

@@ -15,32 +15,23 @@
     using Ocelot.Configuration;
     using TestStack.BDDfy;
     using Xunit;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class DownstreamRequestInitialiserMiddlewareTests
     {
         private readonly DownstreamRequestInitialiserMiddleware _middleware;
-
-        private readonly Mock<HttpContext> _httpContext;
-
-        private readonly Mock<HttpRequest> _httpRequest;
-
-        private readonly Mock<OcelotRequestDelegate> _next;
-
+        private readonly HttpContext _httpContext;
+        private readonly Mock<RequestDelegate> _next;
         private readonly Mock<IRequestMapper> _requestMapper;
-
         private readonly Mock<IOcelotLoggerFactory> _loggerFactory;
-
         private readonly Mock<IOcelotLogger> _logger;
-
         private Response<HttpRequestMessage> _mappedRequest;
-        private DownstreamContext _downstreamContext;
 
         public DownstreamRequestInitialiserMiddlewareTests()
         {
-            _httpContext = new Mock<HttpContext>();
-            _httpRequest = new Mock<HttpRequest>();
+            _httpContext = new DefaultHttpContext();
             _requestMapper = new Mock<IRequestMapper>();
-            _next = new Mock<OcelotRequestDelegate>();
+            _next = new Mock<RequestDelegate>();
             _logger = new Mock<IOcelotLogger>();
 
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
@@ -53,8 +44,6 @@
                 _loggerFactory.Object,
                 _requestMapper.Object,
                 new DownstreamRequestCreator(new FrameworkDescription()));
-
-            _downstreamContext = new DownstreamContext(_httpContext.Object);
         }
 
         [Fact]
@@ -71,7 +60,7 @@
         }
 
         [Fact]
-        public void Should_map_downstream_reroute_method_to_downstream_request()
+        public void Should_map_downstream_route_method_to_downstream_request()
         {
             this.Given(_ => GivenTheHttpContextContainsARequest())
                 .And(_ => GivenTheMapperWillReturnAMappedRequest())
@@ -97,14 +86,12 @@
 
         private void ThenTheDownstreamRequestMethodIs(string expected)
         {
-            _downstreamContext.DownstreamRequest.Method.ShouldBe(expected);
+            _httpContext.Items.DownstreamRequest().Method.ShouldBe(expected);
         }
 
         private void GivenTheHttpContextContainsARequest()
         {
-            _httpContext
-                .Setup(hc => hc.Request)
-                .Returns(_httpRequest.Object);
+            _httpContext.Items.UpsertDownstreamRoute(new DownstreamRouteBuilder().Build());
         }
 
         private void GivenTheMapperWillReturnAMappedRequest()
@@ -112,7 +99,7 @@
             _mappedRequest = new OkResponse<HttpRequestMessage>(new HttpRequestMessage(HttpMethod.Get, "http://www.bbc.co.uk"));
 
             _requestMapper
-                .Setup(rm => rm.Map(It.IsAny<HttpRequest>(), It.IsAny<DownstreamReRoute>()))
+                .Setup(rm => rm.Map(It.IsAny<HttpRequest>(), It.IsAny<DownstreamRoute>()))
                 .ReturnsAsync(_mappedRequest);
         }
 
@@ -121,44 +108,44 @@
             _mappedRequest = new ErrorResponse<HttpRequestMessage>(new UnmappableRequestError(new System.Exception("boooom!")));
 
             _requestMapper
-                .Setup(rm => rm.Map(It.IsAny<HttpRequest>(), It.IsAny<DownstreamReRoute>()))
+                .Setup(rm => rm.Map(It.IsAny<HttpRequest>(), It.IsAny<DownstreamRoute>()))
                 .ReturnsAsync(_mappedRequest);
         }
 
         private void WhenTheMiddlewareIsInvoked()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
         private void ThenTheContexRequestIsMappedToADownstreamRequest()
         {
-            _requestMapper.Verify(rm => rm.Map(_httpRequest.Object, _downstreamContext.DownstreamReRoute), Times.Once);
+            _requestMapper.Verify(rm => rm.Map(_httpContext.Request, _httpContext.Items.DownstreamRoute()), Times.Once);
         }
 
         private void ThenTheDownstreamRequestIsStored()
         {
-            _downstreamContext.DownstreamRequest.ShouldNotBeNull();
+            _httpContext.Items.DownstreamRequest().ShouldNotBeNull();
         }
 
         private void ThenTheDownstreamRequestIsNotStored()
         {
-            _downstreamContext.DownstreamRequest.ShouldBeNull();
+            _httpContext.Items.DownstreamRequest().ShouldBeNull();
         }
 
         private void ThenAPipelineErrorIsStored()
         {
-            _downstreamContext.IsError.ShouldBeTrue();
-            _downstreamContext.Errors.ShouldBe(_mappedRequest.Errors);
+            _httpContext.Items.Errors().Count.ShouldBeGreaterThan(0);
+            _httpContext.Items.Errors().ShouldBe(_mappedRequest.Errors);
         }
 
         private void ThenTheNextMiddlewareIsInvoked()
         {
-            _next.Verify(n => n(_downstreamContext), Times.Once);
+            _next.Verify(n => n(_httpContext), Times.Once);
         }
 
         private void ThenTheNextMiddlewareIsNotInvoked()
         {
-            _next.Verify(n => n(It.IsAny<DownstreamContext>()), Times.Never);
+            _next.Verify(n => n(It.IsAny<HttpContext>()), Times.Never);
         }
     }
 }
