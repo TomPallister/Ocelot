@@ -1,5 +1,5 @@
 ﻿{
-  "ReRoutes": [
+  "Routes": [
     {
       "DownstreamPathTemplate": "/profile",
       "DownstreamScheme": "http",
@@ -121,7 +121,7 @@
       ],
       "UpstreamPathTemplate": "/posts/{postId}",
       "UpstreamHttpMethod": [ "Get" ],
-      "RequestIdKey": "ReRouteRequestId",
+      "RequestIdKey": "RouteRequestId",
       "HttpHandlerOptions": {
         "AllowAutoRedirect": true,
         "UseCookieContainer": true,

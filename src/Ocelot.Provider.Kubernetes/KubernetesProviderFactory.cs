@@ -9,25 +9,27 @@ namespace Ocelot.Provider.Kubernetes
 {
     public static class KubernetesProviderFactory
     {
-        public static ServiceDiscoveryFinderDelegate Get = (provider, config, reRoute) =>
+        public static ServiceDiscoveryFinderDelegate Get = (provider, config, route) =>
         {
             var factory = provider.GetService<IOcelotLoggerFactory>();
-            return GetkubeProvider(provider, config, reRoute, factory);
+            return GetKubeProvider(provider, config, route, factory);
         };
 
-        private static ServiceDiscovery.Providers.IServiceDiscoveryProvider GetkubeProvider(IServiceProvider provider, Configuration.ServiceProviderConfiguration config, DownstreamReRoute reRoute, IOcelotLoggerFactory factory)
+        private static ServiceDiscovery.Providers.IServiceDiscoveryProvider GetKubeProvider(IServiceProvider provider, ServiceProviderConfiguration config, DownstreamRoute route, IOcelotLoggerFactory factory)
         {
             var kubeClient = provider.GetService<IKubeApiClient>();
+
             var k8sRegistryConfiguration = new KubeRegistryConfiguration()
             {
-                KeyOfServiceInK8s = reRoute.ServiceName,
-                KubeNamespace = string.IsNullOrEmpty(reRoute.ServiceNamespace) ? config.Namespace : reRoute.ServiceNamespace
+                KeyOfServiceInK8s = route.ServiceName,
+                KubeNamespace = string.IsNullOrEmpty(route.ServiceNamespace) ? config.Namespace : route.ServiceNamespace
             };
 
-            var k8sServiceDiscoveryProvider = new Kube(k8sRegistryConfiguration, factory, kubeClient);
+            var k8sServiceDiscoveryProvider = new KubernetesServiceDiscoveryProvider(k8sRegistryConfiguration, factory, kubeClient);
+
             if (config.Type?.ToLower() == "pollkube")
             {
-                return new PollKube(config.PollingInterval, factory, k8sServiceDiscoveryProvider);
+                return new PollKubernetes(config.PollingInterval, factory, k8sServiceDiscoveryProvider);
             }
             return k8sServiceDiscoveryProvider;
         }

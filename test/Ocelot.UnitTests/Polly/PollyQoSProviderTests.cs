@@ -17,10 +17,10 @@
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .WithDurationOfBreak(200)
                 .Build();
-            var reRoute = new DownstreamReRouteBuilder().WithQosOptions(options)
+            var route = new DownstreamRouteBuilder().WithQosOptions(options)
                 .Build();
             var factory = new Mock<IOcelotLoggerFactory>();
-            var pollyQoSProvider = new PollyQoSProvider(reRoute, factory.Object);
+            var pollyQoSProvider = new PollyQoSProvider(route, factory.Object);
             pollyQoSProvider.CircuitBreaker.ShouldNotBeNull();
         }
     }

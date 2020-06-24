@@ -1,5 +1,5 @@
 {
-  "ReRoutes": [
+  "Routes": [
     {
       "DownstreamPathTemplate": "/xservice.svc/serviceMethodA/byNumber/{number}",
       "UpstreamPathTemplate": "/gw/serviceMethodA/byNumber/{number}",

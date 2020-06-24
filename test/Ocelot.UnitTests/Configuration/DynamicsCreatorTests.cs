@@ -16,7 +16,7 @@
         private readonly DynamicsCreator _creator;
         private readonly Mock<IRateLimitOptionsCreator> _rloCreator;
         private readonly Mock<IVersionCreator> _versionCreator;
-        private List<ReRoute> _result;
+        private List<Route> _result;
         private FileConfiguration _fileConfig;
         private RateLimitOptions _rlo1;
         private RateLimitOptions _rlo2;
@@ -46,9 +46,9 @@
         {
             var fileConfig = new FileConfiguration
             {
-                DynamicReRoutes = new List<FileDynamicReRoute>
+                DynamicRoutes = new List<FileDynamicRoute>
                 {
-                    new FileDynamicReRoute
+                    new FileDynamicRoute
                     {
                         ServiceName = "1",
                         RateLimitRule = new FileRateLimitRule
@@ -57,7 +57,7 @@
                         },
                         DownstreamHttpVersion = "1.1"
                     },
-                    new FileDynamicReRoute
+                    new FileDynamicRoute
                     {
                         ServiceName = "2",
                         RateLimitRule = new FileRateLimitRule
@@ -73,7 +73,7 @@
                 .And(_ => GivenTheRloCreatorReturns())
                 .And(_ => GivenTheVersionCreatorReturns())
                 .When(_ => WhenICreate())
-                .Then(_ => ThenTheReRoutesAreReturned())
+                .Then(_ => ThenTheRoutesAreReturned())
                 .And(_ => ThenTheRloCreatorIsCalledCorrectly())
                 .And(_ => ThenTheVersionCreatorIsCalledCorrectly())
                 .BDDfy();
@@ -81,31 +81,31 @@
 
         private void ThenTheRloCreatorIsCalledCorrectly()
         {
-            _rloCreator.Verify(x => x.Create(_fileConfig.DynamicReRoutes[0].RateLimitRule,
+            _rloCreator.Verify(x => x.Create(_fileConfig.DynamicRoutes[0].RateLimitRule,
                 _fileConfig.GlobalConfiguration), Times.Once);
 
-            _rloCreator.Verify(x => x.Create(_fileConfig.DynamicReRoutes[1].RateLimitRule,
+            _rloCreator.Verify(x => x.Create(_fileConfig.DynamicRoutes[1].RateLimitRule,
                 _fileConfig.GlobalConfiguration), Times.Once);
         }
 
         private void ThenTheVersionCreatorIsCalledCorrectly()
         {
-            _versionCreator.Verify(x => x.Create(_fileConfig.DynamicReRoutes[0].DownstreamHttpVersion), Times.Once);
-            _versionCreator.Verify(x => x.Create(_fileConfig.DynamicReRoutes[1].DownstreamHttpVersion), Times.Once);
+            _versionCreator.Verify(x => x.Create(_fileConfig.DynamicRoutes[0].DownstreamHttpVersion), Times.Once);
+            _versionCreator.Verify(x => x.Create(_fileConfig.DynamicRoutes[1].DownstreamHttpVersion), Times.Once);
         }
 
-        private void ThenTheReRoutesAreReturned()
+        private void ThenTheRoutesAreReturned()
         {
             _result.Count.ShouldBe(2);
-            _result[0].DownstreamReRoute[0].EnableEndpointEndpointRateLimiting.ShouldBeFalse();
-            _result[0].DownstreamReRoute[0].RateLimitOptions.ShouldBe(_rlo1);
-            _result[0].DownstreamReRoute[0].DownstreamHttpVersion.ShouldBe(_version);
-            _result[0].DownstreamReRoute[0].ServiceName.ShouldBe(_fileConfig.DynamicReRoutes[0].ServiceName);
+            _result[0].DownstreamRoute[0].EnableEndpointEndpointRateLimiting.ShouldBeFalse();
+            _result[0].DownstreamRoute[0].RateLimitOptions.ShouldBe(_rlo1);
+            _result[0].DownstreamRoute[0].DownstreamHttpVersion.ShouldBe(_version);
+            _result[0].DownstreamRoute[0].ServiceName.ShouldBe(_fileConfig.DynamicRoutes[0].ServiceName);
 
-            _result[1].DownstreamReRoute[0].EnableEndpointEndpointRateLimiting.ShouldBeTrue();
-            _result[1].DownstreamReRoute[0].RateLimitOptions.ShouldBe(_rlo2);
-            _result[1].DownstreamReRoute[0].DownstreamHttpVersion.ShouldBe(_version);
-            _result[1].DownstreamReRoute[0].ServiceName.ShouldBe(_fileConfig.DynamicReRoutes[1].ServiceName);
+            _result[1].DownstreamRoute[0].EnableEndpointEndpointRateLimiting.ShouldBeTrue();
+            _result[1].DownstreamRoute[0].RateLimitOptions.ShouldBe(_rlo2);
+            _result[1].DownstreamRoute[0].DownstreamHttpVersion.ShouldBe(_version);
+            _result[1].DownstreamRoute[0].ServiceName.ShouldBe(_fileConfig.DynamicRoutes[1].ServiceName);
         }
 
         private void GivenTheVersionCreatorReturns()

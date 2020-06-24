@@ -34,7 +34,7 @@
             var provider = new ServiceCollection()
                 .BuildServiceProvider();
             // Todo - replace with mocks
-            _configurationValidator = new FileConfigurationFluentValidator(provider, new ReRouteFluentValidator(_authProvider.Object, new HostAndPortValidator(), new FileQoSOptionsFluentValidator(provider)), new FileGlobalConfigurationFluentValidator(new FileQoSOptionsFluentValidator(provider)));
+            _configurationValidator = new FileConfigurationFluentValidator(provider, new RouteFluentValidator(_authProvider.Object, new HostAndPortValidator(), new FileQoSOptionsFluentValidator(provider)), new FileGlobalConfigurationFluentValidator(new FileQoSOptionsFluentValidator(provider)));
         }
 
         [Fact]
@@ -42,9 +42,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -57,6 +57,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Host = "localhost",
                         Type = "ServiceFabric",
                         Port = 8500
@@ -75,9 +76,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -90,6 +91,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Host = "localhost",
                         Type = "FakeServiceDiscoveryProvider",
                         Port = 8500
@@ -113,6 +115,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Host = "localhost",
                         Type = "FakeServiceDiscoveryProvider",
                         Port = 8500
@@ -132,9 +135,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -147,6 +150,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Host = "localhost",
                         Type = "FakeServiceDiscoveryProvider",
                         Port = 8500
@@ -158,7 +162,7 @@
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
                 .And(x => x.ThenTheErrorIs<FileValidationFailedError>())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?"))
                 .BDDfy();
         }
 
@@ -171,6 +175,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Host = "localhost",
                         Type = "FakeServiceDiscoveryProvider",
                         Port = 8500
@@ -182,7 +187,7 @@
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
                 .And(x => x.ThenTheErrorIs<FileValidationFailedError>())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?"))
                 .BDDfy();
         }
 
@@ -191,9 +196,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -206,6 +211,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Host = "localhost",
                         Type = "consul",
                         Port = 8500
@@ -218,7 +224,7 @@
                 .And(x => x.GivenAServiceDiscoveryHandler())
                 .Then(x => x.ThenTheResultIsNotValid())
                 .And(x => x.ThenTheErrorIs<FileValidationFailedError>())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?"))
                 .BDDfy();
         }
 
@@ -227,9 +233,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -265,9 +271,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -306,9 +312,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -336,7 +342,7 @@
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
                 .And(x => x.ThenTheErrorIs<FileValidationFailedError>())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?"))
                 .BDDfy();
         }
 
@@ -345,9 +351,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -378,7 +384,7 @@
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
                 .And(x => x.ThenTheErrorIs<FileValidationFailedError>())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?"))
                 .BDDfy();
         }
 
@@ -387,9 +393,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -405,7 +411,7 @@
                             UpstreamHttpMethod = new List<string> { "Get" },
                             Key = "Laura"
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -422,13 +428,13 @@
                             Key = "Tom"
                         }
                     },
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                     {
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
@@ -448,9 +454,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -466,7 +472,7 @@
                             UpstreamHttpMethod = new List<string> { "Get" },
                             Key = "Laura"
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -484,13 +490,13 @@
                             UpstreamHost = "localhost"
                         }
                     },
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                     {
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/tom",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
@@ -502,7 +508,7 @@
             this.Given(x => x.GivenAConfiguration(configuration))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "reRoute /tom has duplicate aggregate"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /tom has duplicate aggregate"))
                 .BDDfy();
         }
 
@@ -511,9 +517,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -529,7 +535,7 @@
                             UpstreamHttpMethod = new List<string> { "Get" },
                             Key = "Laura"
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -547,13 +553,13 @@
                             UpstreamHost = "localhost"
                         }
                     },
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                     {
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/tom",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
@@ -573,9 +579,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -591,7 +597,7 @@
                             UpstreamHttpMethod = new List<string> { "Get" },
                             Key = "Laura"
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -608,23 +614,23 @@
                             Key = "Tom"
                         }
                     },
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                     {
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/tom",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
                             }
                         },
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/tom",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
@@ -645,9 +651,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -664,13 +670,13 @@
                             Key = "Laura"
                         }
                     },
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                     {
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
@@ -682,7 +688,7 @@
             this.Given(x => x.GivenAConfiguration(configuration))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "ReRoutes for aggregateReRoute / either do not exist or do not have correct ServiceName property"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "Routes for aggregateRoute / either do not exist or do not have correct ServiceName property"))
                 .BDDfy();
         }
 
@@ -691,9 +697,9 @@
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -709,7 +715,7 @@
                             UpstreamHttpMethod = new List<string> { "Get" },
                             Key = "Laura"
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -727,13 +733,13 @@
                             Key = "Tom"
                         }
                     },
-                Aggregates = new List<FileAggregateReRoute>
+                Aggregates = new List<FileAggregateRoute>
                     {
-                        new FileAggregateReRoute
+                        new FileAggregateRoute
                         {
                             UpstreamPathTemplate = "/",
                             UpstreamHost = "localhost",
-                            ReRouteKeys = new List<string>
+                            RouteKeys = new List<string>
                             {
                                 "Tom",
                                 "Laura"
@@ -745,7 +751,7 @@
             this.Given(x => x.GivenAConfiguration(configuration))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "aggregateReRoute / contains ReRoute with specific RequestIdKey, this is not possible with Aggregates"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "aggregateRoute / contains Route with specific RequestIdKey, this is not possible with Aggregates"))
                 .BDDfy();
         }
 
@@ -754,9 +760,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "http://www.bbc.co.uk/api/products/{productId}",
                         UpstreamPathTemplate = "http://asdf.com"
@@ -777,13 +783,13 @@
         }
 
         [Fact]
-        public void configuration_is_valid_with_one_reroute()
+        public void configuration_is_valid_with_one_route()
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -807,9 +813,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "api/products/",
                         UpstreamPathTemplate = "/asdf/"
@@ -827,9 +833,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "api/prod/",
@@ -847,9 +853,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "//api/prod/",
@@ -875,9 +881,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "//api/products/",
                         UpstreamPathTemplate = "/api/prod/",
@@ -903,9 +909,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -934,9 +940,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -954,13 +960,13 @@
         }
 
         [Fact]
-        public void configuration_is_not_valid_with_duplicate_reroutes_all_verbs()
+        public void configuration_is_not_valid_with_duplicate_routes_all_verbs()
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -972,7 +978,7 @@
                             }
                         },
                     },
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
@@ -988,18 +994,18 @@
             }))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "reRoute /asdf/ has duplicate"))
+                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /asdf/ has duplicate"))
                 .BDDfy();
         }
 
         [Fact]
-        public void configuration_is_valid_with_duplicate_reroutes_all_verbs_but_different_hosts()
+        public void configuration_is_valid_with_duplicate_routes_all_verbs_but_different_hosts()
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/",
                             UpstreamPathTemplate = "/asdf/",
@@ -1012,7 +1018,7 @@
                             },
                             UpstreamHost = "host1"
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/www/test/",
                             UpstreamPathTemplate = "/asdf/",
@@ -1033,13 +1039,13 @@
         }
 
         [Fact]
-        public void configuration_is_not_valid_with_duplicate_reroutes_specific_verbs()
+        public void configuration_is_not_valid_with_duplicate_routes_specific_verbs()
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1052,7 +1058,7 @@
                         },
                         UpstreamHttpMethod = new List<string> {"Get"}
                     },
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1069,18 +1075,18 @@
             }))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "reRoute /asdf/ has duplicate"))
+                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /asdf/ has duplicate"))
                 .BDDfy();
         }
 
         [Fact]
-        public void configuration_is_valid_with_duplicate_reroutes_different_verbs()
+        public void configuration_is_valid_with_duplicate_routes_different_verbs()
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1093,7 +1099,7 @@
                             }
                         },
                     },
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1114,13 +1120,139 @@
         }
 
         [Fact]
+        public void configuration_is_not_valid_with_duplicate_routes_with_duplicated_upstreamhosts()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            }
+                        },
+                        UpstreamHttpMethod = new List<string>(),
+                        UpstreamHost = "upstreamhost"
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            }
+                        },
+                        UpstreamHttpMethod = new List<string>(),
+                        UpstreamHost = "upstreamhost"
+                    }
+                }
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsNotValid())
+                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /asdf/ has duplicate"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void configuration_is_valid_with_duplicate_routes_but_different_upstreamhosts()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            }
+                        },
+                        UpstreamHttpMethod = new List<string>(),
+                        UpstreamHost = "upstreamhost111"
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            }
+                        },
+                        UpstreamHttpMethod = new List<string>(),
+                        UpstreamHost = "upstreamhost222"
+                    }
+                }
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsValid())
+                .BDDfy();
+        }
+
+        [Fact]
+        public void configuration_is_valid_with_duplicate_routes_but_one_upstreamhost_is_not_set()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            }
+                        },
+                        UpstreamHttpMethod = new List<string>(),
+                        UpstreamHost = "upstreamhost"
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            }
+                        },
+                        UpstreamHttpMethod = new List<string>()
+                    }
+                }
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsValid())
+                .BDDfy();
+        }
+        
+        [Fact]
         public void configuration_is_invalid_with_invalid_rate_limit_configuration()
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1151,9 +1283,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1183,9 +1315,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1197,6 +1329,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "https",
                         Type = "servicefabric",
                         Host = "localhost",
                         Port = 1234
@@ -1215,9 +1348,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1234,7 +1367,7 @@
             }))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "When not using service discovery Host must be set on DownstreamHostAndPorts if you are not using ReRoute.Host or Ocelot cannot find your service!"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "When not using service discovery Host must be set on DownstreamHostAndPorts if you are not using Route.Host or Ocelot cannot find your service!"))
                 .BDDfy();
         }
 
@@ -1243,9 +1376,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1270,9 +1403,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1297,9 +1430,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1321,9 +1454,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
@@ -1337,7 +1470,7 @@
             }))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "When not using service discovery Host must be set on DownstreamHostAndPorts if you are not using ReRoute.Host or Ocelot cannot find your service!"))
+                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "When not using service discovery Host must be set on DownstreamHostAndPorts if you are not using Route.Host or Ocelot cannot find your service!"))
                 .BDDfy();
         }
 
@@ -1346,9 +1479,9 @@
         {
             this.Given(x => x.GivenAConfiguration(new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/bar/{everything}",
                         DownstreamScheme = "http",
@@ -1363,7 +1496,7 @@
             }))
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
-                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "reRoute /foo/bar/{everything}/{everything} has duplicated placeholder"))
+                .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /foo/bar/{everything}/{everything} has duplicated placeholder"))
                 .BDDfy();
         }
 
@@ -1411,7 +1544,7 @@
             QosDelegatingHandlerDelegate del = (a, b) => new FakeDelegatingHandler();
             collection.AddSingleton<QosDelegatingHandlerDelegate>(del);
             var provider = collection.BuildServiceProvider();
-            _configurationValidator = new FileConfigurationFluentValidator(provider, new ReRouteFluentValidator(_authProvider.Object, new HostAndPortValidator(), new FileQoSOptionsFluentValidator(provider)), new FileGlobalConfigurationFluentValidator(new FileQoSOptionsFluentValidator(provider)));
+            _configurationValidator = new FileConfigurationFluentValidator(provider, new RouteFluentValidator(_authProvider.Object, new HostAndPortValidator(), new FileQoSOptionsFluentValidator(provider)), new FileGlobalConfigurationFluentValidator(new FileQoSOptionsFluentValidator(provider)));
         }
 
         private void GivenAServiceDiscoveryHandler()
@@ -1420,7 +1553,7 @@
             ServiceDiscoveryFinderDelegate del = (a, b, c) => new FakeServiceDiscoveryProvider();
             collection.AddSingleton<ServiceDiscoveryFinderDelegate>(del);
             var provider = collection.BuildServiceProvider();
-            _configurationValidator = new FileConfigurationFluentValidator(provider, new ReRouteFluentValidator(_authProvider.Object, new HostAndPortValidator(), new FileQoSOptionsFluentValidator(provider)), new FileGlobalConfigurationFluentValidator(new FileQoSOptionsFluentValidator(provider)));
+            _configurationValidator = new FileConfigurationFluentValidator(provider, new RouteFluentValidator(_authProvider.Object, new HostAndPortValidator(), new FileQoSOptionsFluentValidator(provider)), new FileGlobalConfigurationFluentValidator(new FileQoSOptionsFluentValidator(provider)));
         }
 
         private class FakeServiceDiscoveryProvider : IServiceDiscoveryProvider

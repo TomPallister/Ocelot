@@ -1,6 +1,6 @@
 ﻿namespace Ocelot.Middleware
 {
-    using DependencyInjection;
+    using Ocelot.DependencyInjection;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,6 @@
     using Ocelot.Configuration.Repository;
     using Ocelot.Configuration.Setter;
     using Ocelot.Logging;
-    using Ocelot.Middleware.Pipeline;
     using Ocelot.Responses;
     using System;
     using System.Diagnostics;
@@ -42,37 +41,25 @@
             return CreateOcelotPipeline(builder, pipelineConfiguration);
         }
 
-        public static Task<IApplicationBuilder> UseOcelot(this IApplicationBuilder app, Action<IOcelotPipelineBuilder, OcelotPipelineConfiguration> builderAction)
+        public static Task<IApplicationBuilder> UseOcelot(this IApplicationBuilder app, Action<IApplicationBuilder, OcelotPipelineConfiguration> builderAction)
             => UseOcelot(app, builderAction, new OcelotPipelineConfiguration());
 
-        public static async Task<IApplicationBuilder> UseOcelot(this IApplicationBuilder app, Action<IOcelotPipelineBuilder, OcelotPipelineConfiguration> builderAction, OcelotPipelineConfiguration configuration)
+        public static async Task<IApplicationBuilder> UseOcelot(this IApplicationBuilder app, Action<IApplicationBuilder, OcelotPipelineConfiguration> builderAction, OcelotPipelineConfiguration configuration)
         {
-            await CreateConfiguration(app);  // initConfiguration
+            await CreateConfiguration(app);
 
             ConfigureDiagnosticListener(app);
 
-            var ocelotPipelineBuilder = new OcelotPipelineBuilder(app.ApplicationServices);
-            builderAction?.Invoke(ocelotPipelineBuilder, configuration ?? new OcelotPipelineConfiguration());
+            builderAction?.Invoke(app, configuration ?? new OcelotPipelineConfiguration());
 
-            var ocelotDelegate = ocelotPipelineBuilder.Build();
             app.Properties["analysis.NextMiddlewareName"] = "TransitionToOcelotMiddleware";
-
-            app.Use(async (context, task) =>
-            {
-                var downstreamContext = new DownstreamContext(context);
-                await ocelotDelegate.Invoke(downstreamContext);
-            });
 
             return app;
         }
 
         private static IApplicationBuilder CreateOcelotPipeline(IApplicationBuilder builder, OcelotPipelineConfiguration pipelineConfiguration)
         {
-            var pipelineBuilder = new OcelotPipelineBuilder(builder.ApplicationServices);
-
-            pipelineBuilder.BuildOcelotPipeline(pipelineConfiguration);
-
-            var firstDelegate = pipelineBuilder.Build();
+            builder.BuildOcelotPipeline(pipelineConfiguration);
 
             /*
             inject first delegate into first piece of asp.net middleware..maybe not like this
@@ -81,12 +68,6 @@
             */
 
             builder.Properties["analysis.NextMiddlewareName"] = "TransitionToOcelotMiddleware";
-
-            builder.Use(async (context, task) =>
-            {
-                var downstreamContext = new DownstreamContext(context);
-                await firstDelegate.Invoke(downstreamContext);
-            });
 
             return builder;
         }

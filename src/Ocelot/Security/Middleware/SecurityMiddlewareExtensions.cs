@@ -1,10 +1,10 @@
-﻿using Ocelot.Middleware.Pipeline;
-
-namespace Ocelot.Security.Middleware
+﻿namespace Ocelot.Security.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class SecurityMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseSecurityMiddleware(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseSecurityMiddleware(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<SecurityMiddleware>();
         }

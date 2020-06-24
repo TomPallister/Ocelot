@@ -23,18 +23,18 @@ namespace Ocelot.ServiceDiscovery
             _delegates = provider.GetService<ServiceDiscoveryFinderDelegate>();
         }
 
-        public Response<IServiceDiscoveryProvider> Get(ServiceProviderConfiguration serviceConfig, DownstreamReRoute reRoute)
+        public Response<IServiceDiscoveryProvider> Get(ServiceProviderConfiguration serviceConfig, DownstreamRoute route)
         {
-            if (reRoute.UseServiceDiscovery)
+            if (route.UseServiceDiscovery)
             {
-                return GetServiceDiscoveryProvider(serviceConfig, reRoute);
+                return GetServiceDiscoveryProvider(serviceConfig, route);
             }
 
             var services = new List<Service>();
 
-            foreach (var downstreamAddress in reRoute.DownstreamAddresses)
+            foreach (var downstreamAddress in route.DownstreamAddresses)
             {
-                var service = new Service(reRoute.ServiceName, new ServiceHostAndPort(downstreamAddress.Host, downstreamAddress.Port, reRoute.DownstreamScheme), string.Empty, string.Empty, new string[0]);
+                var service = new Service(route.ServiceName, new ServiceHostAndPort(downstreamAddress.Host, downstreamAddress.Port, route.DownstreamScheme), string.Empty, string.Empty, new string[0]);
 
                 services.Add(service);
             }
@@ -42,17 +42,17 @@ namespace Ocelot.ServiceDiscovery
             return new OkResponse<IServiceDiscoveryProvider>(new ConfigurationServiceProvider(services));
         }
 
-        private Response<IServiceDiscoveryProvider> GetServiceDiscoveryProvider(ServiceProviderConfiguration config, DownstreamReRoute reRoute)
+        private Response<IServiceDiscoveryProvider> GetServiceDiscoveryProvider(ServiceProviderConfiguration config, DownstreamRoute route)
         {
             if (config.Type?.ToLower() == "servicefabric")
             {
-                var sfConfig = new ServiceFabricConfiguration(config.Host, config.Port, reRoute.ServiceName);
+                var sfConfig = new ServiceFabricConfiguration(config.Host, config.Port, route.ServiceName);
                 return new OkResponse<IServiceDiscoveryProvider>(new ServiceFabricServiceDiscoveryProvider(sfConfig));
             }
 
             if (_delegates != null)
             {
-                var provider = _delegates?.Invoke(_provider, config, reRoute);
+                var provider = _delegates?.Invoke(_provider, config, route);
 
                 if (provider.GetType().Name.ToLower() == config.Type.ToLower())
                 {

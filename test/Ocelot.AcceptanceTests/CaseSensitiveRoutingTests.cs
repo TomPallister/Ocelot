@@ -26,9 +26,9 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/{productId}",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -55,15 +55,15 @@ namespace Ocelot.AcceptanceTests
         }
 
         [Fact]
-        public void should_return_response_200_when_reroute_ignore_case_sensitivity_set()
+        public void should_return_response_200_when_route_ignore_case_sensitivity_set()
         {
             int port = RandomPortFinder.GetRandomPort();
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/{productId}",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -77,7 +77,7 @@ namespace Ocelot.AcceptanceTests
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/products/{productId}",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            ReRouteIsCaseSensitive = false,
+                            RouteIsCaseSensitive = false,
                         }
                     }
             };
@@ -91,15 +91,15 @@ namespace Ocelot.AcceptanceTests
         }
 
         [Fact]
-        public void should_return_response_404_when_reroute_respect_case_sensitivity_set()
+        public void should_return_response_404_when_route_respect_case_sensitivity_set()
         {
             int port = RandomPortFinder.GetRandomPort();
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/{productId}",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -113,7 +113,7 @@ namespace Ocelot.AcceptanceTests
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/products/{productId}",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            ReRouteIsCaseSensitive = true,
+                            RouteIsCaseSensitive = true,
                         }
                     }
             };
@@ -127,15 +127,15 @@ namespace Ocelot.AcceptanceTests
         }
 
         [Fact]
-        public void should_return_response_200_when_reroute_respect_case_sensitivity_set()
+        public void should_return_response_200_when_route_respect_case_sensitivity_set()
         {
             int port = RandomPortFinder.GetRandomPort();
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/{productId}",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -149,7 +149,7 @@ namespace Ocelot.AcceptanceTests
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/PRODUCTS/{productId}",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            ReRouteIsCaseSensitive = true,
+                            RouteIsCaseSensitive = true,
                         }
                     }
             };
@@ -169,9 +169,9 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/{productId}",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -185,7 +185,7 @@ namespace Ocelot.AcceptanceTests
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/products/{productId}",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            ReRouteIsCaseSensitive = true,
+                            RouteIsCaseSensitive = true,
                         }
                     }
             };
@@ -205,9 +205,9 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/products/{productId}",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -221,7 +221,7 @@ namespace Ocelot.AcceptanceTests
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/PRODUCTS/{productId}",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            ReRouteIsCaseSensitive = true,
+                            RouteIsCaseSensitive = true,
                         }
                     }
             };

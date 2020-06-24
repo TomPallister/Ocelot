@@ -28,7 +28,7 @@ namespace OcelotGraphQL
 
     public class Query
     {
-        private List<Hero> _heroes = new List<Hero>
+        private readonly List<Hero> _heroes = new List<Hero>
         {
             new Hero { Id = 1, Name = "R2-D2" },
             new Hero { Id = 2, Name = "Batman" },
@@ -58,7 +58,7 @@ namespace OcelotGraphQL
             var query = await request.Content.ReadAsStringAsync();
 
             //if not body try query string, dont hack like this in real world..
-            if(query.Length == 0)
+            if (query.Length == 0)
             {
                 var decoded = WebUtility.UrlDecode(request.RequestUri.Query);
                 query = decoded.Replace("?query=", "");
@@ -82,7 +82,7 @@ namespace OcelotGraphQL
 
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             var schema = Schema.For(@"
                 type Hero {
@@ -93,7 +93,8 @@ namespace OcelotGraphQL
                 type Query {
                     hero(id: Int): Hero
                 }
-            ", _ => {
+            ", _ =>
+            {
                 _.Types.Include<Query>();
             });
 
@@ -109,10 +110,11 @@ namespace OcelotGraphQL
                         .AddJsonFile("ocelot.json", false, false)
                         .AddEnvironmentVariables();
                 })
-                .ConfigureServices(s => {
-                        s.AddSingleton<ISchema>(schema);
-                        s.AddOcelot()
-                            .AddSingletonDelegatingHandler<GraphQlDelegatingHandler>();
+                .ConfigureServices(s =>
+                {
+                    s.AddSingleton<ISchema>(schema);
+                    s.AddOcelot()
+                        .AddDelegatingHandler<GraphQlDelegatingHandler>();
                 })
                 .ConfigureLogging((hostingContext, logging) =>
                 {
@@ -125,7 +127,7 @@ namespace OcelotGraphQL
                     app.UseOcelot().Wait();
                 })
                 .Build()
-                .Run();     
-            }
+                .Run();
         }
+    }
 }

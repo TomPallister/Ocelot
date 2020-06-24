@@ -1,7 +1,7 @@
 Authentication
 ==============
 
-In order to authenticate ReRoutes and subsequently use any of Ocelot's claims based features such as authorisation or modifying the request with values from the token. Users must register authentication services in their Startup.cs as usual but they provide a scheme (authentication provider key) with each registration e.g.
+In order to authenticate Routes and subsequently use any of Ocelot's claims based features such as authorisation or modifying the request with values from the token. Users must register authentication services in their Startup.cs as usual but they provide a scheme (authentication provider key) with each registration e.g.
 
 .. code-block:: csharp
 
@@ -16,12 +16,11 @@ In order to authenticate ReRoutes and subsequently use any of Ocelot's claims ba
     }
 
 
-In this example TestKey is the scheme that this provider has been registered with.
-We then map this to a ReRoute in the configuration e.g.
+In this example TestKey is the scheme that this provider has been registered with. We then map this to a Route in the configuration e.g.
 
 .. code-block:: json
 
-    "ReRoutes": [{
+    "Routes": [{
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
@@ -31,7 +30,7 @@ We then map this to a ReRoute in the configuration e.g.
             "DownstreamPathTemplate": "/",
             "UpstreamPathTemplate": "/",
             "UpstreamHttpMethod": ["Post"],
-            "ReRouteIsCaseSensitive": false,
+            "RouteIsCaseSensitive": false,
             "DownstreamScheme": "http",
             "AuthenticationOptions": {
                 "AuthenticationProviderKey": "TestKey",
@@ -39,11 +38,9 @@ We then map this to a ReRoute in the configuration e.g.
             }
         }]
 
-When Ocelot runs it will look at this ReRoutes AuthenticationOptions.AuthenticationProviderKey 
-and check that there is an Authentication provider registered with the given key. If there isn't then Ocelot 
-will not start up, if there is then the ReRoute will use that provider when it executes.
+When Ocelot runs it will look at this Routes AuthenticationOptions.AuthenticationProviderKey and check that there is an Authentication provider registered with the given key. If there isn't then Ocelot will not start up, if there is then the Route will use that provider when it executes.
 
-If a ReRoute is authenticated Ocelot will invoke whatever scheme is associated with it while executing the authentication middleware. If the request fails authentication Ocelot returns a http status code 401.
+If a Route is authenticated Ocelot will invoke whatever scheme is associated with it while executing the authentication middleware. If the request fails authentication Ocelot returns a http status code 401.
 
 JWT Tokens
 ^^^^^^^^^^
@@ -66,11 +63,11 @@ If you want to authenticate using JWT tokens maybe from a provider like Auth0 yo
         services.AddOcelot();
     }
 
-Then map the authentication provider key to a ReRoute in your configuration e.g.
+Then map the authentication provider key to a Route in your configuration e.g.
 
 .. code-block:: json
 
-    "ReRoutes": [{
+    "Routes": [{
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
@@ -80,7 +77,7 @@ Then map the authentication provider key to a ReRoute in your configuration e.g.
             "DownstreamPathTemplate": "/",
             "UpstreamPathTemplate": "/",
             "UpstreamHttpMethod": ["Post"],
-            "ReRouteIsCaseSensitive": false,
+            "RouteIsCaseSensitive": false,
             "DownstreamScheme": "http",
             "AuthenticationOptions": {
                 "AuthenticationProviderKey": "TestKey",
@@ -114,11 +111,11 @@ In order to use IdentityServer bearer tokens, register your IdentityServer servi
         services.AddOcelot();
     }
 
-Then map the authentication provider key to a ReRoute in your configuration e.g.
+Then map the authentication provider key to a Route in your configuration e.g.
 
 .. code-block:: json
 
-    "ReRoutes": [{
+    "Routes": [{
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
@@ -128,7 +125,7 @@ Then map the authentication provider key to a ReRoute in your configuration e.g.
             "DownstreamPathTemplate": "/",
             "UpstreamPathTemplate": "/",
             "UpstreamHttpMethod": ["Post"],
-            "ReRouteIsCaseSensitive": false,
+            "RouteIsCaseSensitive": false,
             "DownstreamScheme": "http",
             "AuthenticationOptions": {
                 "AuthenticationProviderKey": "TestKey",
@@ -179,4 +176,4 @@ Allowed Scopes
 
 If you add scopes to AllowedScopes Ocelot will get all the user claims (from the token) of the type scope and make sure that the user has all of the scopes in the list.
 
-This is a way to restrict access to a ReRoute on a per scope basis.
+This is a way to restrict access to a Route on a per scope basis.

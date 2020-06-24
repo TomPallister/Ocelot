@@ -91,7 +91,7 @@ namespace Ocelot.UnitTests.LoadBalancer
 
         private void WhenIGetTheNextHostAndPort()
         {
-            _result = _loadBalancer.Lease(new DownstreamContext(new DefaultHttpContext())).Result;
+            _result = _loadBalancer.Lease(new DefaultHttpContext()).Result;
         }
 
         private void ThenTheHostAndPortIs(ServiceHostAndPort expected)

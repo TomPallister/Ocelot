@@ -5,7 +5,7 @@
     public class UnableToSaveAcceptCommand : Error
     {
         public UnableToSaveAcceptCommand(string message)
-            : base(message, OcelotErrorCode.UnknownError)
+            : base(message, OcelotErrorCode.UnknownError, 404)
         {
         }
     }

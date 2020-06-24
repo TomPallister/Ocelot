@@ -21,7 +21,7 @@ namespace Ocelot.UnitTests.Requester
         private DelegatingHandlerHandlerFactory _factory;
         private readonly Mock<IOcelotLoggerFactory> _loggerFactory;
         private readonly Mock<IOcelotLogger> _logger;
-        private DownstreamReRoute _downstreamReRoute;
+        private DownstreamRoute _downstreamRoute;
         private Response<List<Func<DelegatingHandler>>> _result;
         private readonly Mock<IQoSFactory> _qosFactory;
         private readonly Mock<ITracingHandlerFactory> _tracingFactory;
@@ -50,7 +50,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithDelegatingHandlers(new List<string>
@@ -61,7 +61,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandlerThree, FakeDelegatingHandlerFour>())
@@ -86,7 +86,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithDelegatingHandlers(new List<string>
@@ -98,7 +98,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandlerFour, FakeDelegatingHandlerThree>())
@@ -123,7 +123,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithDelegatingHandlers(new List<string>
@@ -134,7 +134,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandlerThree, FakeDelegatingHandlerFour>())
@@ -159,7 +159,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithDelegatingHandlers(new List<string>
@@ -169,7 +169,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandlerThree, FakeDelegatingHandlerFour>())
@@ -193,13 +193,13 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandler, FakeDelegatingHandlerTwo>())
@@ -219,7 +219,7 @@ namespace Ocelot.UnitTests.Requester
             var qosOptions = new QoSOptionsBuilder()
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, false, true, int.MaxValue))
                 .WithDelegatingHandlers(new List<string>
@@ -230,7 +230,7 @@ namespace Ocelot.UnitTests.Requester
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheServiceProviderReturnsSpecificDelegatingHandlers<FakeDelegatingHandler, FakeDelegatingHandlerTwo>())
                 .When(x => WhenIGet())
                 .Then(x => ThenThereIsDelegatesInProvider(2))
@@ -247,11 +247,11 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, false, true, int.MaxValue)).WithLoadBalancerKey("").Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandler, FakeDelegatingHandlerTwo>())
                 .When(x => WhenIGet())
@@ -267,11 +267,11 @@ namespace Ocelot.UnitTests.Requester
             var qosOptions = new QoSOptionsBuilder()
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, false, true, int.MaxValue)).WithLoadBalancerKey("").Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheServiceProviderReturnsNothing())
                 .When(x => WhenIGet())
                 .Then(x => ThenNoDelegatesAreInTheProvider())
@@ -287,11 +287,11 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, false, true, int.MaxValue)).WithLoadBalancerKey("").Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheServiceProviderReturnsNothing())
                 .When(x => WhenIGet())
@@ -307,11 +307,11 @@ namespace Ocelot.UnitTests.Requester
                 .WithTimeoutValue(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, false, true, int.MaxValue)).WithLoadBalancerKey("").Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturns(new FakeQoSHandler()))
                 .And(x => GivenTheServiceProviderReturnsNothing())
                 .When(x => WhenIGet())
@@ -329,13 +329,13 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturnsError())
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandler, FakeDelegatingHandlerTwo>())
@@ -359,13 +359,13 @@ namespace Ocelot.UnitTests.Requester
                 .WithExceptionsAllowedBeforeBreaking(1)
                 .Build();
 
-            var reRoute = new DownstreamReRouteBuilder()
+            var route = new DownstreamRouteBuilder()
                 .WithQosOptions(qosOptions)
                 .WithHttpHandlerOptions(new HttpHandlerOptions(true, true, true, true, int.MaxValue))
                 .WithLoadBalancerKey("")
                 .Build();
 
-            this.Given(x => GivenTheFollowingRequest(reRoute))
+            this.Given(x => GivenTheFollowingRequest(route))
                 .And(x => GivenTheQosFactoryReturnsNull())
                 .And(x => GivenTheTracingFactoryReturns())
                 .And(x => GivenTheServiceProviderReturnsGlobalDelegatingHandlers<FakeDelegatingHandler, FakeDelegatingHandlerTwo>())
@@ -382,7 +382,7 @@ namespace Ocelot.UnitTests.Requester
 
         private void ThenTheWarningIsLogged()
         {
-            _logger.Verify(x => x.LogWarning($"ReRoute {_downstreamReRoute.UpstreamPathTemplate} specifies use QoS but no QosHandler found in DI container. Will use not use a QosHandler, please check your setup!"), Times.Once);
+            _logger.Verify(x => x.LogWarning($"Route {_downstreamRoute.UpstreamPathTemplate} specifies use QoS but no QosHandler found in DI container. Will use not use a QosHandler, please check your setup!"), Times.Once);
         }
 
         private void ThenHandlerAtPositionIs<T>(int pos)
@@ -452,21 +452,21 @@ namespace Ocelot.UnitTests.Requester
         private void GivenTheQosFactoryReturns(DelegatingHandler handler)
         {
             _qosFactory
-                .Setup(x => x.Get(It.IsAny<DownstreamReRoute>()))
+                .Setup(x => x.Get(It.IsAny<DownstreamRoute>()))
                 .Returns(new OkResponse<DelegatingHandler>(handler));
         }
 
         private void GivenTheQosFactoryReturnsError()
         {
             _qosFactory
-                .Setup(x => x.Get(It.IsAny<DownstreamReRoute>()))
+                .Setup(x => x.Get(It.IsAny<DownstreamRoute>()))
                 .Returns(new ErrorResponse<DelegatingHandler>(new AnyError()));
         }
 
         private void GivenTheQosFactoryReturnsNull()
         {
             _qosFactory
-                .Setup(x => x.Get(It.IsAny<DownstreamReRoute>()))
+                .Setup(x => x.Get(It.IsAny<DownstreamRoute>()))
                 .Returns((ErrorResponse<DelegatingHandler>)null);
         }
 
@@ -483,16 +483,16 @@ namespace Ocelot.UnitTests.Requester
             _result.Data.Count.ShouldBe(count);
         }
 
-        private void GivenTheFollowingRequest(DownstreamReRoute request)
+        private void GivenTheFollowingRequest(DownstreamRoute request)
         {
-            _downstreamReRoute = request;
+            _downstreamRoute = request;
         }
 
         private void WhenIGet()
         {
             _serviceProvider = _services.BuildServiceProvider();
             _factory = new DelegatingHandlerHandlerFactory(_tracingFactory.Object, _qosFactory.Object, _serviceProvider, _loggerFactory.Object);
-            _result = _factory.Get(_downstreamReRoute);
+            _result = _factory.Get(_downstreamRoute);
         }
 
         private void ThenNoDelegatesAreInTheProvider()

@@ -2,6 +2,7 @@ namespace Ocelot.AcceptanceTests
 {
     using Configuration.File;
     using Consul;
+    using IdentityServer4.Extensions;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -37,9 +38,9 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -59,6 +60,7 @@ namespace Ocelot.AcceptanceTests
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -169,9 +171,9 @@ namespace Ocelot.AcceptanceTests
                         {
                             context.Response.StatusCode = statusCode;
                             await context.Response.WriteAsync(responseBody);
-                            });
                         });
-                    })
+                    });
+                })
                 .Build();
 
             _builder.Start();

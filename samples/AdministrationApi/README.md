@@ -1,6 +1,6 @@
 ```json
 {
-  "reRoutes": [
+  "routes": [
     {
       "downstreamPathTemplate": "/{everything}",
       "upstreamPathTemplate": "/templates/{everything}",
@@ -18,7 +18,7 @@
         "ttlSeconds": 0,
         "region": null
       },
-      "reRouteIsCaseSensitive": false,
+      "routeIsCaseSensitive": false,
       "downstreamScheme": "http",
       "qoSOptions": {
         "exceptionsAllowedBeforeBreaking": 0,

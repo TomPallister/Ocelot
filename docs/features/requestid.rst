@@ -1,12 +1,10 @@
 Request Id / Correlation Id
 ===========================
 
-Ocelot supports a client sending a request id in the form of a header. If set Ocelot will
-use the requestid for logging as soon as it becomes available in the middleware pipeline. 
+Ocelot supports a client sending a request id in the form of a header. If set Ocelot willuse the requestid for logging as soon as it becomes available in the middleware pipeline. 
 Ocelot will also forward the request id with the specified header to the downstream service.
 
-You can still get the asp.net core request id in the logs if you set 
-IncludeScopes true in your logging config.
+You can still get the asp.net core request id in the logs if you set IncludeScopes true in your logging config.
 
 In order to use the request id feature you have two options.
 
@@ -20,19 +18,19 @@ In your ocelot.json set the following in the GlobalConfiguration section. This w
     "RequestIdKey": "OcRequestId"
   }
 
-I recommend using the GlobalConfiguration unless you really need it to be ReRoute specific.
+I recommend using the GlobalConfiguration unless you really need it to be Route specific.
 
-*ReRoute*
+*Route*
 
-If you want to override this for a specific ReRoute add the following to ocelot.json for the specific ReRoute.
+If you want to override this for a specific Route add the following to ocelot.json for the specific Route.
 
 .. code-block:: json
 
     "RequestIdKey": "OcRequestId"
 
-Once Ocelot has identified the incoming requests matching ReRoute object it will set the request id based on the ReRoute configuration.
+Once Ocelot has identified the incoming requests matching Route object it will set the request id based on the Route configuration.
 
-This can lead to a small gotcha. If you set a GlobalConfiguration it is possible to get one request id until the ReRoute is identified and then another after that because the request id key can change. This is by design and is the best solution I can think of at the moment. In this case the OcelotLogger will show the request id and previous request id in the logs.
+This can lead to a small gotcha. If you set a GlobalConfiguration it is possible to get one request id until the Route is identified and then another after that because the request id key can change. This is by design and is the best solution I can think of at the moment. In this case the OcelotLogger will show the request id and previous request id in the logs.
 
 Below is an example of the logging when set at Debug level for a normal request..
 
@@ -43,7 +41,7 @@ Below is an example of the logging when set at Debug level for a normal request.
     dbug: Ocelot.DownstreamRouteFinder.Middleware.DownstreamRouteFinderMiddleware[0]
           requestId: asdf, previousRequestId: no previous request id, message: upstream url path is {upstreamUrlPath},
     dbug: Ocelot.DownstreamRouteFinder.Middleware.DownstreamRouteFinderMiddleware[0]
-          requestId: asdf, previousRequestId: no previous request id, message: downstream template is {downstreamRoute.Data.ReRoute.DownstreamPath},
+          requestId: asdf, previousRequestId: no previous request id, message: downstream template is {downstreamRoute.Data.Route.DownstreamPath},
     dbug: Ocelot.RateLimit.Middleware.ClientRateLimitMiddleware[0]
           requestId: asdf, previousRequestId: no previous request id, message: EndpointRateLimiting is not enabled for Ocelot.Values.PathTemplate,
     dbug: Ocelot.Authorisation.Middleware.AuthorisationMiddleware[0]

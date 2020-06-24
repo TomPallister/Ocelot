@@ -1,58 +1,62 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Ocelot.Configuration;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using System.Threading.Tasks;
-
-namespace Ocelot.Authentication.Middleware
+﻿namespace Ocelot.Authentication.Middleware
 {
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Authentication;
+    using Ocelot.Configuration;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System.Threading.Tasks;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+
     public class AuthenticationMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
 
-        public AuthenticationMiddleware(OcelotRequestDelegate next,
+        public AuthenticationMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory)
             : base(loggerFactory.CreateLogger<AuthenticationMiddleware>())
         {
             _next = next;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            if (context.HttpContext.Request.Method.ToUpper() != "OPTIONS" && IsAuthenticatedRoute(context.DownstreamReRoute))
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+
+            if (httpContext.Request.Method.ToUpper() != "OPTIONS" && IsAuthenticatedRoute(downstreamRoute))
             {
-                Logger.LogInformation($"{context.HttpContext.Request.Path} is an authenticated route. {MiddlewareName} checking if client is authenticated");
+                Logger.LogInformation($"{httpContext.Request.Path} is an authenticated route. {MiddlewareName} checking if client is authenticated");
 
-                var result = await context.HttpContext.AuthenticateAsync(context.DownstreamReRoute.AuthenticationOptions.AuthenticationProviderKey);
+                var result = await httpContext.AuthenticateAsync(downstreamRoute.AuthenticationOptions.AuthenticationProviderKey);
 
-                context.HttpContext.User = result.Principal;
+                httpContext.User = result.Principal;
 
-                if (context.HttpContext.User.Identity.IsAuthenticated)
+                if (httpContext.User.Identity.IsAuthenticated)
                 {
-                    Logger.LogInformation($"Client has been authenticated for {context.HttpContext.Request.Path}");
-                    await _next.Invoke(context);
+                    Logger.LogInformation($"Client has been authenticated for {httpContext.Request.Path}");
+                    await _next.Invoke(httpContext);
                 }
                 else
                 {
                     var error = new UnauthenticatedError(
-                        $"Request for authenticated route {context.HttpContext.Request.Path} by {context.HttpContext.User.Identity.Name} was unauthenticated");
+                        $"Request for authenticated route {httpContext.Request.Path} by {httpContext.User.Identity.Name} was unauthenticated");
 
-                    Logger.LogWarning($"Client has NOT been authenticated for {context.HttpContext.Request.Path} and pipeline error set. {error}");
+                    Logger.LogWarning($"Client has NOT been authenticated for {httpContext.Request.Path} and pipeline error set. {error}");
 
-                    SetPipelineError(context, error);
+                    httpContext.Items.SetError(error);
                 }
             }
             else
             {
-                Logger.LogInformation($"No authentication needed for {context.HttpContext.Request.Path}");
+                Logger.LogInformation($"No authentication needed for {httpContext.Request.Path}");
 
-                await _next.Invoke(context);
+                await _next.Invoke(httpContext);
             }
         }
 
-        private static bool IsAuthenticatedRoute(DownstreamReRoute reRoute)
+        private static bool IsAuthenticatedRoute(DownstreamRoute route)
         {
-            return reRoute.IsAuthenticated;
+            return route.IsAuthenticated;
         }
     }
 }

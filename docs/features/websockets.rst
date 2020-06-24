@@ -15,7 +15,7 @@ In your Configure method you need to tell your application to use WebSockets.
         app.UseOcelot().Wait();
     })
 
-Then in your ocelot.json add the following to proxy a ReRoute using websockets.
+Then in your ocelot.json add the following to proxy a Route using websockets.
 
 .. code-block:: json
 
@@ -31,9 +31,7 @@ Then in your ocelot.json add the following to proxy a ReRoute using websockets.
             ],
         }
 
-With this configuration set Ocelot will match any websocket traffic that comes in on / and proxy it to localhost:5001/ws. To make this clearer
-Ocelot will receive messages from the upstream client, proxy these to the downstream service, receive messages from the downstream service and 
-proxy these to the upstream client.
+With this configuration set Ocelot will match any websocket traffic that comes in on / and proxy it to localhost:5001/ws. To make this clearer Ocelot will receive messages from the upstream client, proxy these to the downstream service, receive messages from the downstream service and proxy these to the upstream client.
 
 SignalR
 ^^^^^^^
@@ -56,12 +54,12 @@ In your Configure method you need to tell your application to use SignalR.
         app.UseOcelot().Wait();
     })
 
-Then in your ocelot.json add the following to proxy a ReRoute using SignalR. Note normal Ocelot routing rules apply the main thing is the scheme which is set to "ws".
+Then in your ocelot.json add the following to proxy a Route using SignalR. Note normal Ocelot routing rules apply the main thing is the scheme which is set to "ws".
 
 .. code-block:: json
 
    {
-  "ReRoutes": [
+  "Routes": [
     {
       "DownstreamPathTemplate": "/{catchAll}",
       "DownstreamScheme": "ws",
@@ -77,9 +75,7 @@ Then in your ocelot.json add the following to proxy a ReRoute using SignalR. Not
  ]
 }
 
-With this configuration set Ocelot will match any SignalR traffic that comes in on / and proxy it to localhost:5001/ws. To make this clearer
-Ocelot will receive messages from the upstream client, proxy these to the downstream service, receive messages from the downstream service and 
-proxy these to the upstream client.
+With this configuration set Ocelot will match any SignalR traffic that comes in on / and proxy it to localhost:5001/ws. To make this clearer Ocelot will receive messages from the upstream client, proxy these to the downstream service, receive messages from the downstream service and proxy these to the upstream client.
 
 Supported
 ^^^^^^^^^
@@ -88,8 +84,7 @@ Supported
 2. Routing
 3. Service Discovery
 
-This means that you can set up your downstream services running websockets and either have multiple DownstreamHostAndPorts in your ReRoute 
-config or hook your ReRoute into a service discovery provider and then load balance requests...Which I think is pretty cool :)
+This means that you can set up your downstream services running websockets and either have multiple DownstreamHostAndPorts in your Route config or hook your Route into a service discovery provider and then load balance requests...Which I think is pretty cool :)
 
 Not Supported
 ^^^^^^^^^^^^^

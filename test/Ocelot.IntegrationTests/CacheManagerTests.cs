@@ -48,9 +48,9 @@ namespace Ocelot.IntegrationTests
                 GlobalConfiguration = new FileGlobalConfiguration
                 {
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -69,7 +69,7 @@ namespace Ocelot.IntegrationTests
                             TtlSeconds = 10,
                         },
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {

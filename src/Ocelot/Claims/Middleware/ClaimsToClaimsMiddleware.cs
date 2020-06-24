@@ -1,16 +1,18 @@
-﻿using Ocelot.Logging;
-using Ocelot.Middleware;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Ocelot.Claims.Middleware
+﻿namespace Ocelot.Claims.Middleware
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class ClaimsToClaimsMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
         private readonly IAddClaimsToRequest _addClaimsToRequest;
 
-        public ClaimsToClaimsMiddleware(OcelotRequestDelegate next,
+        public ClaimsToClaimsMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IAddClaimsToRequest addClaimsToRequest)
                 : base(loggerFactory.CreateLogger<ClaimsToClaimsMiddleware>())
@@ -19,24 +21,26 @@ namespace Ocelot.Claims.Middleware
             _addClaimsToRequest = addClaimsToRequest;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            if (context.DownstreamReRoute.ClaimsToClaims.Any())
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+
+            if (downstreamRoute.ClaimsToClaims.Any())
             {
                 Logger.LogDebug("this route has instructions to convert claims to other claims");
 
-                var result = _addClaimsToRequest.SetClaimsOnContext(context.DownstreamReRoute.ClaimsToClaims, context.HttpContext);
+                var result = _addClaimsToRequest.SetClaimsOnContext(downstreamRoute.ClaimsToClaims, httpContext);
 
                 if (result.IsError)
                 {
                     Logger.LogDebug("error converting claims to other claims, setting pipeline error");
 
-                    SetPipelineError(context, result.Errors);
+                    httpContext.Items.UpsertErrors(result.Errors);
                     return;
                 }
             }
 
-            await _next.Invoke(context);
+            await _next.Invoke(httpContext);
         }
     }
 }

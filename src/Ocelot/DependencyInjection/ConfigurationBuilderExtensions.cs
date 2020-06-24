@@ -1,6 +1,6 @@
 namespace Ocelot.DependencyInjection
 {
-    using Configuration.File;
+    using Ocelot.Configuration.File;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Configuration.Memory;
@@ -56,7 +56,7 @@ namespace Ocelot.DependencyInjection
             dynamic fileConfiguration = new JObject();
             fileConfiguration.GlobalConfiguration = new JObject();
             fileConfiguration.Aggregates = new JArray();
-            fileConfiguration.ReRoutes = new JArray();
+            fileConfiguration.Routes = new JArray();
 
             foreach (var file in files)
             {
@@ -89,7 +89,7 @@ namespace Ocelot.DependencyInjection
             }
 
             MergeConfigSection(destConfig, srcConfig, nameof(FileConfiguration.Aggregates));
-            MergeConfigSection(destConfig, srcConfig, nameof(FileConfiguration.ReRoutes));
+            MergeConfigSection(destConfig, srcConfig, nameof(FileConfiguration.Routes));
         }
 
         private static void MergeConfigSection(JToken destConfig, JToken srcConfig, string sectionName)

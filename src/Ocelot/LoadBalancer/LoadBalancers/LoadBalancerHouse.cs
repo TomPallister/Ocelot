@@ -3,7 +3,6 @@ using Ocelot.Responses;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Ocelot.LoadBalancer.LoadBalancers
 {
@@ -18,32 +17,32 @@ namespace Ocelot.LoadBalancer.LoadBalancers
             _loadBalancers = new ConcurrentDictionary<string, ILoadBalancer>();
         }
 
-        public async Task<Response<ILoadBalancer>> Get(DownstreamReRoute reRoute, ServiceProviderConfiguration config)
+        public Response<ILoadBalancer> Get(DownstreamRoute route, ServiceProviderConfiguration config)
         {
             try
             {
                 Response<ILoadBalancer> result;
 
-                if (_loadBalancers.TryGetValue(reRoute.LoadBalancerKey, out var loadBalancer))
+                if (_loadBalancers.TryGetValue(route.LoadBalancerKey, out var loadBalancer))
                 {
-                    loadBalancer = _loadBalancers[reRoute.LoadBalancerKey];
+                    loadBalancer = _loadBalancers[route.LoadBalancerKey];
 
-                    if (reRoute.LoadBalancerOptions.Type != loadBalancer.GetType().Name)
+                    if (route.LoadBalancerOptions.Type != loadBalancer.GetType().Name)
                     {
-                        result = await _factory.Get(reRoute, config);
+                        result = _factory.Get(route, config);
                         if (result.IsError)
                         {
                             return new ErrorResponse<ILoadBalancer>(result.Errors);
                         }
 
                         loadBalancer = result.Data;
-                        AddLoadBalancer(reRoute.LoadBalancerKey, loadBalancer);
+                        AddLoadBalancer(route.LoadBalancerKey, loadBalancer);
                     }
 
                     return new OkResponse<ILoadBalancer>(loadBalancer);
                 }
 
-                result = await _factory.Get(reRoute, config);
+                result = _factory.Get(route, config);
 
                 if (result.IsError)
                 {
@@ -51,14 +50,14 @@ namespace Ocelot.LoadBalancer.LoadBalancers
                 }
 
                 loadBalancer = result.Data;
-                AddLoadBalancer(reRoute.LoadBalancerKey, loadBalancer);
+                AddLoadBalancer(route.LoadBalancerKey, loadBalancer);
                 return new OkResponse<ILoadBalancer>(loadBalancer);
             }
             catch (Exception ex)
             {
                 return new ErrorResponse<ILoadBalancer>(new List<Ocelot.Errors.Error>()
                 {
-                    new UnableToFindLoadBalancerError($"unabe to find load balancer for {reRoute.LoadBalancerKey} exception is {ex}")
+                    new UnableToFindLoadBalancerError($"unabe to find load balancer for {route.LoadBalancerKey} exception is {ex}"),
                 });
             }
         }

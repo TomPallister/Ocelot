@@ -1,19 +1,18 @@
-﻿using Ocelot.Configuration;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-
-namespace Ocelot.Requester
+﻿namespace Ocelot.Requester
 {
+    using Ocelot.Configuration;
+    using Ocelot.Logging;
+    using System;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+
     public class HttpClientBuilder : IHttpClientBuilder
     {
         private readonly IDelegatingHandlerHandlerFactory _factory;
         private readonly IHttpClientCache _cacheHandlers;
         private readonly IOcelotLogger _logger;
-        private DownstreamReRoute _cacheKey;
+        private DownstreamRoute _cacheKey;
         private HttpClient _httpClient;
         private IHttpClient _client;
         private readonly TimeSpan _defaultTimeout;
@@ -32,9 +31,9 @@ namespace Ocelot.Requester
             _defaultTimeout = TimeSpan.FromSeconds(90);
         }
 
-        public IHttpClient Create(DownstreamContext context)
+        public IHttpClient Create(DownstreamRoute downstreamRoute)
         {
-            _cacheKey = context.DownstreamReRoute;
+            _cacheKey = downstreamRoute;
 
             var httpClient = _cacheHandlers.Get(_cacheKey);
 
@@ -44,21 +43,21 @@ namespace Ocelot.Requester
                 return httpClient;
             }
 
-            var handler = CreateHandler(context);
+            var handler = CreateHandler(downstreamRoute);
 
-            if (context.DownstreamReRoute.DangerousAcceptAnyServerCertificateValidator)
+            if (downstreamRoute.DangerousAcceptAnyServerCertificateValidator)
             {
                 handler.ServerCertificateCustomValidationCallback = (request, certificate, chain, errors) => true;
 
                 _logger
-                    .LogWarning($"You have ignored all SSL warnings by using DangerousAcceptAnyServerCertificateValidator for this DownstreamReRoute, UpstreamPathTemplate: {context.DownstreamReRoute.UpstreamPathTemplate}, DownstreamPathTemplate: {context.DownstreamReRoute.DownstreamPathTemplate}");
+                    .LogWarning($"You have ignored all SSL warnings by using DangerousAcceptAnyServerCertificateValidator for this DownstreamRoute, UpstreamPathTemplate: {downstreamRoute.UpstreamPathTemplate}, DownstreamPathTemplate: {downstreamRoute.DownstreamPathTemplate}");
             }
 
-            var timeout = context.DownstreamReRoute.QosOptions.TimeoutValue == 0
+            var timeout = downstreamRoute.QosOptions.TimeoutValue == 0
                 ? _defaultTimeout
-                : TimeSpan.FromMilliseconds(context.DownstreamReRoute.QosOptions.TimeoutValue);
+                : TimeSpan.FromMilliseconds(downstreamRoute.QosOptions.TimeoutValue);
 
-            _httpClient = new HttpClient(CreateHttpMessageHandler(handler, context.DownstreamReRoute))
+            _httpClient = new HttpClient(CreateHttpMessageHandler(handler, downstreamRoute))
             {
                 Timeout = timeout
             };
@@ -68,43 +67,35 @@ namespace Ocelot.Requester
             return _client;
         }
 
-        private HttpClientHandler CreateHandler(DownstreamContext context)
+        private HttpClientHandler CreateHandler(DownstreamRoute downstreamRoute)
         {
             // Dont' create the CookieContainer if UseCookies is not set or the HttpClient will complain
             // under .Net Full Framework
-            bool useCookies = context.DownstreamReRoute.HttpHandlerOptions.UseCookieContainer;
+            var useCookies = downstreamRoute.HttpHandlerOptions.UseCookieContainer;
 
-            if (useCookies)
-            {
-                return UseCookiesHandler(context);
-            }
-            else
-            {
-                return UseNonCookiesHandler(context);
-            }
+            return useCookies ? UseCookiesHandler(downstreamRoute) : UseNonCookiesHandler(downstreamRoute);
         }
 
-        private HttpClientHandler UseNonCookiesHandler(DownstreamContext context)
+        private HttpClientHandler UseNonCookiesHandler(DownstreamRoute downstreamRoute)
         {
             return new HttpClientHandler
             {
-                AllowAutoRedirect = context.DownstreamReRoute.HttpHandlerOptions.AllowAutoRedirect,
-                UseCookies = context.DownstreamReRoute.HttpHandlerOptions.UseCookieContainer,
-                UseProxy = context.DownstreamReRoute.HttpHandlerOptions.UseProxy,
-                MaxConnectionsPerServer = context.DownstreamReRoute.HttpHandlerOptions.MaxConnectionsPerServer
-
+                AllowAutoRedirect = downstreamRoute.HttpHandlerOptions.AllowAutoRedirect,
+                UseCookies = downstreamRoute.HttpHandlerOptions.UseCookieContainer,
+                UseProxy = downstreamRoute.HttpHandlerOptions.UseProxy,
+                MaxConnectionsPerServer = downstreamRoute.HttpHandlerOptions.MaxConnectionsPerServer,
             };
         }
 
-        private HttpClientHandler UseCookiesHandler(DownstreamContext context)
+        private HttpClientHandler UseCookiesHandler(DownstreamRoute downstreamRoute)
         {
             return new HttpClientHandler
             {
-                AllowAutoRedirect = context.DownstreamReRoute.HttpHandlerOptions.AllowAutoRedirect,
-                UseCookies = context.DownstreamReRoute.HttpHandlerOptions.UseCookieContainer,
-                UseProxy = context.DownstreamReRoute.HttpHandlerOptions.UseProxy,
-                MaxConnectionsPerServer = context.DownstreamReRoute.HttpHandlerOptions.MaxConnectionsPerServer,
-                CookieContainer = new CookieContainer()
+                AllowAutoRedirect = downstreamRoute.HttpHandlerOptions.AllowAutoRedirect,
+                UseCookies = downstreamRoute.HttpHandlerOptions.UseCookieContainer,
+                UseProxy = downstreamRoute.HttpHandlerOptions.UseProxy,
+                MaxConnectionsPerServer = downstreamRoute.HttpHandlerOptions.MaxConnectionsPerServer,
+                CookieContainer = new CookieContainer(),
             };
         }
 
@@ -113,7 +104,7 @@ namespace Ocelot.Requester
             _cacheHandlers.Set(_cacheKey, _client, TimeSpan.FromHours(24));
         }
 
-        private HttpMessageHandler CreateHttpMessageHandler(HttpMessageHandler httpMessageHandler, DownstreamReRoute request)
+        private HttpMessageHandler CreateHttpMessageHandler(HttpMessageHandler httpMessageHandler, DownstreamRoute request)
         {
             //todo handle error
             var handlers = _factory.Get(request).Data;

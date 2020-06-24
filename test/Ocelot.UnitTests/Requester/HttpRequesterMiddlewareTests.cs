@@ -14,8 +14,11 @@ namespace Ocelot.UnitTests.Requester
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Ocelot.Configuration;
+    using Ocelot.Infrastructure.RequestData;
     using TestStack.BDDfy;
     using Xunit;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class HttpRequesterMiddlewareTests
     {
@@ -24,11 +27,12 @@ namespace Ocelot.UnitTests.Requester
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
         private readonly HttpRequesterMiddleware _middleware;
-        private DownstreamContext _downstreamContext;
-        private OcelotRequestDelegate _next;
+        private RequestDelegate _next;
+        private HttpContext _httpContext;
 
         public HttpRequesterMiddlewareTests()
         {
+            _httpContext = new DefaultHttpContext();
             _requester = new Mock<IHttpRequester>();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
@@ -71,21 +75,17 @@ namespace Ocelot.UnitTests.Requester
 
         private void ThenTheErrorIsSet()
         {
-            _downstreamContext.IsError.ShouldBeTrue();
+            _httpContext.Items.Errors().Count.ShouldBeGreaterThan(0);
         }
 
         private void WhenICallTheMiddleware()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
         private void GivenTheRequestIs()
         {
-            _downstreamContext =
-                new DownstreamContext(new DefaultHttpContext())
-                {
-                    DownstreamReRoute = new DownstreamReRouteBuilder().Build()
-                };
+            _httpContext.Items.UpsertDownstreamRoute(new DownstreamRouteBuilder().Build());
         }
 
         private void GivenTheRequesterReturns(Response<HttpResponseMessage> response)
@@ -93,7 +93,7 @@ namespace Ocelot.UnitTests.Requester
             _response = response;
 
             _requester
-                .Setup(x => x.GetResponse(It.IsAny<DownstreamContext>()))
+                .Setup(x => x.GetResponse(It.IsAny<HttpContext>()))
                 .ReturnsAsync(_response);
         }
 
@@ -101,14 +101,14 @@ namespace Ocelot.UnitTests.Requester
         {
             foreach (var httpResponseHeader in _response.Data.Headers)
             {
-                if (_downstreamContext.DownstreamResponse.Headers.Any(x => x.Key == httpResponseHeader.Key))
+                if (_httpContext.Items.DownstreamResponse().Headers.Any(x => x.Key == httpResponseHeader.Key))
                 {
                     throw new Exception("Header in response not in downstreamresponse headers");
                 }
             }
 
-            _downstreamContext.DownstreamResponse.Content.ShouldBe(_response.Data.Content);
-            _downstreamContext.DownstreamResponse.StatusCode.ShouldBe(_response.Data.StatusCode);
+            _httpContext.Items.DownstreamResponse().Content.ShouldBe(_response.Data.Content);
+            _httpContext.Items.DownstreamResponse().StatusCode.ShouldBe(_response.Data.StatusCode);
         }
 
         private void WarningIsLogged()

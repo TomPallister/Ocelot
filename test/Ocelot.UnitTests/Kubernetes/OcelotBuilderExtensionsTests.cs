@@ -16,7 +16,6 @@ namespace Ocelot.UnitTests.Kubernetes
     public class OcelotBuilderExtensionsTests
     {
         private readonly IServiceCollection _services;
-        private IServiceProvider _serviceProvider;
         private readonly IConfiguration _configRoot;
         private IOcelotBuilder _ocelotBuilder;
         private Exception _ex;
