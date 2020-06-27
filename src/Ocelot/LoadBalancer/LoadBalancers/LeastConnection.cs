@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Ocelot.Errors;
-using Ocelot.Responses;
-using Ocelot.Values;
-
-namespace Ocelot.LoadBalancer.LoadBalancers
+﻿namespace Ocelot.LoadBalancer.LoadBalancers
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.Middleware;
+    using Ocelot.Responses;
+    using Ocelot.Values;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class LeastConnection : ILoadBalancer
     {
         private readonly Func<Task<List<Service>>> _services;
@@ -22,22 +23,22 @@ namespace Ocelot.LoadBalancer.LoadBalancers
             _leases = new List<Lease>();
         }
 
-        public async Task<Response<ServiceHostAndPort>> Lease()
+        public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
         {
             var services = await _services.Invoke();
 
             if (services == null)
             {
-                return new ErrorResponse<ServiceHostAndPort>(new List<Error>() { new ServicesAreNullError($"services were null for {_serviceName}") });
+                return new ErrorResponse<ServiceHostAndPort>(new ServicesAreNullError($"services were null for {_serviceName}"));
             }
 
             if (!services.Any())
             {
-                return new ErrorResponse<ServiceHostAndPort>(new List<Error>() { new ServicesAreEmptyError($"services were empty for {_serviceName}") });
+                return new ErrorResponse<ServiceHostAndPort>(new ServicesAreEmptyError($"services were empty for {_serviceName}"));
             }
 
-            lock(_syncLock)
-            {        
+            lock (_syncLock)
+            {
                 //todo - maybe this should be moved somewhere else...? Maybe on a repeater on seperate thread? loop every second and update or something?
                 UpdateServices(services);
 
@@ -48,17 +49,18 @@ namespace Ocelot.LoadBalancer.LoadBalancers
                 leaseWithLeastConnections = AddConnection(leaseWithLeastConnections);
 
                 _leases.Add(leaseWithLeastConnections);
-            
-                return new OkResponse<ServiceHostAndPort>(new ServiceHostAndPort(leaseWithLeastConnections.HostAndPort.DownstreamHost, leaseWithLeastConnections.HostAndPort.DownstreamPort));
+
+                return new OkResponse<ServiceHostAndPort>(leaseWithLeastConnections.HostAndPort);
             }
         }
 
         public void Release(ServiceHostAndPort hostAndPort)
         {
-            lock(_syncLock)
+            lock (_syncLock)
             {
                 var matchingLease = _leases.FirstOrDefault(l => l.HostAndPort.DownstreamHost == hostAndPort.DownstreamHost
-                    && l.HostAndPort.DownstreamPort == hostAndPort.DownstreamPort);
+                    && l.HostAndPort.DownstreamPort == hostAndPort.DownstreamPort
+                    && l.HostAndPort.Scheme == hostAndPort.Scheme);
 
                 if (matchingLease != null)
                 {
@@ -108,7 +110,8 @@ namespace Ocelot.LoadBalancer.LoadBalancers
                 foreach (var lease in _leases)
                 {
                     var match = services.FirstOrDefault(s => s.HostAndPort.DownstreamHost == lease.HostAndPort.DownstreamHost
-                        && s.HostAndPort.DownstreamPort == lease.HostAndPort.DownstreamPort);
+                        && s.HostAndPort.DownstreamPort == lease.HostAndPort.DownstreamPort
+                        && s.HostAndPort.Scheme == lease.HostAndPort.Scheme);
 
                     if (match == null)
                     {
@@ -123,7 +126,9 @@ namespace Ocelot.LoadBalancer.LoadBalancers
 
                 foreach (var service in services)
                 {
-                    var exists = _leases.FirstOrDefault(l => l.HostAndPort.DownstreamHost == service.HostAndPort.DownstreamHost && l.HostAndPort.DownstreamPort == service.HostAndPort.DownstreamPort);
+                    var exists = _leases.FirstOrDefault(l => l.HostAndPort.DownstreamHost == service.HostAndPort.DownstreamHost
+                                    && l.HostAndPort.DownstreamPort == service.HostAndPort.DownstreamPort
+                                    && l.HostAndPort.Scheme == service.HostAndPort.Scheme);
 
                     if (exists == null)
                     {
