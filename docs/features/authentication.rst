@@ -171,6 +171,29 @@ NOTE: In order to get Ocelot to view the scope claim from Okta properly, you hav
 
 `Issue 446 <https://github.com/ThreeMammals/Ocelot/issues/446>`_ that contains some code and examples that might help with Okta integration.
 
+Api Key
+^^^^^^^ 
+
+Add the following to your startup ConfigureServices method:
+
+.. code-block:: csharp
+    services
+        .AddAuthentication()
+        .AddApiKey(apiKeyProviderKey, options => 
+        {
+            options.Authority = configuration["Authentication:ApiKey:Authority"]; // Your api key authentication endpoint
+            options.Method = HttpMethod.Get; // The http method to be used to call your authentication endpoint
+        });
+
+NOTE: The api response from your authentication endpoint must be
+
+.. code-block:: csharp
+    public class ApiKeyValidationResponse
+    {
+        public string Owner { get; set; }
+        public IReadOnlyCollection<string> Roles { get; set; }
+    }
+
 Allowed Scopes
 ^^^^^^^^^^^^^
 

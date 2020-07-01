@@ -47,6 +47,7 @@ namespace Ocelot.AcceptanceTests
     using CookieHeaderValue = Microsoft.Net.Http.Headers.CookieHeaderValue;
     using MediaTypeHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue;
     using Ocelot.Tracing.OpenTracing;
+    using Ocelot.Authentication.Extensions.ApiKey;
 
     public class Steps : IDisposable
     {
@@ -751,6 +752,34 @@ namespace Ocelot.AcceptanceTests
             _ocelotClient = _ocelotServer.CreateClient();
         }
 
+        public void GivenOcelotIsRunning(Action<ApiKeyAuthenticationOptions> options, string authenticationProviderKey)
+        {
+            _webHostBuilder = new WebHostBuilder();
+            _webHostBuilder
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
+                    var env = hostingContext.HostingEnvironment;
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: false);
+                    config.AddJsonFile("ocelot.json", optional: true, reloadOnChange: false);
+                    config.AddEnvironmentVariables();
+                })
+                .ConfigureServices(s =>
+                {
+                    s.AddOcelot();
+                    s.AddAuthentication()
+                        .AddApiKey(authenticationProviderKey, options);
+                })
+                .Configure(app =>
+                {
+                    app.UseOcelot().Wait();
+                });
+
+            _ocelotServer = new TestServer(_webHostBuilder);
+            _ocelotClient = _ocelotServer.CreateClient();
+        }
+
         public void ThenTheResponseHeaderIs(string key, string value)
         {
             var header = _response.Headers.GetValues(key);
@@ -949,7 +978,7 @@ namespace Ocelot.AcceptanceTests
 
         public void WhenIGetUrlOnTheApiGateway(string url, HttpContent content)
         {
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url) {Content = content};
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url) { Content = content };
             _response = _ocelotClient.SendAsync(httpRequestMessage).Result;
         }
 
@@ -1185,7 +1214,7 @@ namespace Ocelot.AcceptanceTests
         {
             _changeToken.ChangeToken.HasChanged.ShouldBe(itShouldBeActive);
         }
-        
+
         public void GivenOcelotIsRunningWithLogger()
         {
             _webHostBuilder = new WebHostBuilder();
