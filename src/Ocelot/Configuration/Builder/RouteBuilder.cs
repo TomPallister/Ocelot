@@ -14,6 +14,7 @@
         private List<DownstreamRoute> _downstreamRoutes;
         private List<AggregateRouteConfig> _downstreamRoutesConfig;
         private string _aggregator;
+        private Dictionary<string, string> _upstreamHeaders;
 
         public RouteBuilder()
         {
@@ -63,6 +64,12 @@
             return this;
         }
 
+        public RouteBuilder WithUpstreamHeaders(Dictionary<string, string> upstreamHeaders)
+        {
+            _upstreamHeaders = upstreamHeaders;
+            return this;
+        }
+
         public Route Build()
         {
             return new Route(
@@ -71,7 +78,8 @@
                 _upstreamHttpMethod,
                 _upstreamTemplatePattern,
                 _upstreamHost,
-                _aggregator
+                _aggregator,
+                _upstreamHeaders
                 );
         }
     }

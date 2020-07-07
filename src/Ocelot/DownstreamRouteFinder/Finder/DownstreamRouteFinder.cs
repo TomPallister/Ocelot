@@ -17,7 +17,8 @@ namespace Ocelot.DownstreamRouteFinder.Finder
             _placeholderNameAndValueFinder = urlPathPlaceholderNameAndValueFinder;
         }
 
-        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string httpMethod, IInternalConfiguration configuration, string upstreamHost)
+        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string httpMethod, 
+            IInternalConfiguration configuration, string upstreamHost, Dictionary<string, string> upstreamHeaders)
         {
             var downstreamRoutes = new List<DownstreamRouteHolder>();
 
@@ -34,6 +35,8 @@ namespace Ocelot.DownstreamRouteFinder.Finder
                     downstreamRoutes.Add(GetPlaceholderNamesAndValues(upstreamUrlPath, upstreamQueryString, route));
                 }
             }
+
+            downstreamRoutes = downstreamRoutes.Where(r => HeadersMatch(r.Route, upstreamHeaders)).ToList();
 
             if (downstreamRoutes.Any())
             {
@@ -57,6 +60,12 @@ namespace Ocelot.DownstreamRouteFinder.Finder
             var templatePlaceholderNameAndValues = _placeholderNameAndValueFinder.Find(path, query, route.UpstreamTemplatePattern.OriginalValue);
 
             return new DownstreamRouteHolder(templatePlaceholderNameAndValues.Data, route);
+        }
+
+        private bool HeadersMatch(Route route, Dictionary<string, string> upstreamHeaders)
+        {
+            return !route.UpstreamHeaders.Any(
+                h => !upstreamHeaders.ContainsKey(h.Key) || upstreamHeaders[h.Key] != route.UpstreamHeaders[h.Key]);
         }
     }
 }
