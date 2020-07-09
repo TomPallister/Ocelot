@@ -334,6 +334,153 @@ namespace Ocelot.AcceptanceTests
                 .BDDfy();
         }
 
+        [Fact]
+        public void should_aggregated_route_match_header_value()
+        {
+            var port1 = RandomPortFinder.GetRandomPort();
+            var port2 = RandomPortFinder.GetRandomPort();
+            var headerName = "country_code";
+            var headerValue = "PL";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/a",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port1,
+                                },
+                            },
+                            UpstreamPathTemplate = "/a",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            Key = "Laura",
+                        },
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/b",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port2,
+                                },
+                            },
+                            UpstreamPathTemplate = "/b",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            Key = "Tom",
+                        },
+                    },
+                Aggregates = new List<FileAggregateRoute>()
+                {
+                    new FileAggregateRoute
+                        {
+                            UpstreamPathTemplate = "/",
+                            UpstreamHost = "localhost",
+                            RouteKeys = new List<string>
+                            {
+                                "Laura",
+                                "Tom",
+                            },
+                            UpstreamHeaders = new Dictionary<string, string>()
+                            {
+                                [headerName] = headerValue,
+                            },
+                        },
+                },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port1}", "/a", 200, "Hello from Laura"))
+                .And(x => GivenThereIsAServiceRunningOn($"http://localhost:{port2}", "/b", 200, "Hello from Tom"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenIAddAHeader(headerName, headerValue))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_aggregated_route_not_match_header_value()
+        {
+            var port1 = RandomPortFinder.GetRandomPort();
+            var port2 = RandomPortFinder.GetRandomPort();
+            var headerName = "country_code";
+            var headerValue = "PL";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/a",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port1,
+                                },
+                            },
+                            UpstreamPathTemplate = "/a",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            Key = "Laura",
+                        },
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/b",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port2,
+                                },
+                            },
+                            UpstreamPathTemplate = "/b",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            Key = "Tom",
+                        },
+                    },
+                Aggregates = new List<FileAggregateRoute>()
+                {
+                    new FileAggregateRoute
+                        {
+                            UpstreamPathTemplate = "/",
+                            UpstreamHost = "localhost",
+                            RouteKeys = new List<string>
+                            {
+                                "Laura",
+                                "Tom",
+                            },
+                            UpstreamHeaders = new Dictionary<string, string>()
+                            {
+                                [headerName] = headerValue,
+                            },
+                        },
+                },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port1}", "/a", 200, "Hello from Laura"))
+                .And(x => GivenThereIsAServiceRunningOn($"http://localhost:{port2}", "/b", 200, "Hello from Tom"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.NotFound))
+                .BDDfy();
+        }        
+
         private void GivenThereIsAServiceRunningOn(string baseUrl, string basePath, int statusCode, string responseBody)
         {
             _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
