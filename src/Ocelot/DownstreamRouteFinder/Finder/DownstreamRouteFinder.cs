@@ -64,8 +64,9 @@ namespace Ocelot.DownstreamRouteFinder.Finder
 
         private bool HeadersMatch(Route route, Dictionary<string, string> upstreamHeaders)
         {
-            return !route.UpstreamHeaders.Any(
-                h => !upstreamHeaders.ContainsKey(h.Key) || upstreamHeaders[h.Key] != route.UpstreamHeaders[h.Key]);
+            return route.UpstreamHeaders == null || 
+                upstreamHeaders != null && route.UpstreamHeaders.All(
+                    h => upstreamHeaders.ContainsKey(h.Key) && upstreamHeaders[h.Key] == route.UpstreamHeaders[h.Key]);
         }
     }
 }
