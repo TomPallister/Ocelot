@@ -47,7 +47,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>() 
+                            UpstreamHeaderTemplates = new Dictionary<string, string>() 
                             {
                                 [headerName] = headerValue,
                             },
@@ -90,7 +90,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName] = headerValue,
                             },
@@ -136,7 +136,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName1] = headerValue1,
                                 [headerName2] = headerValue2,
@@ -183,7 +183,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName] = headerValue,
                             },
@@ -225,7 +225,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName] = headerValue,
                             },
@@ -268,7 +268,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName1] = headerValue1,
                                 [headerName2] = headerValue2,
@@ -315,7 +315,7 @@ namespace Ocelot.AcceptanceTests
                             },
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName1] = headerValue1,
                                 [headerName2] = headerValue2,
@@ -390,7 +390,7 @@ namespace Ocelot.AcceptanceTests
                                 "Laura",
                                 "Tom",
                             },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName] = headerValue,
                             },
@@ -464,7 +464,7 @@ namespace Ocelot.AcceptanceTests
                                 "Laura",
                                 "Tom",
                             },
-                            UpstreamHeaders = new Dictionary<string, string>()
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
                                 [headerName] = headerValue,
                             },
@@ -479,7 +479,49 @@ namespace Ocelot.AcceptanceTests
                 .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.NotFound))
                 .BDDfy();
-        }        
+        }
+
+        [Fact]
+        public void should_match_one_header_value_with_placeholder()
+        {
+            var port = RandomPortFinder.GetRandomPort();
+            var headerName = "country_code";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = "/",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
+                            {
+                                [headerName] = "{country_code}",
+                            },
+                        },
+                    },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/pl", 200, "Hello from Laura"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenIAddAHeader(headerName, "pl"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+                .BDDfy();
+        }
 
         private void GivenThereIsAServiceRunningOn(string baseUrl, string basePath, int statusCode, string responseBody)
         {

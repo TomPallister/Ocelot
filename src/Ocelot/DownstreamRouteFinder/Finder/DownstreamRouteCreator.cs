@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
+    using Ocelot.Values;
 
     public class DownstreamRouteCreator : IDownstreamRouteProvider
     {
@@ -45,6 +46,9 @@
 
             var upstreamPathTemplate = new UpstreamPathTemplateBuilder().WithOriginalValue(upstreamUrlPath).Build();
 
+            //TODO
+            var upstreamHeaderTemplates = new Dictionary<string, UpstreamHeaderTemplate>();
+
             var downstreamRouteBuilder = new DownstreamRouteBuilder()
                 .WithServiceName(serviceName)
                 .WithLoadBalancerKey(loadBalancerKey)
@@ -56,7 +60,7 @@
                 .WithLoadBalancerOptions(configuration.LoadBalancerOptions)
                 .WithDownstreamHttpVersion(configuration.DownstreamHttpVersion)
                 .WithUpstreamPathTemplate(upstreamPathTemplate)
-                .WithUpstreamHeaders(upstreamHeaders);
+                .WithUpstreamHeaders(upstreamHeaderTemplates);
 
             var rateLimitOptions = configuration.Routes != null
                 ? configuration.Routes
@@ -77,7 +81,7 @@
                 .WithDownstreamRoute(downstreamRoute)
                 .WithUpstreamHttpMethod(new List<string>() { upstreamHttpMethod })
                 .WithUpstreamPathTemplate(upstreamPathTemplate)
-                .WithUpstreamHeaders(upstreamHeaders)
+                .WithUpstreamHeaders(upstreamHeaderTemplates)
                 .Build();
 
             downstreamRouteHolder = new OkResponse<DownstreamRouteHolder>(new DownstreamRouteHolder(new List<PlaceholderNameAndValue>(), route));

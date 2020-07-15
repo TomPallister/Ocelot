@@ -23,7 +23,7 @@
             DelegatingHandlers = new List<string>();
             LoadBalancerOptions = new FileLoadBalancerOptions();
             SecurityOptions = new FileSecurityOptions();
-            UpstreamHeaders = new Dictionary<string, string>();
+            UpstreamHeaderTemplates = new Dictionary<string, string>();
             Priority = 1;
         }
 
@@ -58,6 +58,6 @@
         public bool DangerousAcceptAnyServerCertificateValidator { get; set; }
         public FileSecurityOptions SecurityOptions { get; set; }
         public string DownstreamHttpVersion { get; set; }
-        public Dictionary<string, string> UpstreamHeaders { get; set; }
+        public Dictionary<string, string> UpstreamHeaderTemplates { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace Ocelot.Configuration.File
         public string UpstreamHost { get; set; }
         public bool RouteIsCaseSensitive { get; set; }
         public string Aggregator { get; set; }
-        public Dictionary<string, string> UpstreamHeaders { get; set; }
+        public Dictionary<string, string> UpstreamHeaderTemplates { get; set; }
 
         // Only supports GET..are you crazy!! POST, PUT WOULD BE CRAZY!! :)
         public List<string> UpstreamHttpMethod
@@ -22,7 +22,7 @@ namespace Ocelot.Configuration.File
 
         public FileAggregateRoute()
         {
-            UpstreamHeaders = new Dictionary<string, string>();
+            UpstreamHeaderTemplates = new Dictionary<string, string>();
         }
     }
 }

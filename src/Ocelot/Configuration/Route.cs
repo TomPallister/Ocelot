@@ -13,7 +13,7 @@
             UpstreamPathTemplate upstreamTemplatePattern,
             string upstreamHost,
             string aggregator,
-            Dictionary<string, string> upstreamHeaders)
+            Dictionary<string, UpstreamHeaderTemplate> upstreamHeaderTemplates)
         {
             UpstreamHost = upstreamHost;
             DownstreamRoute = downstreamRoute;
@@ -21,7 +21,7 @@
             UpstreamHttpMethod = upstreamHttpMethod;
             UpstreamTemplatePattern = upstreamTemplatePattern;
             Aggregator = aggregator;
-            UpstreamHeaders = upstreamHeaders;
+            UpstreamHeaderTemplates = upstreamHeaderTemplates;
         }
 
         public UpstreamPathTemplate UpstreamTemplatePattern { get; private set; }
@@ -30,6 +30,6 @@
         public List<DownstreamRoute> DownstreamRoute { get; private set; }
         public List<AggregateRouteConfig> DownstreamRouteConfig { get; private set; }
         public string Aggregator { get; private set; }
-        public Dictionary<string, string> UpstreamHeaders { get; private set; }
+        public Dictionary<string, UpstreamHeaderTemplate> UpstreamHeaderTemplates { get; private set; }
     }
 }

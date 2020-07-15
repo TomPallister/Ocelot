@@ -2,6 +2,7 @@ namespace Ocelot.Configuration.Creator
 {
     using Builder;
     using File;
+    using Ocelot.Values;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -40,6 +41,9 @@ namespace Ocelot.Configuration.Creator
 
             var upstreamTemplatePattern = _creator.Create(aggregateRoute);
 
+            //TODO
+            var upstreamHeaderTemplates = new Dictionary<string, UpstreamHeaderTemplate>();
+
             var route = new RouteBuilder()
                 .WithUpstreamHttpMethod(aggregateRoute.UpstreamHttpMethod)
                 .WithUpstreamPathTemplate(upstreamTemplatePattern)
@@ -47,7 +51,7 @@ namespace Ocelot.Configuration.Creator
                 .WithAggregateRouteConfig(aggregateRoute.RouteKeysConfig)
                 .WithUpstreamHost(aggregateRoute.UpstreamHost)
                 .WithAggregator(aggregateRoute.Aggregator)
-                .WithUpstreamHeaders(aggregateRoute.UpstreamHeaders)
+                .WithUpstreamHeaders(upstreamHeaderTemplates)
                 .Build();
 
             return route;

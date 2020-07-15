@@ -44,7 +44,7 @@ namespace Ocelot.Configuration.Builder
         private SecurityOptions _securityOptions;
         private string _downstreamHttpMethod;
         private Version _downstreamHttpVersion;
-        private Dictionary<string, string> _upstreamHeaders;
+        private Dictionary<string, UpstreamHeaderTemplate> _upstreamHeaders;
 
         public DownstreamRouteBuilder()
         {
@@ -264,7 +264,7 @@ namespace Ocelot.Configuration.Builder
             return this;
         }
 
-        public DownstreamRouteBuilder WithUpstreamHeaders(Dictionary<string, string> input)
+        public DownstreamRouteBuilder WithUpstreamHeaders(Dictionary<string, UpstreamHeaderTemplate> input)
         {
             _upstreamHeaders = input;
             return this;
