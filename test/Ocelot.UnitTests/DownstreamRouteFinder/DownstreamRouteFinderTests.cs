@@ -13,12 +13,14 @@ using Xunit;
 
 namespace Ocelot.UnitTests.DownstreamRouteFinder
 {
+    using Ocelot.DownstreamRouteFinder.HeaderMatcher;
     using System;
 
     public class DownstreamRouteFinderTests
     {
         private readonly IDownstreamRouteProvider _downstreamRouteFinder;
         private readonly Mock<IUrlPathToUrlTemplateMatcher> _mockMatcher;
+        private readonly Mock<IHeadersToHeaderTemplatesMatcher> _mockHeadersMatcher;
         private readonly Mock<IPlaceholderNameAndValueFinder> _finder;
         private string _upstreamUrlPath;
         private Response<Ocelot.DownstreamRouteFinder.DownstreamRouteHolder> _result;
@@ -33,8 +35,9 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
         public DownstreamRouteFinderTests()
         {
             _mockMatcher = new Mock<IUrlPathToUrlTemplateMatcher>();
+            _mockHeadersMatcher = new Mock<IHeadersToHeaderTemplatesMatcher>();
             _finder = new Mock<IPlaceholderNameAndValueFinder>();
-            _downstreamRouteFinder = new Ocelot.DownstreamRouteFinder.Finder.DownstreamRouteFinder(_mockMatcher.Object, _finder.Object);
+            _downstreamRouteFinder = new Ocelot.DownstreamRouteFinder.Finder.DownstreamRouteFinder(_mockMatcher.Object, _finder.Object, _mockHeadersMatcher.Object);
         }
 
         [Fact]
@@ -67,6 +70,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                         .Build()
                 }, string.Empty, serviceProviderConfig))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Post"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(x => x.ThenTheFollowingIsReturned(new DownstreamRouteHolder(new List<PlaceholderNameAndValue>(),
@@ -113,6 +117,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                         .Build()
                 }, string.Empty, serviceProviderConfig))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Post"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(x => x.ThenTheFollowingIsReturned(new DownstreamRouteHolder(new List<PlaceholderNameAndValue>(),
@@ -152,6 +157,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -194,6 +200,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -237,6 +244,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                     ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -287,6 +295,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                     ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Post"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -324,6 +333,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                      }, string.Empty, serviceProviderConfig
                  ))
                  .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(false))))
+                 .And(x => x.GivenTheHeadersMatcherReturns(true))
                  .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                  .When(x => x.WhenICallTheFinder())
                  .Then(
@@ -356,6 +366,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                     ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Post"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -397,6 +408,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                     ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Post"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -438,6 +450,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 }, string.Empty, serviceProviderConfig
                     ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Post"))
                 .When(x => x.WhenICallTheFinder())
                  .Then(x => x.ThenAnErrorResponseIsReturned())
@@ -470,6 +483,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -513,6 +527,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -565,6 +580,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(x => x.ThenAnErrorResponseIsReturned())
@@ -595,6 +611,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(x => x.ThenAnErrorResponseIsReturned())
@@ -625,6 +642,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .And(x => x.ThenTheUrlMatcherIsCalledCorrectly(1, 0))
@@ -665,6 +683,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -695,6 +714,11 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 ["header1"] = "headerValue1",
                 ["header2"] = "headerValue2",
             };
+            var upstreamHeadersConfig = new Dictionary<string, UpstreamHeaderTemplate>()
+            {
+                ["header1"] = new UpstreamHeaderTemplate("headerValue1", "headerValue1"),
+                ["header2"] = new UpstreamHeaderTemplate("headerValue2", "headerValue2"),
+            };
 
             this.Given(x => x.GivenThereIsAnUpstreamUrlPath("matchInUrlMatcher/"))
                 .And(x => GivenTheUpstreamHeadersIs(upstreamHeaders))
@@ -711,11 +735,12 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                                 .Build())
                             .WithUpstreamHttpMethod(new List<string> { "Get" })
                             .WithUpstreamPathTemplate(new UpstreamPathTemplate("someUpstreamPath", 1, false, "someUpstreamPath"))
-                            .WithUpstreamHeaders(upstreamHeaders)
+                            .WithUpstreamHeaders(upstreamHeadersConfig)
                             .Build(),
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(true))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(
@@ -740,14 +765,10 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
         {
             var serviceProviderConfig = new ServiceProviderConfigurationBuilder().Build();
 
-            var upstreamHeadersConfig1 = new Dictionary<string, string>()
+            var upstreamHeadersConfig = new Dictionary<string, UpstreamHeaderTemplate>()
             {
-                ["header1"] = "headerValue1",
-                ["header2"] = "headerValue2",
-            };
-            var upstreamHeadersConfig2 = new Dictionary<string, string>()
-            {
-                ["header1"] = "headerValueAnother",
+                ["header1"] = new UpstreamHeaderTemplate("headerValue1", "headerValue1"),
+                ["header2"] = new UpstreamHeaderTemplate("headerValue2", "headerValue2"),
             };
 
             this.Given(x => x.GivenThereIsAnUpstreamUrlPath("matchInUrlMatcher/"))
@@ -763,7 +784,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                                 .Build())
                             .WithUpstreamHttpMethod(new List<string> { "Get" })
                             .WithUpstreamPathTemplate(new UpstreamPathTemplate("someUpstreamPath", 1, false, "someUpstreamPath"))
-                            .WithUpstreamHeaders(upstreamHeadersConfig1)
+                            .WithUpstreamHeaders(upstreamHeadersConfig)
                             .Build(),
                         new RouteBuilder()
                             .WithDownstreamRoute(new DownstreamRouteBuilder()
@@ -773,51 +794,17 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                                 .Build())
                             .WithUpstreamHttpMethod(new List<string> { "Get" })
                             .WithUpstreamPathTemplate(new UpstreamPathTemplate("someUpstreamPath", 1, false, "someUpstreamPath"))
-                            .WithUpstreamHeaders(upstreamHeadersConfig2)
+                            .WithUpstreamHeaders(upstreamHeadersConfig)
                             .Build(),
                     }, string.Empty, serviceProviderConfig
                 ))
                 .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
+                .And(x => x.GivenTheHeadersMatcherReturns(false))
                 .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
                 .When(x => x.WhenICallTheFinder())
                 .Then(x => x.ThenAnErrorResponseIsReturned())
                 .BDDfy();
-        }
-
-        [Fact]
-        public void should_not_return_route_when_upstream_headers_null()
-        {
-            var serviceProviderConfig = new ServiceProviderConfigurationBuilder().Build();
-
-            var upstreamHeadersConfig1 = new Dictionary<string, string>()
-            {
-                ["header1"] = "headerValue1",
-                ["header2"] = "headerValue2",
-            };
-
-            this.Given(x => x.GivenThereIsAnUpstreamUrlPath("matchInUrlMatcher/"))
-                .And(x => GivenTheUpstreamHeadersIs(null))
-                .And(x => x.GivenTheTemplateVariableAndNameFinderReturns(new OkResponse<List<PlaceholderNameAndValue>>(new List<PlaceholderNameAndValue>())))
-                .And(x => x.GivenTheConfigurationIs(new List<Route>
-                    {
-                        new RouteBuilder()
-                            .WithDownstreamRoute(new DownstreamRouteBuilder()
-                                .WithDownstreamPathTemplate("someDownstreamPath")
-                                .WithUpstreamHttpMethod(new List<string> { "Get" })
-                                .WithUpstreamPathTemplate(new UpstreamPathTemplate("someUpstreamPath", 1, false, "someUpstreamPath"))
-                                .Build())
-                            .WithUpstreamHttpMethod(new List<string> { "Get" })
-                            .WithUpstreamPathTemplate(new UpstreamPathTemplate("someUpstreamPath", 1, false, "someUpstreamPath"))
-                            .WithUpstreamHeaders(upstreamHeadersConfig1)
-                            .Build(),
-                    }, string.Empty, serviceProviderConfig
-                ))
-                .And(x => x.GivenTheUrlMatcherReturns(new OkResponse<UrlMatch>(new UrlMatch(true))))
-                .And(x => x.GivenTheUpstreamHttpMethodIs("Get"))
-                .When(x => x.WhenICallTheFinder())
-                .Then(x => x.ThenAnErrorResponseIsReturned())
-                .BDDfy();
-        }
+        }        
 
         private void GivenTheUpstreamHostIs(string upstreamHost)
         {
@@ -876,6 +863,13 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
             _mockMatcher
                 .Setup(x => x.Match(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpstreamPathTemplate>()))
                 .Returns(_match);
+        }
+
+        private void GivenTheHeadersMatcherReturns(bool headersMatch)
+        {
+            _mockHeadersMatcher
+                .Setup(x => x.Match(It.IsAny<Dictionary<string, string>>(), It.IsAny<Dictionary<string, UpstreamHeaderTemplate>>()))
+                .Returns(headersMatch);
         }
 
         private void GivenTheConfigurationIs(List<Route> routesConfig, string adminPath, ServiceProviderConfiguration serviceProviderConfig)

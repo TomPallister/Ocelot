@@ -7,8 +7,8 @@ using System.Text;
 
 namespace Ocelot.DownstreamRouteFinder.HeaderMatcher
 {
-    interface IHeaderPlaceholderNameAndValueFinder
+    public interface IHeadersToHeaderTemplatesMatcher
     {
-        Response<UrlMatch> Match(Dictionary<string, string> upstreamHeaders, Dictionary<string, string> routeHeaders);
+        bool Match(Dictionary<string, string> upstreamHeaders, Dictionary<string, UpstreamHeaderTemplate> routeHeaders);
     }
 }

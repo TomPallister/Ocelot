@@ -9,11 +9,8 @@ namespace Ocelot.Configuration.Creator
     public class UpstreamHeaderTemplatePatternCreator : IUpstreamHeaderTemplatePatternCreator
     {
         private const string RegExMatchOneOrMoreOfEverything = ".+";
-        private const string RegExMatchOneOrMoreOfEverythingUntilNextForwardSlash = "[^/]+";
         private const string RegExMatchEndString = "$";
         private const string RegExIgnoreCase = "(?i)";
-        private const string RegExForwardSlashOnly = "^/$";
-        private const string RegExForwardSlashAndOnePlaceHolder = "^/.*";
         private const string RegExPlaceholders = @"\{(.*?)\}";
 
         public Dictionary<string, UpstreamHeaderTemplate> Create(IRoute route)

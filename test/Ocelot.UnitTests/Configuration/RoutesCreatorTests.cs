@@ -20,6 +20,7 @@
         private Mock<IClaimsToThingCreator> _cthCreator;
         private Mock<IAuthenticationOptionsCreator> _aoCreator;
         private Mock<IUpstreamTemplatePatternCreator> _utpCreator;
+        private Mock<IUpstreamHeaderTemplatePatternCreator> _uhtpCreator;
         private Mock<IRequestIdKeyCreator> _ridkCreator;
         private Mock<IQoSOptionsCreator> _qosoCreator;
         private Mock<IRouteOptionsCreator> _rroCreator;
@@ -67,6 +68,7 @@
             _rrkCreator = new Mock<IRouteKeyCreator>();
             _soCreator = new Mock<ISecurityOptionsCreator>();
             _versionCreator = new Mock<IVersionCreator>();
+            _uhtpCreator = new Mock<IUpstreamHeaderTemplatePatternCreator>();
 
             _creator = new RoutesCreator(
                 _cthCreator.Object,
@@ -83,7 +85,8 @@
                 _lboCreator.Object,
                 _rrkCreator.Object,
                 _soCreator.Object,
-                _versionCreator.Object
+                _versionCreator.Object,
+                _uhtpCreator.Object
                 );
         }
 
