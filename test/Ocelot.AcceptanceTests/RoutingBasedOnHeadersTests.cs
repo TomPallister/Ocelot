@@ -507,7 +507,7 @@ namespace Ocelot.AcceptanceTests
                             UpstreamHttpMethod = new List<string> { "Get" },
                             UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
-                                [headerName] = "{country_code}",
+                                [headerName] = "start_{country_code}_version_{version}_end",
                             },
                         },
                     },
@@ -516,7 +516,7 @@ namespace Ocelot.AcceptanceTests
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/pl", 200, "Hello from Laura"))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
-                .And(x => _steps.GivenIAddAHeader(headerName, "pl"))
+                .And(x => _steps.GivenIAddAHeader(headerName, "start_pl_version_v1_end"))
                 .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))

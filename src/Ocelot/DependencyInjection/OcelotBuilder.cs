@@ -108,6 +108,7 @@ namespace Ocelot.DependencyInjection
             Services.TryAddSingleton<IUrlPathToUrlTemplateMatcher, RegExUrlMatcher>();
             Services.TryAddSingleton<IHeadersToHeaderTemplatesMatcher, HeadersToHeaderTemplatesMatcher>();
             Services.TryAddSingleton<IPlaceholderNameAndValueFinder, UrlPathPlaceholderNameAndValueFinder>();
+            Services.TryAddSingleton<IHeaderPlaceholderNameAndValueFinder, HeaderPlaceholderNameAndValueFinder>();
             Services.TryAddSingleton<IDownstreamPathPlaceholderReplacer, DownstreamTemplatePathPlaceholderReplacer>();
             Services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteFinder>();
             Services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteCreator>();
