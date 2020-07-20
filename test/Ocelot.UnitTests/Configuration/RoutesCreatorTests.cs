@@ -175,7 +175,7 @@
             _dhp = new List<DownstreamHostAndPort>();
             _lbo = new LoadBalancerOptionsBuilder().Build();
 
-            _rroCreator.Setup(x => x.Create(It.IsAny<FileRoute>())).Returns(_rro);
+            _rroCreator.Setup(x => x.Create(It.IsAny<FileRoute>(), It.IsAny<FileGlobalConfiguration>())).Returns(_rro);
             _ridkCreator.Setup(x => x.Create(It.IsAny<FileRoute>(), It.IsAny<FileGlobalConfiguration>())).Returns(_requestId);
             _rrkCreator.Setup(x => x.Create(It.IsAny<FileRoute>())).Returns(_rrk);
             _utpCreator.Setup(x => x.Create(It.IsAny<IRoute>())).Returns(_upt);
@@ -262,7 +262,7 @@
 
         private void ThenTheDepsAreCalledFor(FileRoute fileRoute, FileGlobalConfiguration globalConfig)
         {
-            _rroCreator.Verify(x => x.Create(fileRoute), Times.Once);
+            _rroCreator.Verify(x => x.Create(fileRoute, globalConfig), Times.Once);
             _ridkCreator.Verify(x => x.Create(fileRoute, globalConfig), Times.Once);
             _rrkCreator.Verify(x => x.Create(fileRoute), Times.Once);
             _utpCreator.Verify(x => x.Create(fileRoute), Times.Exactly(2));

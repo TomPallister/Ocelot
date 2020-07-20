@@ -13,6 +13,7 @@ namespace Ocelot.UnitTests.Configuration
     {
         private readonly RouteOptionsCreator _creator;
         private FileRoute _route;
+        private FileGlobalConfiguration _globalConfiguration;
         private RouteOptions _result;
 
         public RouteOptionsCreatorTests()
@@ -52,20 +53,185 @@ namespace Ocelot.UnitTests.Configuration
                 .WithUseServiceDiscovery(true)
                 .Build();
 
-            this.Given(x => x.GivenTheFollowing(route))
+            this.Given(x => x.GivenTheFollowing(route, null))
                 .When(x => x.WhenICreate())
                 .Then(x => x.ThenTheFollowingIsReturned(expected))
                 .BDDfy();
         }
 
-        private void GivenTheFollowing(FileRoute route)
+        [Fact]
+        public void should_set_isauthenticated_to_true_when_providerkey_set_in_route()
+        {
+            var route = new FileRoute
+            {
+                RateLimitOptions = new FileRateLimitRule
+                {
+                    EnableRateLimiting = true,
+                },
+                RouteClaimsRequirement = new Dictionary<string, string>()
+                {
+                    {"",""},
+                },
+                FileCacheOptions = new FileCacheOptions
+                {
+                    TtlSeconds = 1,
+                },
+                ServiceName = "west",
+                AuthenticationOptions = new FileAuthenticationOptions()
+                {
+                    AuthenticationProviderKey = "Test",
+                },
+            };
+            var globalConf = new FileGlobalConfiguration
+            {                
+            };
+
+            var expected = new RouteOptionsBuilder()
+                .WithIsAuthenticated(true)
+                .WithIsAuthorised(true)
+                .WithIsCached(true)
+                .WithRateLimiting(true)
+                .WithUseServiceDiscovery(true)
+                .Build();
+
+            this.Given(x => x.GivenTheFollowing(route, globalConf))
+                .When(x => x.WhenICreate())
+                .Then(x => x.ThenTheFollowingIsReturned(expected))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_set_isauthenticated_to_true_when_providerkey_set_in_globalconfiguration()
+        {
+            var route = new FileRoute
+            {
+                RateLimitOptions = new FileRateLimitRule
+                {
+                    EnableRateLimiting = true,
+                },                
+                RouteClaimsRequirement = new Dictionary<string, string>()
+                {
+                    {"",""},
+                },
+                FileCacheOptions = new FileCacheOptions
+                {
+                    TtlSeconds = 1,
+                },
+                ServiceName = "west",
+            };
+            var globalConf = new FileGlobalConfiguration
+            {
+                AuthenticationOptions = new FileAuthenticationOptions()
+                {
+                    AuthenticationProviderKey = "Test",
+                },
+            };
+
+            var expected = new RouteOptionsBuilder()
+                .WithIsAuthenticated(true)
+                .WithIsAuthorised(true)
+                .WithIsCached(true)
+                .WithRateLimiting(true)
+                .WithUseServiceDiscovery(true)
+                .Build();
+
+            this.Given(x => x.GivenTheFollowing(route, globalConf))
+                .When(x => x.WhenICreate())
+                .Then(x => x.ThenTheFollowingIsReturned(expected))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_set_isauthenticated_to_false_when_providerkey_set_in_globalconfiguration_but_route_has_allowanonymous()
+        {
+            var route = new FileRoute
+            {
+                RateLimitOptions = new FileRateLimitRule
+                {
+                    EnableRateLimiting = true,
+                },
+                RouteClaimsRequirement = new Dictionary<string, string>()
+                {
+                    { "", "" },
+                },
+                FileCacheOptions = new FileCacheOptions
+                {
+                    TtlSeconds = 1,
+                },
+                ServiceName = "west",
+                AuthenticationOptions = new FileAuthenticationOptions
+                {
+                    AllowAnonymous = true,
+                },
+            };
+            var globalConf = new FileGlobalConfiguration
+            {
+                AuthenticationOptions = new FileAuthenticationOptions()
+                {
+                    AuthenticationProviderKey = "Test",
+                },
+            };
+
+            var expected = new RouteOptionsBuilder()
+                .WithIsAuthenticated(false)
+                .WithIsAuthorised(true)
+                .WithIsCached(true)
+                .WithRateLimiting(true)
+                .WithUseServiceDiscovery(true)
+                .Build();
+
+            this.Given(x => x.GivenTheFollowing(route, globalConf))
+                .When(x => x.WhenICreate())
+                .Then(x => x.ThenTheFollowingIsReturned(expected))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_set_isauthenticated_to_false_when_providerkey_not_set_at_all()
+        {
+            var route = new FileRoute
+            {
+                RateLimitOptions = new FileRateLimitRule
+                {
+                    EnableRateLimiting = true,
+                },
+                RouteClaimsRequirement = new Dictionary<string, string>()
+                {
+                    {"",""},
+                },
+                FileCacheOptions = new FileCacheOptions
+                {
+                    TtlSeconds = 1,
+                },
+                ServiceName = "west",
+            };
+            var globalConf = new FileGlobalConfiguration
+            {
+            };
+
+            var expected = new RouteOptionsBuilder()
+                .WithIsAuthenticated(false)
+                .WithIsAuthorised(true)
+                .WithIsCached(true)
+                .WithRateLimiting(true)
+                .WithUseServiceDiscovery(true)
+                .Build();
+
+            this.Given(x => x.GivenTheFollowing(route, globalConf))
+                .When(x => x.WhenICreate())
+                .Then(x => x.ThenTheFollowingIsReturned(expected))
+                .BDDfy();
+        }
+
+        private void GivenTheFollowing(FileRoute route, FileGlobalConfiguration globalConfiguration)
         {
             _route = route;
+            _globalConfiguration = globalConfiguration;
         }
 
         private void WhenICreate()
         {
-            _result = _creator.Create(_route);
+            _result = _creator.Create(_route, _globalConfiguration);
         }
 
         private void ThenTheFollowingIsReturned(RouteOptions expected)

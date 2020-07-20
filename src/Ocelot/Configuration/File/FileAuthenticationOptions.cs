@@ -13,6 +13,7 @@ namespace Ocelot.Configuration.File
 
         public string AuthenticationProviderKey { get; set; }
         public List<string> AllowedScopes { get; set; }
+        public bool AllowAnonymous { get; set; }
 
         public override string ToString()
         {
