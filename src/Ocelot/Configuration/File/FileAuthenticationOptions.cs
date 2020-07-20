@@ -13,7 +13,8 @@ namespace Ocelot.Configuration.File
 
         public string AuthenticationProviderKey { get; set; }
         public List<string> AllowedScopes { get; set; }
-        public bool AllowAnonymous { get; set; }
+        // the property below is significant only if the global AuthenticationOptions are used
+        public bool AllowAnonymousForGlobalAuthenticationOptions { get; set; }
 
         public override string ToString()
         {

@@ -161,19 +161,60 @@ namespace Ocelot.UnitTests.Configuration
                 ServiceName = "west",
                 AuthenticationOptions = new FileAuthenticationOptions
                 {
-                    AllowAnonymous = true,
+                    AllowAnonymousForGlobalAuthenticationOptions = true,
                 },
             };
             var globalConf = new FileGlobalConfiguration
             {
                 AuthenticationOptions = new FileAuthenticationOptions()
                 {
-                    AuthenticationProviderKey = "Test",
                 },
             };
 
             var expected = new RouteOptionsBuilder()
                 .WithIsAuthenticated(false)
+                .WithIsAuthorised(true)
+                .WithIsCached(true)
+                .WithRateLimiting(true)
+                .WithUseServiceDiscovery(true)
+                .Build();
+
+            this.Given(x => x.GivenTheFollowing(route, globalConf))
+                .When(x => x.WhenICreate())
+                .Then(x => x.ThenTheFollowingIsReturned(expected))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_set_isauthenticated_to_true_when_providerkey_set_in_route_and_route_has_allowanonymous()
+        {
+            var route = new FileRoute
+            {
+                RateLimitOptions = new FileRateLimitRule
+                {
+                    EnableRateLimiting = true,
+                },
+                RouteClaimsRequirement = new Dictionary<string, string>()
+                {
+                    { "", "" },
+                },
+                FileCacheOptions = new FileCacheOptions
+                {
+                    TtlSeconds = 1,
+                },
+                ServiceName = "west",
+                AuthenticationOptions = new FileAuthenticationOptions
+                {
+                    AuthenticationProviderKey = "Test",
+                    AllowAnonymousForGlobalAuthenticationOptions = true,
+                },
+            };
+            var globalConf = new FileGlobalConfiguration
+            {
+            };
+
+            var expected = new RouteOptionsBuilder()
+                .WithIsAuthenticated(true)
                 .WithIsAuthorised(true)
                 .WithIsCached(true)
                 .WithRateLimiting(true)

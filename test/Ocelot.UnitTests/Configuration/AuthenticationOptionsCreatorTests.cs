@@ -72,6 +72,38 @@ namespace Ocelot.UnitTests.Configuration
         }
 
         [Fact]
+        public void should_use_global_configuration_when_route_provider_key_is_empty()
+        {
+            var route = new FileRoute
+            {
+                AuthenticationOptions = new FileAuthenticationOptions
+                {
+                    AuthenticationProviderKey = "",
+                    AllowedScopes = new List<string> { "cheese" },
+                },
+            };
+            var globalConfig = new FileGlobalConfiguration
+            {
+                AuthenticationOptions = new FileAuthenticationOptions()
+                {
+                    AuthenticationProviderKey = "key",
+                    AllowedScopes = new List<string>() { "scope1", "scope2" },
+                },
+            };
+
+            var expected = new AuthenticationOptionsBuilder()
+                .WithAllowedScopes(globalConfig.AuthenticationOptions?.AllowedScopes)
+                .WithAuthenticationProviderKey(globalConfig.AuthenticationOptions?.AuthenticationProviderKey)
+                .Build();
+
+            this.Given(x => x.GivenTheFollowingRoute(route))
+                .And(x => x.GivenTheFollowingGlobalConfig(globalConfig))
+                .When(x => x.WhenICreateTheAuthenticationOptions())
+                .Then(x => x.ThenTheFollowingConfigIsReturned(expected))
+                .BDDfy();
+        }
+
+        [Fact]
         public void should_use_route_over_global_specific()
         {
             var route = new FileRoute

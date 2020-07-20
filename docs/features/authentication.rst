@@ -42,7 +42,7 @@ When Ocelot runs it will look at this Routes AuthenticationOptions.Authenticatio
 
 If a Route is authenticated Ocelot will invoke whatever scheme is associated with it while executing the authentication middleware. If the request fails authentication Ocelot returns a http status code 401.
 
-If you want to configure AuthenticationOptions the same for all Routes, do it in GlobalConfiguration the same way as for Route. If there are AuthenticationOptions configured both for GlobalConfiguration and Route, the Route section has priority.
+If you want to configure AuthenticationOptions the same for all Routes, do it in GlobalConfiguration the same way as for Route. If there are AuthenticationOptions configured both for GlobalConfiguration and Route (AuthenticationProviderKey is set), the Route section has priority. If you want to exclude route from global AuthenticationOptions, you can do that by setting AllowAnonymousForGlobalAuthenticationOptions to true in the route AuthenticationOptions - then this route will not be authenticated.
 
 JWT Tokens
 ^^^^^^^^^^
