@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ocelot.Requester
@@ -15,9 +16,9 @@ namespace Ocelot.Requester
             Client = client;
         }
 
-        public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
+        public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
-            return Client.SendAsync(request);
+            return Client.SendAsync(request, cancellationToken);
         }
     }
 }

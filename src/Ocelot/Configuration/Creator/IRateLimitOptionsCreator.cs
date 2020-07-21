@@ -4,6 +4,6 @@ namespace Ocelot.Configuration.Creator
 {
     public interface IRateLimitOptionsCreator
     {
-        RateLimitOptions Create(FileReRoute fileReRoute, FileGlobalConfiguration globalConfiguration, bool enableRateLimiting);
+        RateLimitOptions Create(FileRateLimitRule fileRateLimitRule, FileGlobalConfiguration globalConfiguration);
     }
 }

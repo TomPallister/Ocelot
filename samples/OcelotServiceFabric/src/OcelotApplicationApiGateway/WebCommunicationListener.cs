@@ -59,7 +59,6 @@ namespace OcelotApplicationApiGateway
             {
                 this.webHost = new WebHostBuilder()
                .UseKestrel()
-               //.UseStartup<Startup>()
                .UseUrls(this.listeningAddress)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -67,7 +66,7 @@ namespace OcelotApplicationApiGateway
                         .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
                         .AddJsonFile("appsettings.json", true, true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                        .AddJsonFile("configuration.json")
+                        .AddJsonFile("ocelot.json", false, false)
                         .AddEnvironmentVariables();
                 })
                .ConfigureLogging((hostingContext, logging) =>

@@ -9,20 +9,20 @@ namespace Ocelot.UnitTests.Infrastructure
 {
     public class HttpDataRepositoryTests
     {
-        private HttpContext _httpContext;
+        private readonly HttpContext _httpContext;
         private IHttpContextAccessor _httpContextAccessor;
-        private HttpDataRepository _httpDataRepository;
+        private readonly HttpDataRepository _httpDataRepository;
         private object _result;
 
         public HttpDataRepositoryTests()
         {
             _httpContext = new DefaultHttpContext();
-            _httpContextAccessor = new HttpContextAccessor{HttpContext = _httpContext};
+            _httpContextAccessor = new HttpContextAccessor { HttpContext = _httpContext };
             _httpDataRepository = new HttpDataRepository(_httpContextAccessor);
         }
 
         /*
-        TODO - Additional tests -> Type mistmatch aka Add string, request int 
+        TODO - Additional tests -> Type mistmatch aka Add string, request int
         TODO - Additional tests -> HttpContent null. This should never happen
         */
 
@@ -72,9 +72,9 @@ namespace Ocelot.UnitTests.Infrastructure
         private void ThenTheResultIsAnErrorReposnse<T>(object resultValue)
         {
             _result.ShouldBeOfType<ErrorResponse<T>>();
-            ((ErrorResponse<T>) _result).Data.ShouldBeNull();
+            ((ErrorResponse<T>)_result).Data.ShouldBeNull();
             ((ErrorResponse<T>)_result).IsError.ShouldBe(true);
-            ((ErrorResponse<T>) _result).Errors.ShouldHaveSingleItem()
+            ((ErrorResponse<T>)_result).Errors.ShouldHaveSingleItem()
                 .ShouldBeOfType<CannotFindDataError>()
                 .Message.ShouldStartWith("Unable to find data for key: ");
         }

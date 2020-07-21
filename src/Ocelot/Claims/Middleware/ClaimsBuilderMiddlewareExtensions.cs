@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Ocelot.Middleware.Pipeline;
-
-namespace Ocelot.Claims.Middleware
+﻿namespace Ocelot.Claims.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class ClaimsBuilderMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseClaimsBuilderMiddleware(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseClaimsToClaimsMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<ClaimsBuilderMiddleware>();
+            return builder.UseMiddleware<ClaimsToClaimsMiddleware>();
         }
     }
 }

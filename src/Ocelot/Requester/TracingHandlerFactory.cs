@@ -1,37 +1,26 @@
-using Butterfly.Client.Tracing;
-using Butterfly.OpenTracing;
-using Ocelot.Infrastructure.RequestData;
-
 namespace Ocelot.Requester
 {
+    using Logging;
+    using Microsoft.Extensions.DependencyInjection;
+    using Ocelot.Infrastructure.RequestData;
+    using System;
+
     public class TracingHandlerFactory : ITracingHandlerFactory
     {
-        private readonly IServiceTracer _tracer;
+        private readonly ITracer _tracer;
         private readonly IRequestScopedDataRepository _repo;
 
         public TracingHandlerFactory(
-            IServiceTracer tracer,
+            IServiceProvider services,
             IRequestScopedDataRepository repo)
         {
             _repo = repo;
-            _tracer = tracer;
+            _tracer = services.GetService<ITracer>();
         }
 
         public ITracingHandler Get()
         {
             return new OcelotHttpTracingHandler(_tracer, _repo);
-        }
-    }
-
-    public class FakeServiceTracer : IServiceTracer
-    {
-        public ITracer Tracer { get; }
-        public string ServiceName { get; }
-        public string Environment { get; }
-        public string Identity { get; }
-        public ISpan Start(ISpanBuilder spanBuilder)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

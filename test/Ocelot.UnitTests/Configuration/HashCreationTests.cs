@@ -1,7 +1,6 @@
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using Shouldly;
 using Xunit;
 
 namespace Ocelot.UnitTests.Configuration
@@ -21,7 +20,7 @@ namespace Ocelot.UnitTests.Configuration
             }
 
             var storedSalt = Convert.ToBase64String(salt);
-    
+
             var storedHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: password,
                 salt: salt,

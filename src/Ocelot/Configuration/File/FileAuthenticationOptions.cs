@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Ocelot.Infrastructure.Extensions;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Ocelot.Configuration.File
@@ -10,7 +11,7 @@ namespace Ocelot.Configuration.File
             AllowedScopes = new List<string>();
         }
 
-        public string AuthenticationProviderKey {get; set;}
+        public string AuthenticationProviderKey { get; set; }
         public List<string> AllowedScopes { get; set; }
 
         public override string ToString()

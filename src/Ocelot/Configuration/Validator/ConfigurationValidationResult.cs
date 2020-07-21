@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Ocelot.Errors;
-
-namespace Ocelot.Configuration.Validator
+﻿namespace Ocelot.Configuration.Validator
 {
+    using Ocelot.Errors;
+    using System.Collections.Generic;
+
     public class ConfigurationValidationResult
     {
         public ConfigurationValidationResult(bool isError)
@@ -17,8 +17,8 @@ namespace Ocelot.Configuration.Validator
             Errors = errors;
         }
 
-        public bool IsError { get; private set; }
+        public bool IsError { get; }
 
-        public List<Error> Errors { get; private set; } 
+        public List<Error> Errors { get; }
     }
 }

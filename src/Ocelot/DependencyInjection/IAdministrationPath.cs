@@ -2,6 +2,6 @@ namespace Ocelot.DependencyInjection
 {
     public interface IAdministrationPath
     {
-        string Path {get;}
+        string Path { get; }
     }
 }

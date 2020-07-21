@@ -1,44 +1,44 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using Consul;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Ocelot.Configuration.File;
-using Shouldly;
-using TestStack.BDDfy;
-using Xunit;
-
-namespace Ocelot.AcceptanceTests
+﻿namespace Ocelot.AcceptanceTests
 {
+    using Configuration.File;
+    using Consul;
+    using Microsoft.AspNetCore.Http;
+    using Newtonsoft.Json;
+    using Shouldly;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using TestStack.BDDfy;
+    using Xunit;
+
     public class ServiceDiscoveryTests : IDisposable
     {
-        private IWebHost _builderOne;
-        private IWebHost _builderTwo;
-        private IWebHost _fakeConsulBuilder;
         private readonly Steps _steps;
-        private readonly List<ServiceEntry> _serviceEntries;
+        private readonly List<ServiceEntry> _consulServices;
         private int _counterOne;
         private int _counterTwo;
-        private static readonly object _syncLock = new object();
-        private IWebHost _builder;
+        private static readonly object SyncLock = new object();
         private string _downstreamPath;
+        private string _receivedToken;
+        private readonly ServiceHandler _serviceHandler;
 
         public ServiceDiscoveryTests()
         {
+            _serviceHandler = new ServiceHandler();
             _steps = new Steps();
-            _serviceEntries = new List<ServiceEntry>();
+            _consulServices = new List<ServiceEntry>();
         }
 
         [Fact]
-        public void should_use_service_discovery_and_load_balance_request()
+        public void should_use_consul_service_discovery_and_load_balance_request()
         {
-            var consulPort = 8502;
+            var consulPort = RandomPortFinder.GetRandomPort();
+            var servicePort1 = RandomPortFinder.GetRandomPort();
+            var servicePort2 = RandomPortFinder.GetRandomPort();
             var serviceName = "product";
-            var downstreamServiceOneUrl = "http://localhost:50881";
-            var downstreamServiceTwoUrl = "http://localhost:50882";
+            var downstreamServiceOneUrl = $"http://localhost:{servicePort1}";
+            var downstreamServiceTwoUrl = $"http://localhost:{servicePort2}";
             var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
             var serviceEntryOne = new ServiceEntry()
             {
@@ -46,7 +46,7 @@ namespace Ocelot.AcceptanceTests
                 {
                     Service = serviceName,
                     Address = "localhost",
-                    Port = 50881,
+                    Port = servicePort1,
                     ID = Guid.NewGuid().ToString(),
                     Tags = new string[0]
                 },
@@ -57,7 +57,7 @@ namespace Ocelot.AcceptanceTests
                 {
                     Service = serviceName,
                     Address = "localhost",
-                    Port = 50882,
+                    Port = servicePort2,
                     ID = Guid.NewGuid().ToString(),
                     Tags = new string[0]
                 },
@@ -65,27 +65,27 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/",
                             UpstreamHttpMethod = new List<string> { "Get" },
                             ServiceName = serviceName,
-                            LoadBalancer = "LeastConnection",
-                            UseServiceDiscovery = true,
+                            LoadBalancerOptions = new FileLoadBalancerOptions { Type = "LeastConnection" },
                         }
                     },
-                    GlobalConfiguration = new FileGlobalConfiguration()
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
-                        ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
-                        {
-                            Host = "localhost",
-                            Port = consulPort
-                        }
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort
                     }
+                }
             };
 
             this.Given(x => x.GivenProductServiceOneIsRunning(downstreamServiceOneUrl, 200))
@@ -93,20 +93,20 @@ namespace Ocelot.AcceptanceTests
                 .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
                 .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne, serviceEntryTwo))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
-                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenOcelotIsRunningWithConsul())
                 .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimes("/", 50))
                 .Then(x => x.ThenTheTwoServicesShouldHaveBeenCalledTimes(50))
                 .And(x => x.ThenBothServicesCalledRealisticAmountOfTimes(24, 26))
                 .BDDfy();
         }
 
-        //test from issue 213
         [Fact]
         public void should_handle_request_to_consul_for_downstream_service_and_make_request()
         {
-            var consulPort = 8505;
-            var serviceName = "web";
-            var downstreamServiceOneUrl = "http://localhost:8080";
+            int consulPort = RandomPortFinder.GetRandomPort();
+            int servicePort = RandomPortFinder.GetRandomPort();
+            const string serviceName = "web";
+            string downstreamServiceOneUrl = $"http://localhost:{servicePort}";
             var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
             var serviceEntryOne = new ServiceEntry()
             {
@@ -114,55 +114,55 @@ namespace Ocelot.AcceptanceTests
                 {
                     Service = serviceName,
                     Address = "localhost",
-                    Port = 8080,
+                    Port = servicePort,
                     ID = "web_90_0_2_224_8080",
-                    Tags = new string[1]{"version-v1"}
+                    Tags = new[] { "version-v1" }
                 },
             };
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/home",
                             DownstreamScheme = "http",
                             UpstreamPathTemplate = "/home",
                             UpstreamHttpMethod = new List<string> { "Get", "Options" },
                             ServiceName = serviceName,
-                            LoadBalancer = "LeastConnection",
-                            UseServiceDiscovery = true,
+                            LoadBalancerOptions = new FileLoadBalancerOptions { Type = "LeastConnection" },
                         }
                     },
-                    GlobalConfiguration = new FileGlobalConfiguration()
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
-                        ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
-                        {
-                            Host = "localhost",
-                            Port = consulPort
-                        }
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort
                     }
+                }
             };
 
-                this.Given(x => x.GivenThereIsAServiceRunningOn(downstreamServiceOneUrl, "/api/home", 200, "Hello from Laura"))                
-                .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
-                .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne))
-                .And(x => _steps.GivenThereIsAConfiguration(configuration))
-                .And(x => _steps.GivenOcelotIsRunning())
-                 .When(x => _steps.WhenIGetUrlOnTheApiGateway("/home"))
-                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
-                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
-                .BDDfy();
+            this.Given(x => x.GivenThereIsAServiceRunningOn(downstreamServiceOneUrl, "/api/home", 200, "Hello from Laura"))
+            .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
+            .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne))
+            .And(x => _steps.GivenThereIsAConfiguration(configuration))
+            .And(x => _steps.GivenOcelotIsRunningWithConsul())
+            .When(x => _steps.WhenIGetUrlOnTheApiGateway("/home"))
+            .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+            .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+            .BDDfy();
         }
 
         [Fact]
-        public void should_send_request_to_service_after_it_becomes_available()
+        public void should_handle_request_to_consul_for_downstream_service_and_make_request_no_re_routes()
         {
-            var consulPort = 8501;
-            var serviceName = "product";
-            var downstreamServiceOneUrl = "http://localhost:50879";
-            var downstreamServiceTwoUrl = "http://localhost:50880";
+            int consulPort = RandomPortFinder.GetRandomPort();
+            const string serviceName = "web";
+            int downstreamServicePort = RandomPortFinder.GetRandomPort();
+            var downstreamServiceOneUrl = $"http://localhost:{downstreamServicePort}";
             var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
             var serviceEntryOne = new ServiceEntry()
             {
@@ -170,7 +170,60 @@ namespace Ocelot.AcceptanceTests
                 {
                     Service = serviceName,
                     Address = "localhost",
-                    Port = 50879,
+                    Port = downstreamServicePort,
+                    ID = "web_90_0_2_224_8080",
+                    Tags = new[] { "version-v1" }
+                },
+            };
+
+            var configuration = new FileConfiguration
+            {
+                GlobalConfiguration = new FileGlobalConfiguration
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
+                    {
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort
+                    },
+                    DownstreamScheme = "http",
+                    HttpHandlerOptions = new FileHttpHandlerOptions
+                    {
+                        AllowAutoRedirect = true,
+                        UseCookieContainer = true,
+                        UseTracing = false
+                    }
+                }
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn(downstreamServiceOneUrl, "/something", 200, "Hello from Laura"))
+            .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
+            .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne))
+            .And(x => _steps.GivenThereIsAConfiguration(configuration))
+            .And(x => _steps.GivenOcelotIsRunningWithConsul())
+            .When(x => _steps.WhenIGetUrlOnTheApiGateway("/web/something"))
+            .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+            .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+            .BDDfy();
+        }
+
+        [Fact]
+        public void should_use_consul_service_discovery_and_load_balance_request_no_re_routes()
+        {
+            var consulPort = RandomPortFinder.GetRandomPort();
+            var serviceName = "product";
+            var serviceOnePort = RandomPortFinder.GetRandomPort();
+            var serviceTwoPort = RandomPortFinder.GetRandomPort();
+            var downstreamServiceOneUrl = $"http://localhost:{serviceOnePort}";
+            var downstreamServiceTwoUrl = $"http://localhost:{serviceTwoPort}";
+            var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
+            var serviceEntryOne = new ServiceEntry()
+            {
+                Service = new AgentService()
+                {
+                    Service = serviceName,
+                    Address = "localhost",
+                    Port = serviceOnePort,
                     ID = Guid.NewGuid().ToString(),
                     Tags = new string[0]
                 },
@@ -181,7 +234,7 @@ namespace Ocelot.AcceptanceTests
                 {
                     Service = serviceName,
                     Address = "localhost",
-                    Port = 50880,
+                    Port = serviceTwoPort,
                     ID = Guid.NewGuid().ToString(),
                     Tags = new string[0]
                 },
@@ -189,27 +242,17 @@ namespace Ocelot.AcceptanceTests
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
-                        new FileReRoute
-                        {
-                            DownstreamPathTemplate = "/",
-                            DownstreamScheme = "http",
-                            UpstreamPathTemplate = "/",
-                            UpstreamHttpMethod = new List<string> { "Get" },
-                            ServiceName = serviceName,
-                            LoadBalancer = "LeastConnection",
-                            UseServiceDiscovery = true,
-                        }
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort
                     },
-                    GlobalConfiguration = new FileGlobalConfiguration()
-                    {
-                        ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
-                        {
-                            Host = "localhost",
-                            Port = consulPort
-                        }
-                    }
+                    LoadBalancerOptions = new FileLoadBalancerOptions { Type = "LeastConnection" },
+                    DownstreamScheme = "http"
+                }
             };
 
             this.Given(x => x.GivenProductServiceOneIsRunning(downstreamServiceOneUrl, 200))
@@ -217,7 +260,136 @@ namespace Ocelot.AcceptanceTests
                 .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
                 .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne, serviceEntryTwo))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
-                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenOcelotIsRunningWithConsul())
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimes($"/{serviceName}/", 50))
+                .Then(x => x.ThenTheTwoServicesShouldHaveBeenCalledTimes(50))
+                .And(x => x.ThenBothServicesCalledRealisticAmountOfTimes(24, 26))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_use_token_to_make_request_to_consul()
+        {
+            var token = "abctoken";
+            var consulPort = RandomPortFinder.GetRandomPort();
+            var serviceName = "web";
+            var servicePort = RandomPortFinder.GetRandomPort();
+            var downstreamServiceOneUrl = $"http://localhost:{servicePort}";
+            var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
+            var serviceEntryOne = new ServiceEntry()
+            {
+                Service = new AgentService()
+                {
+                    Service = serviceName,
+                    Address = "localhost",
+                    Port = servicePort,
+                    ID = "web_90_0_2_224_8080",
+                    Tags = new[] { "version-v1" }
+                },
+            };
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/api/home",
+                            DownstreamScheme = "http",
+                            UpstreamPathTemplate = "/home",
+                            UpstreamHttpMethod = new List<string> { "Get", "Options" },
+                            ServiceName = serviceName,
+                            LoadBalancerOptions = new FileLoadBalancerOptions { Type = "LeastConnection" },
+                        }
+                    },
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
+                    {
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort,
+                        Token = token
+                    }
+                }
+            };
+
+            this.Given(_ => GivenThereIsAServiceRunningOn(downstreamServiceOneUrl, "/api/home", 200, "Hello from Laura"))
+                .And(_ => GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
+                .And(_ => GivenTheServicesAreRegisteredWithConsul(serviceEntryOne))
+                .And(_ => _steps.GivenThereIsAConfiguration(configuration))
+                .And(_ => _steps.GivenOcelotIsRunningWithConsul())
+                .When(_ => _steps.WhenIGetUrlOnTheApiGateway("/home"))
+                .Then(_ => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(_ => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+                .And(_ => _receivedToken.ShouldBe(token))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_send_request_to_service_after_it_becomes_available_in_consul()
+        {
+            var consulPort = RandomPortFinder.GetRandomPort();
+            var serviceName = "product";
+            var servicePort1 = RandomPortFinder.GetRandomPort();
+            var servicePort2 = RandomPortFinder.GetRandomPort();
+            var downstreamServiceOneUrl = $"http://localhost:{servicePort1}";
+            var downstreamServiceTwoUrl = $"http://localhost:{servicePort2}";
+            var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
+            var serviceEntryOne = new ServiceEntry()
+            {
+                Service = new AgentService()
+                {
+                    Service = serviceName,
+                    Address = "localhost",
+                    Port = servicePort1,
+                    ID = Guid.NewGuid().ToString(),
+                    Tags = new string[0]
+                },
+            };
+            var serviceEntryTwo = new ServiceEntry()
+            {
+                Service = new AgentService()
+                {
+                    Service = serviceName,
+                    Address = "localhost",
+                    Port = servicePort2,
+                    ID = Guid.NewGuid().ToString(),
+                    Tags = new string[0]
+                },
+            };
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/",
+                            DownstreamScheme = "http",
+                            UpstreamPathTemplate = "/",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            ServiceName = serviceName,
+                            LoadBalancerOptions = new FileLoadBalancerOptions { Type = "LeastConnection" },
+                        }
+                    },
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
+                    {
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort
+                    }
+                }
+            };
+
+            this.Given(x => x.GivenProductServiceOneIsRunning(downstreamServiceOneUrl, 200))
+                .And(x => x.GivenProductServiceTwoIsRunning(downstreamServiceTwoUrl, 200))
+                .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
+                .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne, serviceEntryTwo))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunningWithConsul())
                 .And(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimes("/", 10))
                 .And(x => x.ThenTheTwoServicesShouldHaveBeenCalledTimes(10))
                 .And(x => x.ThenBothServicesCalledRealisticAmountOfTimes(4, 6))
@@ -233,9 +405,68 @@ namespace Ocelot.AcceptanceTests
                 .BDDfy();
         }
 
+        [Fact]
+        public void should_handle_request_to_poll_consul_for_downstream_service_and_make_request()
+        {
+            int consulPort = RandomPortFinder.GetRandomPort();
+            const string serviceName = "web";
+            int downstreamServicePort = RandomPortFinder.GetRandomPort();
+            var downstreamServiceOneUrl = $"http://localhost:{downstreamServicePort}";
+            var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
+            var serviceEntryOne = new ServiceEntry()
+            {
+                Service = new AgentService()
+                {
+                    Service = serviceName,
+                    Address = "localhost",
+                    Port = downstreamServicePort,
+                    ID = $"web_90_0_2_224_{downstreamServicePort}",
+                    Tags = new[] { "version-v1" }
+                },
+            };
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/api/home",
+                            DownstreamScheme = "http",
+                            UpstreamPathTemplate = "/home",
+                            UpstreamHttpMethod = new List<string> { "Get", "Options" },
+                            ServiceName = serviceName,
+                            LoadBalancerOptions = new FileLoadBalancerOptions { Type = "LeastConnection" },
+                        }
+                    },
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
+                    {
+                        Scheme = "http",
+                        Host = "localhost",
+                        Port = consulPort,
+                        Type = "PollConsul",
+                        PollingInterval = 0,
+                        Namespace = string.Empty
+                    }
+                }
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn(downstreamServiceOneUrl, "/api/home", 200, "Hello from Laura"))
+            .And(x => x.GivenThereIsAFakeConsulServiceDiscoveryProvider(fakeConsulServiceDiscoveryUrl, serviceName))
+            .And(x => x.GivenTheServicesAreRegisteredWithConsul(serviceEntryOne))
+            .And(x => _steps.GivenThereIsAConfiguration(configuration))
+            .And(x => _steps.GivenOcelotIsRunningWithConsul())
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayWaitingForTheResponseToBeOk("/home"))
+            .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+            .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+            .BDDfy();
+        }
+
         private void WhenIAddAServiceBackIn(ServiceEntry serviceEntryTwo)
         {
-            _serviceEntries.Add(serviceEntryTwo);
+            _consulServices.Add(serviceEntryTwo);
         }
 
         private void ThenOnlyOneServiceHasBeenCalled()
@@ -246,10 +477,10 @@ namespace Ocelot.AcceptanceTests
 
         private void WhenIRemoveAService(ServiceEntry serviceEntryTwo)
         {
-            _serviceEntries.Remove(serviceEntryTwo);
+            _consulServices.Remove(serviceEntryTwo);
         }
 
-         private void GivenIResetCounters()
+        private void GivenIResetCounters()
         {
             _counterOne = 0;
             _counterTwo = 0;
@@ -269,139 +500,97 @@ namespace Ocelot.AcceptanceTests
 
         private void GivenTheServicesAreRegisteredWithConsul(params ServiceEntry[] serviceEntries)
         {
-            foreach(var serviceEntry in serviceEntries)
+            foreach (var serviceEntry in serviceEntries)
             {
-                _serviceEntries.Add(serviceEntry);
+                _consulServices.Add(serviceEntry);
             }
         }
 
         private void GivenThereIsAFakeConsulServiceDiscoveryProvider(string url, string serviceName)
         {
-            _fakeConsulBuilder = new WebHostBuilder()
-                            .UseUrls(url)
-                            .UseKestrel()
-                            .UseContentRoot(Directory.GetCurrentDirectory())
-                            .UseIISIntegration()
-                            .UseUrls(url)
-                            .Configure(app =>
-                            {
-                                app.Run(async context =>
-                                {
-                                    if(context.Request.Path.Value == $"/v1/health/service/{serviceName}")
-                                    {
-                                        await context.Response.WriteJsonAsync(_serviceEntries);
-                                    }
-                                });
-                            })
-                            .Build();
-
-            _fakeConsulBuilder.Start();
+            _serviceHandler.GivenThereIsAServiceRunningOn(url, async context =>
+            {
+                if (context.Request.Path.Value == $"/v1/health/service/{serviceName}")
+                {
+                    if (context.Request.Headers.TryGetValue("X-Consul-Token", out var values))
+                    {
+                        _receivedToken = values.First();
+                    }
+                    var json = JsonConvert.SerializeObject(_consulServices);
+                    context.Response.Headers.Add("Content-Type", "application/json");
+                    await context.Response.WriteAsync(json);
+                }
+            });
         }
 
         private void GivenProductServiceOneIsRunning(string url, int statusCode)
         {
-            _builderOne = new WebHostBuilder()
-                .UseUrls(url)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseUrls(url)
-                .Configure(app =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(url, async context =>
+            {
+                try
                 {
-                    app.Run(async context =>
+                    string response;
+                    lock (SyncLock)
                     {
-                        try
-                        {
-                            var response = string.Empty;
-                            lock (_syncLock)
-                            {
-                                _counterOne++;
-                                response = _counterOne.ToString();
-                            }
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync(response);
-                        }
-                        catch (System.Exception exception)
-                        {
-                            await context.Response.WriteAsync(exception.StackTrace);
-                        }
-                    });
-                })
-                .Build();
+                        _counterOne++;
+                        response = _counterOne.ToString();
+                    }
 
-            _builderOne.Start();
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync(response);
+                }
+                catch (Exception exception)
+                {
+                    await context.Response.WriteAsync(exception.StackTrace);
+                }
+            });
         }
 
         private void GivenProductServiceTwoIsRunning(string url, int statusCode)
         {
-            _builderTwo = new WebHostBuilder()
-                .UseUrls(url)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseUrls(url)
-                .Configure(app =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(url, async context =>
+            {
+                try
                 {
-                    app.Run(async context =>
+                    string response;
+                    lock (SyncLock)
                     {
-                        try
-                        {
-                            var response = string.Empty;
-                            lock (_syncLock)
-                            {
-                                _counterTwo++;
-                                response = _counterTwo.ToString();
-                            }
-                            
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync(response);
-                        }
-                        catch (System.Exception exception)
-                        {
-                            await context.Response.WriteAsync(exception.StackTrace);
-                        }                  
-                    });
-                })
-                .Build();
+                        _counterTwo++;
+                        response = _counterTwo.ToString();
+                    }
 
-            _builderTwo.Start();
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync(response);
+                }
+                catch (Exception exception)
+                {
+                    await context.Response.WriteAsync(exception.StackTrace);
+                }
+            });
         }
 
         private void GivenThereIsAServiceRunningOn(string baseUrl, string basePath, int statusCode, string responseBody)
         {
-            _builder = new WebHostBuilder()
-                .UseUrls(baseUrl)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .Configure(app =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
+            {
+                _downstreamPath = !string.IsNullOrEmpty(context.Request.PathBase.Value) ? context.Request.PathBase.Value : context.Request.Path.Value;
+
+                if (_downstreamPath != basePath)
                 {
-                    app.UsePathBase(basePath);
-                    app.Run(async context =>
-                    {   
-                        _downstreamPath = !string.IsNullOrEmpty(context.Request.PathBase.Value) ? context.Request.PathBase.Value : context.Request.Path.Value;
-
-                        if(_downstreamPath != basePath)
-                        {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync("downstream path didnt match base path");
-                        }
-                        else
-                        {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync(responseBody);
-                        }
-                    });
-                })
-                .Build();
-
-            _builder.Start();
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync("downstream path didnt match base path");
+                }
+                else
+                {
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync(responseBody);
+                }
+            });
         }
 
         public void Dispose()
         {
-            _builderOne?.Dispose();
-            _builderTwo?.Dispose();
+            _serviceHandler?.Dispose();
             _steps.Dispose();
         }
     }

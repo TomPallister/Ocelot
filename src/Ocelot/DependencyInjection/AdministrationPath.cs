@@ -7,6 +7,6 @@ namespace Ocelot.DependencyInjection
             Path = path;
         }
 
-        public string Path {get;private set;}
+        public string Path { get; private set; }
     }
 }

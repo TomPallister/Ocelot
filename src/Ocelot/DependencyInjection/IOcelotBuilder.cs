@@ -1,27 +1,50 @@
-using Butterfly.Client.AspNetCore;
-using CacheManager.Core;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Ocelot.Multiplexer;
 using System;
 using System.Net.Http;
-using IdentityServer4.AccessTokenValidation;
+using Ocelot.Configuration;
+using Ocelot.LoadBalancer.LoadBalancers;
+using Ocelot.ServiceDiscovery.Providers;
 
 namespace Ocelot.DependencyInjection
 {
     public interface IOcelotBuilder
     {
-        IOcelotBuilder AddStoreOcelotConfigurationInConsul();
+        IServiceCollection Services { get; }
 
-        IOcelotBuilder AddCacheManager(Action<ConfigurationBuilderCachePart> settings);
+        IConfiguration Configuration { get; }
 
-        IOcelotBuilder AddOpenTracing(Action<ButterflyOptions> settings);
+        IMvcCoreBuilder MvcCoreBuilder { get; }
 
-        IOcelotAdministrationBuilder AddAdministration(string path, string secret);
+        IOcelotBuilder AddDelegatingHandler(Type type, bool global = false);
 
-        IOcelotAdministrationBuilder AddAdministration(string path, Action<IdentityServerAuthenticationOptions> configOptions);
-
-        IOcelotBuilder AddSingletonDelegatingHandler<T>(bool global = false)
+        IOcelotBuilder AddDelegatingHandler<T>(bool global = false)
             where T : DelegatingHandler;
+
+        IOcelotBuilder AddSingletonDefinedAggregator<T>()
+            where T : class, IDefinedAggregator;
+
+        IOcelotBuilder AddTransientDefinedAggregator<T>()
+            where T : class, IDefinedAggregator;
+
+        IOcelotBuilder AddCustomLoadBalancer<T>()
+            where T : ILoadBalancer, new();
         
-        IOcelotBuilder AddTransientDelegatingHandler<T>(bool global = false)
-            where T : DelegatingHandler;
+        IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc)
+            where T : ILoadBalancer;
+
+        IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc)
+            where T : ILoadBalancer;
+
+        IOcelotBuilder AddCustomLoadBalancer<T>(
+            Func<DownstreamRoute, IServiceDiscoveryProvider, T> loadBalancerFactoryFunc)
+            where T : ILoadBalancer;
+
+        IOcelotBuilder AddCustomLoadBalancer<T>(
+            Func<IServiceProvider, DownstreamRoute, IServiceDiscoveryProvider, T> loadBalancerFactoryFunc)
+            where T : ILoadBalancer;
+
+        IOcelotBuilder AddConfigPlaceholders();
     }
 }

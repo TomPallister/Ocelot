@@ -6,7 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-
+*.DS_Store
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -243,7 +243,7 @@ tools/
 .DS_Store
 
 # Ocelot acceptance test config
-test/Ocelot.AcceptanceTests/configuration.json
+test/Ocelot.AcceptanceTests/ocelot.json
 
 # Read the docstates
 _build/
@@ -252,3 +252,6 @@ _templates/
 
 # JetBrains Rider
 .idea/
+
+# Test Results
+*.trx

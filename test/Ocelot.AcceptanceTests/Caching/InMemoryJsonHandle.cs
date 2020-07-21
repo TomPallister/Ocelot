@@ -1,13 +1,13 @@
-﻿using CacheManager.Core;
-using CacheManager.Core.Internal;
-using CacheManager.Core.Logging;
-using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using static CacheManager.Core.Utility.Guard;
-
-namespace Ocelot.AcceptanceTests.Caching
+﻿namespace Ocelot.AcceptanceTests.Caching
 {
+    using CacheManager.Core;
+    using CacheManager.Core.Internal;
+    using CacheManager.Core.Logging;
+    using CacheManager.Core.Utility;
+    using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
+
     public class InMemoryJsonHandle<TCacheValue> : BaseCacheHandle<TCacheValue>
     {
         private readonly ICacheSerializer _serializer;
@@ -32,7 +32,7 @@ namespace Ocelot.AcceptanceTests.Caching
 
         public override void ClearRegion(string region)
         {
-            NotNullOrWhiteSpace(region, nameof(region));
+            Guard.NotNullOrWhiteSpace(region, nameof(region));
 
             var key = string.Concat(region, ":");
             foreach (var item in _cache.Where(p => p.Key.StartsWith(key, StringComparison.OrdinalIgnoreCase)))
@@ -43,21 +43,21 @@ namespace Ocelot.AcceptanceTests.Caching
 
         public override bool Exists(string key)
         {
-            NotNullOrWhiteSpace(key, nameof(key));
+            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
             return _cache.ContainsKey(key);
         }
 
         public override bool Exists(string key, string region)
         {
-            NotNullOrWhiteSpace(region, nameof(region));
+            Guard.NotNullOrWhiteSpace(region, nameof(region));
             var fullKey = GetKey(key, region);
             return _cache.ContainsKey(fullKey);
         }
 
         protected override bool AddInternalPrepared(CacheItem<TCacheValue> item)
         {
-            NotNull(item, nameof(item));
+            Guard.NotNull(item, nameof(item));
 
             var key = GetKey(item.Key, item.Region);
 
@@ -91,7 +91,7 @@ namespace Ocelot.AcceptanceTests.Caching
 
         protected override void PutInternalPrepared(CacheItem<TCacheValue> item)
         {
-            NotNull(item, nameof(item));
+            Guard.NotNull(item, nameof(item));
 
             var serializedItem = _serializer.SerializeCacheItem<TCacheValue>(item);
 
@@ -108,7 +108,7 @@ namespace Ocelot.AcceptanceTests.Caching
 
         private static string GetKey(string key, string region)
         {
-            NotNullOrWhiteSpace(key, nameof(key));
+            Guard.NotNullOrWhiteSpace(key, nameof(key));
 
             if (string.IsNullOrWhiteSpace(region))
             {

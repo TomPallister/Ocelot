@@ -1,66 +1,72 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Ocelot.DownstreamRouteFinder.Middleware;
-using Ocelot.Infrastructure.RequestData;
-using Ocelot.LoadBalancer.LoadBalancers;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using Ocelot.QueryStrings.Middleware;
-
-namespace Ocelot.LoadBalancer.Middleware
+﻿namespace Ocelot.LoadBalancer.Middleware
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+    using Ocelot.LoadBalancer.LoadBalancers;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System;
+    using System.Threading.Tasks;
+
     public class LoadBalancingMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
-        private readonly IOcelotLogger _logger;
+        private readonly RequestDelegate _next;
         private readonly ILoadBalancerHouse _loadBalancerHouse;
 
-        public LoadBalancingMiddleware(OcelotRequestDelegate next,
+        public LoadBalancingMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
-            ILoadBalancerHouse loadBalancerHouse) 
+            ILoadBalancerHouse loadBalancerHouse)
+                : base(loggerFactory.CreateLogger<LoadBalancingMiddleware>())
         {
             _next = next;
-            _logger = loggerFactory.CreateLogger<LoadBalancingMiddleware>();
             _loadBalancerHouse = loadBalancerHouse;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            var loadBalancer = await _loadBalancerHouse.Get(context.DownstreamReRoute, context.ServiceProviderConfiguration);
-            if(loadBalancer.IsError)
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+
+            var internalConfiguration = httpContext.Items.IInternalConfiguration();
+
+            var loadBalancer = _loadBalancerHouse.Get(downstreamRoute, internalConfiguration.ServiceProviderConfiguration);
+
+            if (loadBalancer.IsError)
             {
-                _logger.LogDebug("there was an error retriving the loadbalancer, setting pipeline error");
-                SetPipelineError(context, loadBalancer.Errors);
+                Logger.LogDebug("there was an error retriving the loadbalancer, setting pipeline error");
+                httpContext.Items.UpsertErrors(loadBalancer.Errors);
                 return;
             }
 
-            var hostAndPort = await loadBalancer.Data.Lease();
-            if(hostAndPort.IsError)
+            var hostAndPort = await loadBalancer.Data.Lease(httpContext);
+            if (hostAndPort.IsError)
             {
-                _logger.LogDebug("there was an error leasing the loadbalancer, setting pipeline error");
-                SetPipelineError(context, hostAndPort.Errors);
+                Logger.LogDebug("there was an error leasing the loadbalancer, setting pipeline error");
+                httpContext.Items.UpsertErrors(hostAndPort.Errors);
                 return;
             }
 
-            var uriBuilder = new UriBuilder(context.DownstreamRequest.RequestUri);
+            var downstreamRequest = httpContext.Items.DownstreamRequest();
 
-            uriBuilder.Host = hostAndPort.Data.DownstreamHost;
+            //todo check downstreamRequest is ok
+            downstreamRequest.Host = hostAndPort.Data.DownstreamHost;
 
             if (hostAndPort.Data.DownstreamPort > 0)
             {
-                uriBuilder.Port = hostAndPort.Data.DownstreamPort;
+                downstreamRequest.Port = hostAndPort.Data.DownstreamPort;
             }
 
-            context.DownstreamRequest.RequestUri = uriBuilder.Uri;
+            if (!string.IsNullOrEmpty(hostAndPort.Data.Scheme))
+            {
+                downstreamRequest.Scheme = hostAndPort.Data.Scheme;
+            }
 
             try
             {
-                await _next.Invoke(context);
+                await _next.Invoke(httpContext);
             }
             catch (Exception)
             {
-                _logger.LogDebug("Exception calling next middleware, exception will be thrown to global handler");
+                Logger.LogDebug("Exception calling next middleware, exception will be thrown to global handler");
                 throw;
             }
             finally

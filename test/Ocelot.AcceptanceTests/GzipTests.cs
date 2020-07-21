@@ -1,40 +1,38 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Ocelot.Configuration.File;
-using Shouldly;
-using TestStack.BDDfy;
-using Xunit;
-
 namespace Ocelot.AcceptanceTests
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.Configuration.File;
+    using Shouldly;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Net;
+    using TestStack.BDDfy;
+    using Xunit;
+
     public class GzipTests : IDisposable
     {
-        private IWebHost _builder;
         private readonly Steps _steps;
+        private readonly ServiceHandler _serviceHandler;
 
         public GzipTests()
         {
+            _serviceHandler = new ServiceHandler();
             _steps = new Steps();
         }
 
         [Fact]
         public void should_return_response_200_with_simple_url()
         {
+            var port = RandomPortFinder.GetRandomPort();
+
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -43,7 +41,7 @@ namespace Ocelot.AcceptanceTests
                                 new FileHostAndPort
                                 {
                                     Host = "localhost",
-                                    Port = 51879,
+                                    Port = port,
                                 }
                             },
                             UpstreamPathTemplate = "/",
@@ -53,8 +51,8 @@ namespace Ocelot.AcceptanceTests
             };
 
             var input = "people";
-            
-            this.Given(x => x.GivenThereIsAServiceRunningOn("http://localhost:51879", "/", 200, "Hello from Laura", "\"people\""))
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/", 200, "Hello from Laura", "\"people\""))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
                 .And(x => _steps.GivenThePostHasGzipContent(input))
@@ -66,51 +64,42 @@ namespace Ocelot.AcceptanceTests
 
         private void GivenThereIsAServiceRunningOn(string baseUrl, string basePath, int statusCode, string responseBody, string expected)
         {
-            _builder = new WebHostBuilder()
-                .UseUrls(baseUrl)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .Configure(app =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
+            {
+                if (context.Request.Headers.TryGetValue("Content-Encoding", out var contentEncoding))
                 {
-                    app.UsePathBase(basePath);
-                    app.Run(async context =>
-                    {   
-                        if(context.Request.Headers.TryGetValue("Content-Encoding", out var contentEncoding))
-                        {
-                            contentEncoding.First().ShouldBe("gzip");
-                            
-                            string text = null;
-                            using (var decompress = new GZipStream(context.Request.Body, CompressionMode.Decompress))
-                            {
-                                using (var sr = new StreamReader(decompress)) {
-                                    text = sr.ReadToEnd();
-                                }
-                            }
+                    contentEncoding.First().ShouldBe("gzip");
 
-                            if(text != expected)
-                            {
-                                throw new Exception("not gzipped");
-                            }
-                            
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync(responseBody);
-                        }
-                        else
+                    string text = null;
+                    using (var decompress = new GZipStream(context.Request.Body, CompressionMode.Decompress))
+                    {
+                        using (var sr = new StreamReader(decompress))
                         {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync("downstream path didnt match base path");
+                            // Synchronous operations are disallowed. Call ReadAsync or set AllowSynchronousIO to true instead.
+                            // text = sr.ReadToEnd();
+                            text = await sr.ReadToEndAsync();
                         }
-                    });
-                })
-                .Build();
+                    }
 
-            _builder.Start();
+                    if (text != expected)
+                    {
+                        throw new Exception("not gzipped");
+                    }
+
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync(responseBody);
+                }
+                else
+                {
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync("downstream path didnt match base path");
+                }
+            });
         }
 
         public void Dispose()
         {
-            _builder?.Dispose();
+            _serviceHandler?.Dispose();
             _steps.Dispose();
         }
     }

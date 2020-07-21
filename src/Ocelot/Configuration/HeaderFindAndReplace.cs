@@ -10,11 +10,11 @@ namespace Ocelot.Configuration
             Index = index;
         }
 
-        public string Key {get;}
-        public string Find {get;}
-        public string Replace {get;}
-        
+        public string Key { get; }
+        public string Find { get; }
+        public string Replace { get; }
+
         // only index 0 for now..
-        public int Index {get;}
+        public int Index { get; }
     }
 }

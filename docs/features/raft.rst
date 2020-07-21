@@ -1,11 +1,15 @@
 Raft (EXPERIMENTAL DO NOT USE IN PRODUCTION)
 ============================================
 
-Ocelot has recenely integrated `Rafty <https://github.com/TomPallister/Rafty>`_ which is an implementation of Raft that I have also been working on over the last year. This project is very experimental so please do not use this feature of Ocelot in production until I think it's OK.
+Ocelot has recently integrated `Rafty <https://github.com/ThreeMammals/Rafty>`_ which is an implementation of Raft that I have also been working on over the last year. This project is very experimental so please do not use this feature of Ocelot in production until I think it's OK.
 
-Raft is a distributed concensus algorythm that allows a cluster of servers (Ocelots) to maintain local state without having a centralised database for storing state (e.g. SQL Server). 
+Raft is a distributed concensus algorithm that allows a cluster of servers (Ocelots) to maintain local state without having a centralised database for storing state (e.g. SQL Server). 
 
-In order to enable Rafty in Ocelot you must make the following changes to your Startup.cs.
+To get Raft support you must first install the Ocelot Rafty package.
+
+``Install-Package Ocelot.Provider.Rafty``
+
+Then you must make the following changes to your Startup.cs / Program.cs.
 
 .. code-block:: csharp
 
@@ -42,4 +46,4 @@ In addition to this you must add a file called peers.json to your main project a
 
 Each instance of Ocelot must have it's address in the array so that they can communicate using Rafty.
 
-Once you have made these configuration changes you must deploy and start each instance of Ocelot using the addresses in the peers.json file. The servers should then start communicating with each other! You can test if everything is working by posting a configuration update and checking it has replicated to all servers by getting there configuration.
+Once you have made these configuration changes you must deploy and start each instance of Ocelot using the addresses in the peers.json file. The servers should then start communicating with each other! You can test if everything is working by posting a configuration update and checking it has replicated to all servers by getting their configuration.

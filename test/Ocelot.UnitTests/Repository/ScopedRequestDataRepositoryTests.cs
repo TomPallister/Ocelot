@@ -25,7 +25,7 @@ namespace Ocelot.UnitTests.Repository
         [Fact]
         public void should_add_item()
         {
-            this.Given(x => x.GivenIHaveAnItemToAdd("blahh", new [] {1,2,3,4}))
+            this.Given(x => x.GivenIHaveAnItemToAdd("blahh", new[] { 1, 2, 3, 4 }))
                 .When(x => x.WhenIAddTheItem())
                 .Then(x => x.ThenTheItemIsAdded())
                 .BDDfy();
@@ -54,7 +54,7 @@ namespace Ocelot.UnitTests.Repository
         private void GivenThereIsAnItemInTheContext(string key)
         {
             _key = key;
-            var data = new[] {5435345};
+            var data = new[] { 5435345 };
             _httpContextAccesor.HttpContext.Items.Add(key, data);
         }
 

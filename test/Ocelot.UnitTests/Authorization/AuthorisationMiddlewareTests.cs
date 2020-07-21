@@ -1,21 +1,22 @@
-﻿using Ocelot.Middleware;
-
+﻿
 namespace Ocelot.UnitTests.Authorization
 {
-    using System.Collections.Generic;
-    using System.Security.Claims;
-    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
     using Moq;
     using Ocelot.Authorisation;
     using Ocelot.Authorisation.Middleware;
+    using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
+    using Ocelot.DownstreamRouteFinder.Middleware;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
     using Ocelot.Logging;
+    using Ocelot.Middleware;
     using Ocelot.Responses;
+    using System.Collections.Generic;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
     using TestStack.BDDfy;
     using Xunit;
-    using Microsoft.AspNetCore.Http;
-    using Ocelot.Configuration;
 
     public class AuthorisationMiddlewareTests
     {
@@ -24,14 +25,14 @@ namespace Ocelot.UnitTests.Authorization
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
         private readonly AuthorisationMiddleware _middleware;
-        private readonly DownstreamContext _downstreamContext;
-        private OcelotRequestDelegate _next;
+        private RequestDelegate _next;
+        private HttpContext _httpContext;
 
         public AuthorisationMiddlewareTests()
         {
+            _httpContext = new DefaultHttpContext();
             _authService = new Mock<IClaimsAuthoriser>();
             _authScopesService = new Mock<IScopesAuthoriser>();
-            _downstreamContext = new DownstreamContext(new DefaultHttpContext());
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<AuthorisationMiddleware>()).Returns(_logger.Object);
@@ -42,8 +43,9 @@ namespace Ocelot.UnitTests.Authorization
         [Fact]
         public void should_call_authorisation_service()
         {
-            this.Given(x => x.GivenTheDownStreamRouteIs(new List<PlaceholderNameAndValue>(), 
-                new DownstreamReRouteBuilder()
+            this.Given(x => x.GivenTheDownStreamRouteIs(new List<PlaceholderNameAndValue>(),
+                new DownstreamRouteBuilder()
+                    .WithUpstreamPathTemplate(new UpstreamPathTemplateBuilder().Build())
                     .WithIsAuthorised(true)
                     .WithUpstreamHttpMethod(new List<string> { "Get" })
                     .Build()))
@@ -55,27 +57,33 @@ namespace Ocelot.UnitTests.Authorization
 
         private void WhenICallTheMiddleware()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
-        private void GivenTheDownStreamRouteIs(List<PlaceholderNameAndValue> templatePlaceholderNameAndValues, DownstreamReRoute downstreamReRoute)
+        private void GivenTheDownStreamRouteIs(List<PlaceholderNameAndValue> templatePlaceholderNameAndValues, DownstreamRoute downstreamRoute)
         {
-            _downstreamContext.TemplatePlaceholderNameAndValues = templatePlaceholderNameAndValues;
-            _downstreamContext.DownstreamReRoute = downstreamReRoute;
+            _httpContext.Items.UpsertTemplatePlaceholderNameAndValues(templatePlaceholderNameAndValues);
+            _httpContext.Items.UpsertDownstreamRoute(downstreamRoute);
         }
 
         private void GivenTheAuthServiceReturns(Response<bool> expected)
         {
             _authService
-                .Setup(x => x.Authorise(It.IsAny<ClaimsPrincipal>(), It.IsAny<Dictionary<string, string>>()))
+                .Setup(x => x.Authorise(
+                           It.IsAny<ClaimsPrincipal>(),
+                           It.IsAny<Dictionary<string, string>>(),
+                           It.IsAny<List<PlaceholderNameAndValue>>()))
                 .Returns(expected);
         }
 
         private void ThenTheAuthServiceIsCalledCorrectly()
         {
             _authService
-                .Verify(x => x.Authorise(It.IsAny<ClaimsPrincipal>(),
-                It.IsAny<Dictionary<string, string>>()), Times.Once);
+                .Verify(x => x.Authorise(
+                    It.IsAny<ClaimsPrincipal>(),
+                    It.IsAny<Dictionary<string, string>>(),
+                    It.IsAny<List<PlaceholderNameAndValue>>())
+                        , Times.Once);
         }
     }
 }

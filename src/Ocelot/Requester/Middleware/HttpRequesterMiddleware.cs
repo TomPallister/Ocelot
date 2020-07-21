@@ -1,43 +1,63 @@
-using Microsoft.AspNetCore.Http;
-using Ocelot.Infrastructure.RequestData;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using System.Threading.Tasks;
-using Ocelot.DownstreamRouteFinder.Middleware;
-using Ocelot.Requester.QoS;
-
 namespace Ocelot.Requester.Middleware
 {
+    using Microsoft.AspNetCore.Http;
+    using System.Net;
+    using System.Net.Http;
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System.Threading.Tasks;
+    using Ocelot.Responses;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+
     public class HttpRequesterMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
         private readonly IHttpRequester _requester;
-        private readonly IOcelotLogger _logger;
 
-        public HttpRequesterMiddleware(OcelotRequestDelegate next,
+        public HttpRequesterMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IHttpRequester requester)
+                : base(loggerFactory.CreateLogger<HttpRequesterMiddleware>())
         {
             _next = next;
             _requester = requester;
-            _logger = loggerFactory.CreateLogger<HttpRequesterMiddleware>();
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            var response = await _requester.GetResponse(context);
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+
+            var response = await _requester.GetResponse(httpContext);
+
+            CreateLogBasedOnResponse(response);
 
             if (response.IsError)
             {
-                _logger.LogDebug("IHttpRequester returned an error, setting pipeline error");
+                Logger.LogDebug("IHttpRequester returned an error, setting pipeline error");
 
-                SetPipelineError(context, response.Errors);
+                httpContext.Items.UpsertErrors(response.Errors);
                 return;
             }
 
-            _logger.LogDebug("setting http response message");
+            Logger.LogDebug("setting http response message");
 
-            context.DownstreamResponse = response.Data;
+            httpContext.Items.UpsertDownstreamResponse(new DownstreamResponse(response.Data));
+
+            await _next.Invoke(httpContext);
+        }
+
+        private void CreateLogBasedOnResponse(Response<HttpResponseMessage> response)
+        {
+            if (response.Data?.StatusCode <= HttpStatusCode.BadRequest)
+            {
+                Logger.LogInformation(
+                    $"{(int)response.Data.StatusCode} ({response.Data.ReasonPhrase}) status code, request uri: {response.Data.RequestMessage?.RequestUri}");
+            } 
+            else if (response.Data?.StatusCode >= HttpStatusCode.BadRequest)
+            {
+                Logger.LogWarning(
+                    $"{(int) response.Data.StatusCode} ({response.Data.ReasonPhrase}) status code, request uri: {response.Data.RequestMessage?.RequestUri}");
+            }
         }
     }
 }

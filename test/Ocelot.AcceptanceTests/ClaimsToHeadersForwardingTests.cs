@@ -1,36 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using IdentityServer4.AccessTokenValidation;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Ocelot.Configuration.File;
-using TestStack.BDDfy;
-using Xunit;
+﻿using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace Ocelot.AcceptanceTests
 {
-    using IdentityServer4;
+    using IdentityServer4.AccessTokenValidation;
+    using IdentityServer4.Models;
     using IdentityServer4.Test;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
+    using Ocelot.Configuration.File;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Security.Claims;
+    using TestStack.BDDfy;
 
     public class ClaimsToHeadersForwardingTests : IDisposable
     {
-        private IWebHost _servicebuilder;
         private IWebHost _identityServerBuilder;
         private readonly Steps _steps;
         private Action<IdentityServerAuthenticationOptions> _options;
-        private string _identityServerRootUrl = "http://localhost:52888";
+        private string _identityServerRootUrl;
+        private readonly ServiceHandler _serviceHandler;
 
         public ClaimsToHeadersForwardingTests()
         {
+            _serviceHandler = new ServiceHandler();
             _steps = new Steps();
+            var identityServerPort = RandomPortFinder.GetRandomPort();
+            _identityServerRootUrl = $"http://localhost:{identityServerPort}";
             _options = o =>
             {
                 o.Authority = _identityServerRootUrl;
@@ -44,23 +47,25 @@ namespace Ocelot.AcceptanceTests
         [Fact]
         public void should_return_response_200_and_foward_claim_as_header()
         {
-           var user = new TestUser()
-           {
-               Username = "test",
-               Password = "test",
-               SubjectId = "registered|1231231",
-               Claims = new List<Claim>
+            var user = new TestUser()
+            {
+                Username = "test",
+                Password = "test",
+                SubjectId = "registered|1231231",
+                Claims = new List<Claim>
                {
                    new Claim("CustomerId", "123"),
                    new Claim("LocationId", "1")
                }
-           };
+            };
 
-           var configuration = new FileConfiguration
-           {
-               ReRoutes = new List<FileReRoute>
+            int port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
                    {
-                       new FileReRoute
+                       new FileRoute
                        {
                            DownstreamPathTemplate = "/",
                            DownstreamHostAndPorts = new List<FileHostAndPort>
@@ -68,7 +73,7 @@ namespace Ocelot.AcceptanceTests
                                new FileHostAndPort
                                {
                                    Host = "localhost",
-                                   Port = 52876,
+                                   Port = port,
                                }
                            },
                            DownstreamScheme = "http",
@@ -91,45 +96,33 @@ namespace Ocelot.AcceptanceTests
                            }
                        }
                    }
-           };
+            };
 
-           this.Given(x => x.GivenThereIsAnIdentityServerOn("http://localhost:52888", "api", AccessTokenType.Jwt, user))
-               .And(x => x.GivenThereIsAServiceRunningOn("http://localhost:52876", 200))
-               .And(x => _steps.GivenIHaveAToken("http://localhost:52888"))
-               .And(x => _steps.GivenThereIsAConfiguration(configuration))
-               .And(x => _steps.GivenOcelotIsRunning(_options, "Test"))
-               .And(x => _steps.GivenIHaveAddedATokenToMyRequest())
-               .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
-               .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
-               .And(x => _steps.ThenTheResponseBodyShouldBe("CustomerId: 123 LocationId: 1 UserType: registered UserId: 1231231"))
-               .BDDfy();
+            this.Given(x => x.GivenThereIsAnIdentityServerOn(_identityServerRootUrl, "api", AccessTokenType.Jwt, user))
+                .And(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", 200))
+                .And(x => _steps.GivenIHaveAToken(_identityServerRootUrl))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning(_options, "Test"))
+                .And(x => _steps.GivenIHaveAddedATokenToMyRequest())
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("CustomerId: 123 LocationId: 1 UserType: registered UserId: 1231231"))
+                .BDDfy();
         }
 
         private void GivenThereIsAServiceRunningOn(string url, int statusCode)
         {
-            _servicebuilder = new WebHostBuilder()
-                .UseUrls(url)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseUrls(url)
-                .Configure(app =>
-                {
-                    app.Run(async context =>
-                    {
-                        var customerId = context.Request.Headers.First(x => x.Key == "CustomerId").Value.First();
-                        var locationId = context.Request.Headers.First(x => x.Key == "LocationId").Value.First();
-                        var userType = context.Request.Headers.First(x => x.Key == "UserType").Value.First();
-                        var userId = context.Request.Headers.First(x => x.Key == "UserId").Value.First();
+            _serviceHandler.GivenThereIsAServiceRunningOn(url, async context =>
+            {
+                var customerId = context.Request.Headers.First(x => x.Key == "CustomerId").Value.First();
+                var locationId = context.Request.Headers.First(x => x.Key == "LocationId").Value.First();
+                var userType = context.Request.Headers.First(x => x.Key == "UserType").Value.First();
+                var userId = context.Request.Headers.First(x => x.Key == "UserId").Value.First();
 
-                        var responseBody = $"CustomerId: {customerId} LocationId: {locationId} UserType: {userType} UserId: {userId}";
-                        context.Response.StatusCode = statusCode;
-                        await context.Response.WriteAsync(responseBody);
-                    });
-                })
-                .Build();
-
-            _servicebuilder.Start();
+                var responseBody = $"CustomerId: {customerId} LocationId: {locationId} UserType: {userType} UserId: {userId}";
+                context.Response.StatusCode = statusCode;
+                await context.Response.WriteAsync(responseBody);
+            });
         }
 
         private void GivenThereIsAnIdentityServerOn(string url, string apiName, AccessTokenType tokenType, TestUser user)
@@ -203,7 +196,7 @@ namespace Ocelot.AcceptanceTests
 
         public void Dispose()
         {
-            _servicebuilder?.Dispose();
+            _serviceHandler?.Dispose();
             _steps.Dispose();
             _identityServerBuilder?.Dispose();
         }

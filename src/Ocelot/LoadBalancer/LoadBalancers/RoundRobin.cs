@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Ocelot.Responses;
-using Ocelot.Values;
-using System;
-
-namespace Ocelot.LoadBalancer.LoadBalancers
+﻿namespace Ocelot.LoadBalancer.LoadBalancers
 {
+    using Ocelot.Middleware;
+    using Ocelot.Responses;
+    using Ocelot.Values;
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+
     public class RoundRobin : ILoadBalancer
     {
         private readonly Func<Task<List<Service>>> _services;
+        private readonly object _lock = new object();
 
         private int _last;
 
@@ -17,17 +20,20 @@ namespace Ocelot.LoadBalancer.LoadBalancers
             _services = services;
         }
 
-        public async Task<Response<ServiceHostAndPort>> Lease()
+        public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
         {
-            var services = await _services.Invoke();
-            if (_last >= services.Count)
+            var services = await _services();
+            lock (_lock)
             {
-                _last = 0;
-            }
+                if (_last >= services.Count)
+                {
+                    _last = 0;
+                }
 
-            var next = await Task.FromResult(services[_last]);
-            _last++;
-            return new OkResponse<ServiceHostAndPort>(next.HostAndPort);
+                var next = services[_last];
+                _last++;
+                return new OkResponse<ServiceHostAndPort>(next.HostAndPort);
+            }
         }
 
         public void Release(ServiceHostAndPort hostAndPort)

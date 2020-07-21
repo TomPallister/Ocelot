@@ -1,110 +1,109 @@
-﻿using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Ocelot.Infrastructure.RequestData;
-using Ocelot.Logging;
-using Ocelot.Middleware;
-using System.IO;
-using Ocelot.DownstreamRouteFinder.Middleware;
-
-namespace Ocelot.Cache.Middleware
+﻿namespace Ocelot.Cache.Middleware
 {
+    using Ocelot.Logging;
+    using Ocelot.Middleware;
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
+
     public class OutputCacheMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
-        private readonly IOcelotLogger _logger;
+        private readonly RequestDelegate _next;
         private readonly IOcelotCache<CachedResponse> _outputCache;
-        private readonly IRegionCreator _regionCreator;
+        private readonly ICacheKeyGenerator _cacheGenerator;
 
-        public OutputCacheMiddleware(OcelotRequestDelegate next,
+        public OutputCacheMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
             IOcelotCache<CachedResponse> outputCache,
-            IRegionCreator regionCreator)
+            ICacheKeyGenerator cacheGenerator)
+                : base(loggerFactory.CreateLogger<OutputCacheMiddleware>())
         {
             _next = next;
             _outputCache = outputCache;
-            _logger = loggerFactory.CreateLogger<OutputCacheMiddleware>();
-            _regionCreator = regionCreator;
+            _cacheGenerator = cacheGenerator;
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            if (!context.DownstreamReRoute.IsCached)
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+
+            if (!downstreamRoute.IsCached)
             {
-                await _next.Invoke(context);
+                await _next.Invoke(httpContext);
                 return;
             }
 
-            var downstreamUrlKey = $"{context.DownstreamRequest.Method.Method}-{context.DownstreamRequest.RequestUri.OriginalString}";
+            var downstreamRequest = httpContext.Items.DownstreamRequest();
 
-            _logger.LogDebug("started checking cache for {downstreamUrlKey}", downstreamUrlKey);
+            var downstreamUrlKey = $"{downstreamRequest.Method}-{downstreamRequest.OriginalString}";
+            string downStreamRequestCacheKey = _cacheGenerator.GenerateRequestCacheKey(downstreamRequest);
 
-            var cached = _outputCache.Get(downstreamUrlKey, context.DownstreamReRoute.CacheOptions.Region);
+            Logger.LogDebug($"Started checking cache for {downstreamUrlKey}");
+
+            var cached = _outputCache.Get(downStreamRequestCacheKey, downstreamRoute.CacheOptions.Region);
 
             if (cached != null)
             {
-                _logger.LogDebug("cache entry exists for {downstreamUrlKey}", downstreamUrlKey);
+                Logger.LogDebug($"cache entry exists for {downstreamUrlKey}");
 
                 var response = CreateHttpResponseMessage(cached);
-                SetHttpResponseMessageThisRequest(context, response);
+                SetHttpResponseMessageThisRequest(httpContext, response);
 
-                _logger.LogDebug("finished returned cached response for {downstreamUrlKey}", downstreamUrlKey);
+                Logger.LogDebug($"finished returned cached response for {downstreamUrlKey}");
 
                 return;
             }
 
-            _logger.LogDebug("no resonse cached for {downstreamUrlKey}", downstreamUrlKey);
+            Logger.LogDebug($"no resonse cached for {downstreamUrlKey}");
 
-            await _next.Invoke(context);
+            await _next.Invoke(httpContext);
 
-            if (context.IsError)
+            if (httpContext.Items.Errors().Count > 0)
             {
-                _logger.LogDebug("there was a pipeline error for {downstreamUrlKey}", downstreamUrlKey);
+                Logger.LogDebug($"there was a pipeline error for {downstreamUrlKey}");
 
                 return;
             }
 
-            cached = await CreateCachedResponse(context.DownstreamResponse);
+            var downstreamResponse = httpContext.Items.DownstreamResponse();
 
-            _outputCache.Add(downstreamUrlKey, cached, TimeSpan.FromSeconds(context.DownstreamReRoute.CacheOptions.TtlSeconds), context.DownstreamReRoute.CacheOptions.Region);
+            cached = await CreateCachedResponse(downstreamResponse);
 
-            _logger.LogDebug("finished response added to cache for {downstreamUrlKey}", downstreamUrlKey);
+            _outputCache.Add(downStreamRequestCacheKey, cached, TimeSpan.FromSeconds(downstreamRoute.CacheOptions.TtlSeconds), downstreamRoute.CacheOptions.Region);
+
+            Logger.LogDebug($"finished response added to cache for {downstreamUrlKey}");
         }
 
-        private void SetHttpResponseMessageThisRequest(DownstreamContext context, HttpResponseMessage response)
+        private void SetHttpResponseMessageThisRequest(HttpContext context,
+                                                       DownstreamResponse response)
         {
-            context.DownstreamResponse = response;
+            context.Items.UpsertDownstreamResponse(response);
         }
 
-        internal HttpResponseMessage CreateHttpResponseMessage(CachedResponse cached)
+        internal DownstreamResponse CreateHttpResponseMessage(CachedResponse cached)
         {
             if (cached == null)
             {
                 return null;
             }
 
-            var response = new HttpResponseMessage(cached.StatusCode);
-
-            foreach (var header in cached.Headers)
-            {
-                response.Headers.Add(header.Key, header.Value);
-            }
-
             var content = new MemoryStream(Convert.FromBase64String(cached.Body));
 
-            response.Content = new StreamContent(content);
+            var streamContent = new StreamContent(content);
 
             foreach (var header in cached.ContentHeaders)
             {
-                response.Content.Headers.Add(header.Key, header.Value);
+                streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
             }
 
-            return response;
+            return new DownstreamResponse(streamContent, cached.StatusCode, cached.Headers.ToList(), cached.ReasonPhrase);
         }
 
-        internal async Task<CachedResponse> CreateCachedResponse(HttpResponseMessage response)
+        internal async Task<CachedResponse> CreateCachedResponse(DownstreamResponse response)
         {
             if (response == null)
             {
@@ -112,7 +111,7 @@ namespace Ocelot.Cache.Middleware
             }
 
             var statusCode = response.StatusCode;
-            var headers = response.Headers.ToDictionary(v => v.Key, v => v.Value);
+            var headers = response.Headers.ToDictionary(v => v.Key, v => v.Values);
             string body = null;
 
             if (response.Content != null)
@@ -123,7 +122,7 @@ namespace Ocelot.Cache.Middleware
 
             var contentHeaders = response?.Content?.Headers.ToDictionary(v => v.Key, v => v.Value);
 
-            var cached = new CachedResponse(statusCode, headers, body, contentHeaders);
+            var cached = new CachedResponse(statusCode, headers, body, contentHeaders, response.ReasonPhrase);
             return cached;
         }
     }

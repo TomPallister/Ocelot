@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Ocelot.Infrastructure.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Ocelot.Configuration.File
 {
@@ -26,7 +24,7 @@ namespace Ocelot.Configuration.File
         public string Period { get; set; }
 
         public double PeriodTimespan { get; set; }
-        
+
         /// <summary>
         /// Maximum number of requests that a client can make in a defined period
         /// </summary>

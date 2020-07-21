@@ -1,12 +1,12 @@
-﻿using System;
-using Ocelot.Errors;
+﻿using Ocelot.Errors;
+using System;
 
 namespace Ocelot.Requester
 {
     public class UnableToCompleteRequestError : Error
     {
-        public UnableToCompleteRequestError(Exception exception) 
-            : base($"Error making http request, exception: {exception}", OcelotErrorCode.UnableToCompleteRequestError)
+        public UnableToCompleteRequestError(Exception exception)
+            : base($"Error making http request, exception: {exception}", OcelotErrorCode.UnableToCompleteRequestError, 500)
         {
         }
     }

@@ -3,19 +3,16 @@
     <Description>Stateless Service Application</Description>
     <Authors> </Authors>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>OcelotApplicationService</AssemblyName>
     <PackageId>OcelotApplicationService</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback)</PackageTargetFallback>
   </PropertyGroup>
-  <ItemGroup>&#xD;
-    &#xD;
-  </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric" Version="6.1.456"/>
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.456"/>
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1"/>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.2"/>
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.0.456"/>
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.1.456" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.0.456" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="3.0.456" />
   </ItemGroup>
 </Project>

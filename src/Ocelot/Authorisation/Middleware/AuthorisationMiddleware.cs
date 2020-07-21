@@ -1,96 +1,91 @@
 ﻿namespace Ocelot.Authorisation.Middleware
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Errors;
+    using Ocelot.Configuration;
+    using Ocelot.Logging;
     using Ocelot.Middleware;
-    using Logging;
-    using Responses;
-    using Configuration;
+    using Ocelot.Responses;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class AuthorisationMiddleware : OcelotMiddleware
     {
-        private readonly OcelotRequestDelegate _next;
+        private readonly RequestDelegate _next;
         private readonly IClaimsAuthoriser _claimsAuthoriser;
         private readonly IScopesAuthoriser _scopesAuthoriser;
-        private readonly IOcelotLogger _logger;
 
-        public AuthorisationMiddleware(OcelotRequestDelegate next,
+        public AuthorisationMiddleware(RequestDelegate next,
             IClaimsAuthoriser claimsAuthoriser,
             IScopesAuthoriser scopesAuthoriser,
             IOcelotLoggerFactory loggerFactory)
+            : base(loggerFactory.CreateLogger<AuthorisationMiddleware>())
         {
             _next = next;
             _claimsAuthoriser = claimsAuthoriser;
             _scopesAuthoriser = scopesAuthoriser;
-            _logger = loggerFactory.CreateLogger<AuthorisationMiddleware>();
         }
 
-        public async Task Invoke(DownstreamContext context)
+        public async Task Invoke(HttpContext httpContext)
         {
-            if (IsAuthenticatedRoute(context.DownstreamReRoute))
-            {
-                _logger.LogDebug("route is authenticated scopes must be checked");
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
 
-                var authorised = _scopesAuthoriser.Authorise(context.HttpContext.User, context.DownstreamReRoute.AuthenticationOptions.AllowedScopes);
+            if (!IsOptionsHttpMethod(httpContext) && IsAuthenticatedRoute(downstreamRoute))
+            {
+                Logger.LogInformation("route is authenticated scopes must be checked");
+
+                var authorised = _scopesAuthoriser.Authorise(httpContext.User, downstreamRoute.AuthenticationOptions.AllowedScopes);
 
                 if (authorised.IsError)
                 {
-                    _logger.LogDebug("error authorising user scopes");
+                    Logger.LogWarning("error authorising user scopes");
 
-                    SetPipelineError(context, authorised.Errors);
+                    httpContext.Items.UpsertErrors(authorised.Errors);
                     return;
                 }
 
                 if (IsAuthorised(authorised))
                 {
-                    _logger.LogDebug("user scopes is authorised calling next authorisation checks");
+                    Logger.LogInformation("user scopes is authorised calling next authorisation checks");
                 }
                 else
                 {
-                    _logger.LogDebug("user scopes is not authorised setting pipeline error");
+                    Logger.LogWarning("user scopes is not authorised setting pipeline error");
 
-                    SetPipelineError(context, new List<Error>
-                    {
-                        new UnauthorisedError(
-                            $"{context.HttpContext.User.Identity.Name} unable to access {context.DownstreamReRoute.UpstreamPathTemplate.Value}")
-                    });
+                    httpContext.Items.SetError(new UnauthorisedError(
+                            $"{httpContext.User.Identity.Name} unable to access {downstreamRoute.UpstreamPathTemplate.OriginalValue}"));
                 }
             }
 
-            if (IsAuthorisedRoute(context.DownstreamReRoute))
+            if (!IsOptionsHttpMethod(httpContext) && IsAuthorisedRoute(downstreamRoute))
             {
-                _logger.LogDebug("route is authorised");
+                Logger.LogInformation("route is authorised");
 
-                var authorised = _claimsAuthoriser.Authorise(context.HttpContext.User, context.DownstreamReRoute.RouteClaimsRequirement);
+                var authorised = _claimsAuthoriser.Authorise(httpContext.User, downstreamRoute.RouteClaimsRequirement, httpContext.Items.TemplatePlaceholderNameAndValues());
 
                 if (authorised.IsError)
                 {
-                    _logger.LogDebug($"Error whilst authorising {context.HttpContext.User.Identity.Name} for {context.HttpContext.User.Identity.Name}. Setting pipeline error");
+                    Logger.LogWarning($"Error whilst authorising {httpContext.User.Identity.Name}. Setting pipeline error");
 
-                    SetPipelineError(context, authorised.Errors);
+                    httpContext.Items.UpsertErrors(authorised.Errors);
                     return;
                 }
 
                 if (IsAuthorised(authorised))
                 {
-                    _logger.LogDebug($"{context.HttpContext.User.Identity.Name} has succesfully been authorised for {context.DownstreamReRoute.UpstreamPathTemplate.Value}. Calling next middleware");
-                    await _next.Invoke(context);
+                    Logger.LogInformation($"{httpContext.User.Identity.Name} has succesfully been authorised for {downstreamRoute.UpstreamPathTemplate.OriginalValue}.");
+                    await _next.Invoke(httpContext);
                 }
                 else
                 {
-                    _logger.LogDebug($"{context.HttpContext.User.Identity.Name} is not authorised to access {context.DownstreamReRoute.UpstreamPathTemplate.Value}. Setting pipeline error");
+                    Logger.LogWarning($"{httpContext.User.Identity.Name} is not authorised to access {downstreamRoute.UpstreamPathTemplate.OriginalValue}. Setting pipeline error");
 
-                    SetPipelineError(context, new List<Error>
-                    {
-                        new UnauthorisedError($"{context.HttpContext.User.Identity.Name} is not authorised to access {context.DownstreamReRoute.UpstreamPathTemplate.Value}")
-                    });
+                    httpContext.Items.SetError(new UnauthorisedError($"{httpContext.User.Identity.Name} is not authorised to access {downstreamRoute.UpstreamPathTemplate.OriginalValue}"));
                 }
             }
             else
             {
-                _logger.LogDebug($"{context.DownstreamReRoute.DownstreamPathTemplate.Value} route does not require user to be authorised");
-                await _next.Invoke(context);
+                Logger.LogInformation($"{downstreamRoute.DownstreamPathTemplate.Value} route does not require user to be authorised");
+                await _next.Invoke(httpContext);
             }
         }
 
@@ -99,14 +94,19 @@
             return authorised.Data;
         }
 
-        private static bool IsAuthenticatedRoute(DownstreamReRoute reRoute)
+        private static bool IsAuthenticatedRoute(DownstreamRoute route)
         {
-            return reRoute.IsAuthenticated;
+            return route.IsAuthenticated;
         }
 
-        private static bool IsAuthorisedRoute(DownstreamReRoute reRoute)
+        private static bool IsAuthorisedRoute(DownstreamRoute route)
         {
-            return reRoute.IsAuthorised;
+            return route.IsAuthorised;
+        }
+
+        private static bool IsOptionsHttpMethod(HttpContext httpContext)
+        {
+            return httpContext.Request.Method.ToUpper() == "OPTIONS";
         }
     }
 }

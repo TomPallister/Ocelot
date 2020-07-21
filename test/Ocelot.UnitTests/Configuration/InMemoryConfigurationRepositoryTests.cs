@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Ocelot.Configuration;
+﻿using Ocelot.Configuration;
 using Ocelot.Configuration.Builder;
 using Ocelot.Configuration.Repository;
 using Ocelot.Responses;
 using Shouldly;
+using System;
+using System.Collections.Generic;
+using Moq;
+using Ocelot.Configuration.ChangeTracking;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -14,14 +14,17 @@ namespace Ocelot.UnitTests.Configuration
 {
     public class InMemoryConfigurationRepositoryTests
     {
-        private readonly InMemoryOcelotConfigurationRepository _repo;
-        private IOcelotConfiguration _config;
+        private readonly InMemoryInternalConfigurationRepository _repo;
+        private IInternalConfiguration _config;
         private Response _result;
-        private Response<IOcelotConfiguration> _getResult;
+        private Response<IInternalConfiguration> _getResult;
+        private readonly Mock<IOcelotConfigurationChangeTokenSource> _changeTokenSource;
 
         public InMemoryConfigurationRepositoryTests()
         {
-            _repo = new InMemoryOcelotConfigurationRepository();
+            _changeTokenSource = new Mock<IOcelotConfigurationChangeTokenSource>(MockBehavior.Strict);
+            _changeTokenSource.Setup(m => m.Activate());
+            _repo = new InMemoryInternalConfigurationRepository(_changeTokenSource.Object);
         }
 
         [Fact]
@@ -30,6 +33,7 @@ namespace Ocelot.UnitTests.Configuration
             this.Given(x => x.GivenTheConfigurationIs(new FakeConfig("initial", "adminath")))
                 .When(x => x.WhenIAddOrReplaceTheConfig())
                 .Then(x => x.ThenNoErrorsAreReturned())
+                .And(x => AndTheChangeTokenIsActivated())
                 .BDDfy();
         }
 
@@ -44,12 +48,12 @@ namespace Ocelot.UnitTests.Configuration
 
         private void ThenTheConfigurationIsReturned()
         {
-            _getResult.Data.ReRoutes[0].DownstreamReRoute[0].DownstreamPathTemplate.Value.ShouldBe("initial");
+            _getResult.Data.Routes[0].DownstreamRoute[0].DownstreamPathTemplate.Value.ShouldBe("initial");
         }
 
         private void WhenIGetTheConfiguration()
         {
-            _getResult = _repo.Get().Result;
+            _getResult = _repo.Get();
         }
 
         private void GivenThereIsASavedConfiguration()
@@ -58,14 +62,14 @@ namespace Ocelot.UnitTests.Configuration
             WhenIAddOrReplaceTheConfig();
         }
 
-        private void GivenTheConfigurationIs(IOcelotConfiguration config)
+        private void GivenTheConfigurationIs(IInternalConfiguration config)
         {
             _config = config;
         }
 
         private void WhenIAddOrReplaceTheConfig()
         {
-            _result = _repo.AddOrReplace(_config).Result;
+            _result = _repo.AddOrReplace(_config);
         }
 
         private void ThenNoErrorsAreReturned()
@@ -73,7 +77,12 @@ namespace Ocelot.UnitTests.Configuration
             _result.IsError.ShouldBeFalse();
         }
 
-        class FakeConfig : IOcelotConfiguration
+        private void AndTheChangeTokenIsActivated()
+        {
+            _changeTokenSource.Verify(m => m.Activate(), Times.Once);
+        }
+
+        private class FakeConfig : IInternalConfiguration
         {
             private readonly string _downstreamTemplatePath;
 
@@ -83,30 +92,35 @@ namespace Ocelot.UnitTests.Configuration
                 AdministrationPath = administrationPath;
             }
 
-            public List<ReRoute> ReRoutes
+            public List<Route> Routes
             {
                 get
                 {
-                    var downstreamReRoute = new DownstreamReRouteBuilder()
+                    var downstreamRoute = new DownstreamRouteBuilder()
                         .WithDownstreamPathTemplate(_downstreamTemplatePath)
                         .WithUpstreamHttpMethod(new List<string> { "Get" })
                         .Build();
 
-                    return new List<ReRoute>
+                    return new List<Route>
                     {
-                        new ReRouteBuilder()
-                            .WithDownstreamReRoute(downstreamReRoute)
+                        new RouteBuilder()
+                            .WithDownstreamRoute(downstreamRoute)
                             .WithUpstreamHttpMethod(new List<string> {"Get"})
                             .Build()
                     };
                 }
             }
 
-            public string AdministrationPath {get;}
+            public string AdministrationPath { get; }
 
             public ServiceProviderConfiguration ServiceProviderConfiguration => throw new NotImplementedException();
 
-            public string RequestId {get;}
+            public string RequestId { get; }
+            public LoadBalancerOptions LoadBalancerOptions { get; }
+            public string DownstreamScheme { get; }
+            public QoSOptions QoSOptions { get; }
+            public HttpHandlerOptions HttpHandlerOptions { get; }
+            public Version DownstreamHttpVersion { get; }
         }
     }
 }

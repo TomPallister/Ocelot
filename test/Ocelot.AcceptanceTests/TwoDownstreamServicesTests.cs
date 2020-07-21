@@ -1,30 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using Consul;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Ocelot.Configuration.File;
-using Shouldly;
-using TestStack.BDDfy;
-using Xunit;
-
-namespace Ocelot.AcceptanceTests
+﻿namespace Ocelot.AcceptanceTests
 {
+    using Configuration.File;
+    using Consul;
+    using Microsoft.AspNetCore.Http;
+    using Newtonsoft.Json;
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using TestStack.BDDfy;
+    using Xunit;
+
     public class TwoDownstreamServicesTests : IDisposable
     {
-        private IWebHost _builderOne;
-        private IWebHost _builderTwo;
-        private IWebHost _fakeConsulBuilder;
         private readonly Steps _steps;
         private readonly List<ServiceEntry> _serviceEntries;
         private string _downstreamPathOne;
         private string _downstreamPathTwo;
+        private readonly ServiceHandler _serviceHandler;
 
         public TwoDownstreamServicesTests()
         {
+            _serviceHandler = new ServiceHandler();
             _steps = new Steps();
             _serviceEntries = new List<ServiceEntry>();
         }
@@ -32,16 +28,18 @@ namespace Ocelot.AcceptanceTests
         [Fact]
         public void should_fix_issue_194()
         {
-            var consulPort = 8503;
-            var downstreamServiceOneUrl = "http://localhost:8362";
-            var downstreamServiceTwoUrl = "http://localhost:8330";
+            var consulPort = RandomPortFinder.GetRandomPort();
+            var servicePort1 = RandomPortFinder.GetRandomPort();
+            var servicePort2 = RandomPortFinder.GetRandomPort();
+            var downstreamServiceOneUrl = $"http://localhost:{servicePort1}";
+            var downstreamServiceTwoUrl = $"http://localhost:{servicePort2}";
             var fakeConsulServiceDiscoveryUrl = $"http://localhost:{consulPort}";
-          
+
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/user/{user}",
                             DownstreamScheme = "http",
@@ -50,13 +48,13 @@ namespace Ocelot.AcceptanceTests
                                 new FileHostAndPort
                                 {
                                     Host = "localhost",
-                                    Port = 8362,
+                                    Port = servicePort1,
                                 }
                             },
                             UpstreamPathTemplate = "/api/user/{user}",
                             UpstreamHttpMethod = new List<string> { "Get" },
                         },
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/api/product/{product}",
                             DownstreamScheme = "http",
@@ -65,21 +63,22 @@ namespace Ocelot.AcceptanceTests
                                 new FileHostAndPort
                                 {
                                     Host = "localhost",
-                                    Port = 8330,
+                                    Port = servicePort2,
                                 }
                             },
                             UpstreamPathTemplate = "/api/product/{product}",
                             UpstreamHttpMethod = new List<string> { "Get" },
                         }
                     },
-                    GlobalConfiguration = new FileGlobalConfiguration()
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
-                        ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
-                        {
-                            Host = "localhost",
-                            Port = consulPort
-                        }
+                        Scheme = "https",
+                        Host = "localhost",
+                        Port = consulPort
                     }
+                }
             };
 
             this.Given(x => x.GivenProductServiceOneIsRunning(downstreamServiceOneUrl, "/api/user/info", 200, "user"))
@@ -98,93 +97,60 @@ namespace Ocelot.AcceptanceTests
 
         private void GivenThereIsAFakeConsulServiceDiscoveryProvider(string url)
         {
-            _fakeConsulBuilder = new WebHostBuilder()
-                            .UseUrls(url)
-                            .UseKestrel()
-                            .UseContentRoot(Directory.GetCurrentDirectory())
-                            .UseIISIntegration()
-                            .UseUrls(url)
-                            .Configure(app =>
-                            {
-                                app.Run(async context =>
-                                {
-                                    if(context.Request.Path.Value == "/v1/health/service/product")
-                                    {
-                                        await context.Response.WriteJsonAsync(_serviceEntries);
-                                    }
-                                });
-                            })
-                            .Build();
-
-            _fakeConsulBuilder.Start();
+            _serviceHandler.GivenThereIsAServiceRunningOn(url, async context =>
+            {
+                if (context.Request.Path.Value == "/v1/health/service/product")
+                {
+                    var json = JsonConvert.SerializeObject(_serviceEntries);
+                    context.Response.Headers.Add("Content-Type", "application/json");
+                    await context.Response.WriteAsync(json);
+                }
+            });
         }
 
         private void GivenProductServiceOneIsRunning(string baseUrl, string basePath, int statusCode, string responseBody)
         {
-            _builderOne = new WebHostBuilder()
-                .UseUrls(baseUrl)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .Configure(app =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
+            {
+                _downstreamPathOne = !string.IsNullOrEmpty(context.Request.PathBase.Value)
+                    ? context.Request.PathBase.Value
+                    : context.Request.Path.Value;
+
+                if (_downstreamPathOne != basePath)
                 {
-                    app.UsePathBase(basePath);
-                    app.Run(async context =>
-                    {   
-                        _downstreamPathOne = !string.IsNullOrEmpty(context.Request.PathBase.Value) ? context.Request.PathBase.Value : context.Request.Path.Value;
-
-                        if(_downstreamPathOne != basePath)
-                        {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync("downstream path didnt match base path");
-                        }
-                        else
-                        {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync(responseBody);
-                        }
-                    });
-                })
-                .Build();
-
-            _builderOne.Start();
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync("downstream path didnt match base path");
+                }
+                else
+                {
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync(responseBody);
+                }
+            });
         }
 
         private void GivenProductServiceTwoIsRunning(string baseUrl, string basePath, int statusCode, string responseBody)
         {
-            _builderTwo = new WebHostBuilder()
-                .UseUrls(baseUrl)
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .Configure(app =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
+            {
+                _downstreamPathTwo = !string.IsNullOrEmpty(context.Request.PathBase.Value) ? context.Request.PathBase.Value : context.Request.Path.Value;
+
+                if (_downstreamPathTwo != basePath)
                 {
-                    app.UsePathBase(basePath);
-                    app.Run(async context =>
-                    {   
-                        _downstreamPathTwo = !string.IsNullOrEmpty(context.Request.PathBase.Value) ? context.Request.PathBase.Value : context.Request.Path.Value;
-
-                        if(_downstreamPathTwo != basePath)
-                        {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync("downstream path didnt match base path");
-                        }
-                        else
-                        {
-                            context.Response.StatusCode = statusCode;
-                            await context.Response.WriteAsync(responseBody);
-                        }
-                    });
-                })
-                .Build();
-
-            _builderTwo.Start();
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync("downstream path didnt match base path");
+                }
+                else
+                {
+                    context.Response.StatusCode = statusCode;
+                    await context.Response.WriteAsync(responseBody);
+                }
+            });
         }
 
         public void Dispose()
         {
-            _builderOne?.Dispose();
-            _builderTwo?.Dispose();
+            _serviceHandler?.Dispose();
             _steps.Dispose();
         }
     }

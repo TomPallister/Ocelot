@@ -1,40 +1,41 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Ocelot.Configuration;
-using Ocelot.Logging;
-using Ocelot.Requester.QoS;
-using Ocelot.Responses;
-
 namespace Ocelot.Requester
 {
+    using Logging;
+    using Microsoft.Extensions.DependencyInjection;
+    using Ocelot.Configuration;
+    using Ocelot.Responses;
+    using QoS;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+
     public class DelegatingHandlerHandlerFactory : IDelegatingHandlerHandlerFactory
     {
-        private readonly ITracingHandlerFactory _factory;
-        private readonly IOcelotLoggerFactory _loggerFactory;
-        private readonly IQosProviderHouse _qosProviderHouse;
+        private readonly ITracingHandlerFactory _tracingFactory;
+        private readonly IQoSFactory _qoSFactory;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IOcelotLogger _logger;
 
-        public DelegatingHandlerHandlerFactory(IOcelotLoggerFactory loggerFactory, 
-            ITracingHandlerFactory factory,
-            IQosProviderHouse qosProviderHouse,
-            IServiceProvider serviceProvider)
+        public DelegatingHandlerHandlerFactory(
+            ITracingHandlerFactory tracingFactory,
+            IQoSFactory qoSFactory,
+            IServiceProvider serviceProvider,
+            IOcelotLoggerFactory loggerFactory)
         {
+            _logger = loggerFactory.CreateLogger<DelegatingHandlerHandlerFactory>();
             _serviceProvider = serviceProvider;
-            _factory = factory;
-            _loggerFactory = loggerFactory;
-            _qosProviderHouse = qosProviderHouse;
+            _tracingFactory = tracingFactory;
+            _qoSFactory = qoSFactory;
         }
 
-        public Response<List<Func<DelegatingHandler>>> Get(DownstreamReRoute request)
+        public Response<List<Func<DelegatingHandler>>> Get(DownstreamRoute downstreamRoute)
         {
             var globalDelegatingHandlers = _serviceProvider
                 .GetServices<GlobalDelegatingHandler>()
                 .ToList();
 
-            var reRouteSpecificHandlers = _serviceProvider
+            var routeSpecificHandlers = _serviceProvider
                 .GetServices<DelegatingHandler>()
                 .ToList();
 
@@ -42,9 +43,9 @@ namespace Ocelot.Requester
 
             foreach (var handler in globalDelegatingHandlers)
             {
-                if (GlobalIsInHandlersConfig(request, handler))
+                if (GlobalIsInHandlersConfig(downstreamRoute, handler))
                 {
-                    reRouteSpecificHandlers.Add(handler.DelegatingHandler);
+                    routeSpecificHandlers.Add(handler.DelegatingHandler);
                 }
                 else
                 {
@@ -52,9 +53,9 @@ namespace Ocelot.Requester
                 }
             }
 
-            if (request.DelegatingHandlers.Any())
+            if (downstreamRoute.DelegatingHandlers.Any())
             {
-                var sorted = SortByConfigOrder(request, reRouteSpecificHandlers);
+                var sorted = SortByConfigOrder(downstreamRoute, routeSpecificHandlers);
 
                 foreach (var handler in sorted)
                 {
@@ -62,29 +63,32 @@ namespace Ocelot.Requester
                 }
             }
 
-            if (request.HttpHandlerOptions.UseTracing)
+            if (downstreamRoute.HttpHandlerOptions.UseTracing)
             {
-                handlers.Add(() => (DelegatingHandler)_factory.Get());
+                handlers.Add(() => (DelegatingHandler)_tracingFactory.Get());
             }
 
-            if (request.IsQos)
+            if (downstreamRoute.QosOptions.UseQos)
             {
-                var qosProvider = _qosProviderHouse.Get(request);
+                var handler = _qoSFactory.Get(downstreamRoute);
 
-                if (qosProvider.IsError)
+                if (handler != null && !handler.IsError)
                 {
-                    return new ErrorResponse<List<Func<DelegatingHandler>>>(qosProvider.Errors);
+                    handlers.Add(() => handler.Data);
                 }
-
-                handlers.Add(() => new PollyCircuitBreakingDelegatingHandler(qosProvider.Data, _loggerFactory));
+                else
+                {
+                    _logger.LogWarning($"Route {downstreamRoute.UpstreamPathTemplate} specifies use QoS but no QosHandler found in DI container. Will use not use a QosHandler, please check your setup!");
+                    handlers.Add(() => new NoQosDelegatingHandler());
+                }
             }
 
             return new OkResponse<List<Func<DelegatingHandler>>>(handlers);
         }
 
-        private List<DelegatingHandler> SortByConfigOrder(DownstreamReRoute request, List<DelegatingHandler> reRouteSpecificHandlers)
+        private List<DelegatingHandler> SortByConfigOrder(DownstreamRoute request, List<DelegatingHandler> routeSpecificHandlers)
         {
-            return reRouteSpecificHandlers
+            return routeSpecificHandlers
                 .Where(x => request.DelegatingHandlers.Contains(x.GetType().Name))
                 .OrderBy(d =>
                 {
@@ -94,7 +98,7 @@ namespace Ocelot.Requester
                 }).ToList();
         }
 
-        private bool GlobalIsInHandlersConfig(DownstreamReRoute request, GlobalDelegatingHandler handler)
+        private bool GlobalIsInHandlersConfig(DownstreamRoute request, GlobalDelegatingHandler handler)
         {
             return request.DelegatingHandlers.Contains(handler.DelegatingHandler.GetType().Name);
         }

@@ -1,0 +1,18 @@
+{
+    "Routes": [
+      {
+        "DownstreamPathTemplate": "/service/stats/collected",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 5100
+          }
+        ],
+        "UpstreamPathTemplate": "/api/stats/collected"
+      }
+    ],
+    "GlobalConfiguration": {
+      "BaseUrl": "http://localhost:5000"
+    }
+  }

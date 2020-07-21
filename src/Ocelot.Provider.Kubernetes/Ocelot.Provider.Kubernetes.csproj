@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <Product>Ocelot</Product>
+    <Description>Provides Ocelot extensions to use kubernetes</Description>
+    <PackageProjectUrl>https://github.com/ThreeMammals/Ocelot</PackageProjectUrl>
+    <PackageIconUrl>http://threemammals.com/images/ocelot_logo.png</PackageIconUrl>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <AssemblyName>Ocelot.Provider.Kubernetes</AssemblyName>
+    <PackageId>Ocelot.Provider.Kubernetes</PackageId>
+    <PackageTags>API Gateway;.NET core</PackageTags>
+    <RuntimeIdentifiers>win10-x64;osx.10.11-x64;osx.10.12-x64;win7-x64</RuntimeIdentifiers>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Version>0.0.0-dev</Version>
+    <Authors>geffzhang</Authors>
+    <Company />
+    <CodeAnalysisRuleSet>..\..\codeanalysis.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="IKubeApiClientFactory.cs" />
+    <Compile Remove="KubeApiClientFactory.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="KubeClient" Version="2.3.11" />
+    <PackageReference Include="KubeClient.Extensions.DependencyInjection" Version="2.3.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ocelot\Ocelot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

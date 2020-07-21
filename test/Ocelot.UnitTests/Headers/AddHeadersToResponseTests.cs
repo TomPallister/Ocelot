@@ -1,29 +1,28 @@
-using Xunit;
-using Shouldly;
-using TestStack.BDDfy;
-using Ocelot.Headers;
-using System.Net.Http;
-using System.Collections.Generic;
-using Ocelot.Configuration.Creator;
-using System.Linq;
 using Moq;
-using Ocelot.Infrastructure.RequestData;
-using Ocelot.Responses;
+using Ocelot.Configuration.Creator;
+using Ocelot.Headers;
 using Ocelot.Infrastructure;
-using Ocelot.UnitTests.Responder;
-using System;
 using Ocelot.Logging;
+using Ocelot.Middleware;
+using Ocelot.Responses;
+using Ocelot.UnitTests.Responder;
+using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using TestStack.BDDfy;
+using Xunit;
 
 namespace Ocelot.UnitTests.Headers
 {
     public class AddHeadersToResponseTests
     {
-        private IAddHeadersToResponse _adder;
-        private Mock<IPlaceholders> _placeholders;
-        private HttpResponseMessage _response;
+        private readonly IAddHeadersToResponse _adder;
+        private readonly Mock<IPlaceholders> _placeholders;
+        private DownstreamResponse _response;
         private List<AddHeader> _addHeaders;
         private Mock<IOcelotLoggerFactory> _factory;
-        private Mock<IOcelotLogger> _logger;
+        private readonly Mock<IOcelotLogger> _logger;
 
         public AddHeadersToResponseTests()
         {
@@ -56,9 +55,9 @@ namespace Ocelot.UnitTests.Headers
             {
                 new AddHeader("Trace-Id", "{TraceId}")
             };
-             
-             var traceId = "123";
-            
+
+            var traceId = "123";
+
             this.Given(_ => GivenAResponseMessage())
                 .And(_ => GivenTheTraceIdIs(traceId))
                 .And(_ => GivenTheAddHeaders(addHeaders))
@@ -94,7 +93,7 @@ namespace Ocelot.UnitTests.Headers
             {
                 new AddHeader("Trace-Id", "{TraceId}")
             };
-             
+
             this.Given(_ => GivenAResponseMessage())
                 .And(_ => GivenTheTraceIdErrors())
                 .And(_ => GivenTheAddHeaders(addHeaders))
@@ -106,12 +105,12 @@ namespace Ocelot.UnitTests.Headers
 
         private void ThenTheErrorIsLogged()
         {
-            _logger.Verify(x => x.LogError("Unable to add header to response Trace-Id: {TraceId}"), Times.Once);
+            _logger.Verify(x => x.LogWarning("Unable to add header to response Trace-Id: {TraceId}"), Times.Once);
         }
 
         private void ThenTheHeaderIsNotAdded(string key)
         {
-            _response.Headers.TryGetValues(key, out var values).ShouldBeFalse();
+            _response.Headers.Any(x => x.Key == key).ShouldBeFalse();
         }
 
         private void GivenTheTraceIdIs(string traceId)
@@ -126,8 +125,8 @@ namespace Ocelot.UnitTests.Headers
 
         private void ThenTheHeaderIsReturned(string key, string value)
         {
-            var values = _response.Headers.GetValues(key);
-            values.First().ShouldBe(value);
+            var values = _response.Headers.First(x => x.Key == key);
+            values.Values.First().ShouldBe(value);
         }
 
         private void WhenIAdd()
@@ -137,7 +136,7 @@ namespace Ocelot.UnitTests.Headers
 
         private void GivenAResponseMessage()
         {
-            _response = new HttpResponseMessage();
+            _response = new DownstreamResponse(new HttpResponseMessage());
         }
 
         private void GivenTheAddHeaders(List<AddHeader> addHeaders)

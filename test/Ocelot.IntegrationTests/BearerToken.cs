@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace Ocelot.IntegrationTests
 {
-    class BearerToken
+    internal class BearerToken
     {
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }

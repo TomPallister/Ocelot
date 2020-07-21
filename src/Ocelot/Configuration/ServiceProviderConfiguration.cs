@@ -2,15 +2,32 @@
 {
     public class ServiceProviderConfiguration
     {
-        public ServiceProviderConfiguration(string type, string host, int port)
+        public ServiceProviderConfiguration(string type, string scheme, string host, int port, string token, string configurationKey, int pollingInterval, string @namespace = "")
         {
+            ConfigurationKey = configurationKey;
+            Scheme = scheme;
             Host = host;
             Port = port;
+            Token = token;
             Type = type;
+            PollingInterval = pollingInterval;
+            Namespace = @namespace;
         }
 
-        public string Host { get; private set; }
-        public int Port { get; private set; }
-        public string Type { get; private set; }
+        public string Scheme { get; }
+
+        public string Host { get; }
+
+        public int Port { get; }
+
+        public string Type { get; }
+
+        public string Token { get; }
+
+        public string ConfigurationKey { get; }
+
+        public int PollingInterval { get; }
+
+        public string Namespace { get; }
     }
 }

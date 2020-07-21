@@ -13,7 +13,7 @@
 # Service fabric
 OcelotApplicationApiGatewayPkg/Code
 OcelotApplication/OcelotApplicationApiGatewayPkg/Code/appsettings.json
-OcelotApplication/OcelotApplicationApiGatewayPkg/Code/configuration.json
+OcelotApplication/OcelotApplicationApiGatewayPkg/Code/ocelot.json
 OcelotApplication/OcelotApplicationApiGatewayPkg/Code/runtimes/
 OcelotApplicationServicePkg/Code
 OcelotApplication/OcelotApplicationApiGatewayPkg/Code/web.config

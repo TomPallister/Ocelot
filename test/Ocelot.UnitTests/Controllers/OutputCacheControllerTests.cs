@@ -1,12 +1,9 @@
-using Xunit;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using Ocelot.Cache;
 using Shouldly;
 using TestStack.BDDfy;
-using Ocelot.Cache;
-using System;
-using Moq;
-using System.Net.Http;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+using Xunit;
 
 namespace Ocelot.UnitTests.Controllers
 {
@@ -25,9 +22,9 @@ namespace Ocelot.UnitTests.Controllers
         [Fact]
         public void should_delete_key()
         {
-             this.When(_ => WhenIDeleteTheKey("a"))
-                .Then(_ => ThenTheKeyIsDeleted("a"))
-                .BDDfy();
+            this.When(_ => WhenIDeleteTheKey("a"))
+               .Then(_ => ThenTheKeyIsDeleted("a"))
+               .BDDfy();
         }
 
         private void ThenTheKeyIsDeleted(string key)

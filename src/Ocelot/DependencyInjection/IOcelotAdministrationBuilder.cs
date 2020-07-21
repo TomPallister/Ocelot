@@ -1,7 +1,11 @@
 namespace Ocelot.DependencyInjection
 {
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+
     public interface IOcelotAdministrationBuilder
     {
-        IOcelotAdministrationBuilder AddRafty();
+        IServiceCollection Services { get; }
+        IConfiguration ConfigurationRoot { get; }
     }
 }

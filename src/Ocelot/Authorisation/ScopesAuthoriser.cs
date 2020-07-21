@@ -1,9 +1,7 @@
-﻿using IdentityModel;
-using Ocelot.Errors;
-using Ocelot.Responses;
+﻿using Ocelot.Responses;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Linq;
+using System.Security.Claims;
 
 namespace Ocelot.Authorisation
 {
@@ -12,6 +10,7 @@ namespace Ocelot.Authorisation
     public class ScopesAuthoriser : IScopesAuthoriser
     {
         private readonly IClaimsParser _claimsParser;
+        private readonly string _scope = "scope";
 
         public ScopesAuthoriser(IClaimsParser claimsParser)
         {
@@ -25,7 +24,7 @@ namespace Ocelot.Authorisation
                 return new OkResponse<bool>(true);
             }
 
-            var values = _claimsParser.GetValuesByClaimType(claimsPrincipal.Claims, JwtClaimTypes.Scope);
+            var values = _claimsParser.GetValuesByClaimType(claimsPrincipal.Claims, _scope);
 
             if (values.IsError)
             {
@@ -38,11 +37,8 @@ namespace Ocelot.Authorisation
 
             if (matchesScopes.Count == 0)
             {
-                return new ErrorResponse<bool>(new List<Error>
-                {
-                     new ScopeNotAuthorisedError(
-                         $"no one user scope: '{string.Join(",", userScopes)}' match with some allowed scope: '{string.Join(",", routeAllowedScopes)}'")
-                });
+                return new ErrorResponse<bool>(
+                    new ScopeNotAuthorisedError($"no one user scope: '{string.Join(",", userScopes)}' match with some allowed scope: '{string.Join(",", routeAllowedScopes)}'"));
             }
 
             return new OkResponse<bool>(true);

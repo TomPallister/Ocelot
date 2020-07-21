@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Ocelot.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Ocelot.RateLimit
 {
@@ -34,11 +31,11 @@ namespace Ocelot.RateLimit
                 if (entry.HasValue)
                 {
                     // entry has not expired
-                    if (entry.Value.Timestamp + ConvertToTimeSpan(rule.Period) >= DateTime.UtcNow)
+                    if (entry.Value.Timestamp + TimeSpan.FromSeconds(rule.PeriodTimespan) >= DateTime.UtcNow)
                     {
                         // increment request count
                         var totalRequests = entry.Value.TotalRequests + 1;
-                        
+
                         // deep copy
                         counter = new RateLimitCounter(entry.Value.Timestamp, totalRequests);
                     }
@@ -71,7 +68,7 @@ namespace Ocelot.RateLimit
         {
             var counterId = ComputeCounterKey(requestIdentity, option);
             var rule = option.RateLimitRule;
-            
+
             // stores: id (string) - timestamp (datetime) - total_requests (long)
             _counterHandler.Set(counterId, counter, expirationTime);
         }
@@ -134,15 +131,19 @@ namespace Ocelot.RateLimit
             {
                 case "d":
                     return TimeSpan.FromDays(double.Parse(value));
+
                 case "h":
                     return TimeSpan.FromHours(double.Parse(value));
+
                 case "m":
                     return TimeSpan.FromMinutes(double.Parse(value));
+
                 case "s":
                     return TimeSpan.FromSeconds(double.Parse(value));
+
                 default:
                     throw new FormatException($"{timeSpan} can't be converted to TimeSpan, unknown type {type}");
             }
-        }  
+        }
     }
 }

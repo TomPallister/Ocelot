@@ -17,9 +17,9 @@ namespace Ocelot.UnitTests.Requester
             Order = order;
         }
 
-        public int Order {get;private set;}
+        public int Order { get; private set; }
 
-        public DateTime TimeCalled {get;private set;}
+        public DateTime TimeCalled { get; private set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -71,9 +71,9 @@ namespace Ocelot.UnitTests.Requester
             Order = 2;
         }
 
-        public int Order {get;private set;}
+        public int Order { get; private set; }
 
-        public DateTime TimeCalled {get;private set;}
+        public DateTime TimeCalled { get; private set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {

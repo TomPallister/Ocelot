@@ -2,11 +2,11 @@
 
 namespace Ocelot.UnitTests.Infrastructure
 {
-    using System.Collections.Generic;
-    using System.Security.Claims;
     using Ocelot.Infrastructure.Claims.Parser;
     using Responses;
     using Shouldly;
+    using System.Collections.Generic;
+    using System.Security.Claims;
     using TestStack.BDDfy;
     using Xunit;
 
@@ -119,6 +119,6 @@ namespace Ocelot.UnitTests.Infrastructure
         {
             _result.Data.ShouldBe(expected.Data);
             _result.IsError.ShouldBe(expected.IsError);
-        } 
+        }
     }
 }

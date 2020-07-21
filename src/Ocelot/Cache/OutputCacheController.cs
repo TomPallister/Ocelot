@@ -1,9 +1,5 @@
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ocelot.Cache;
-using Ocelot.Configuration.Provider;
 
 namespace Ocelot.Cache
 {
@@ -11,7 +7,7 @@ namespace Ocelot.Cache
     [Route("outputcache")]
     public class OutputCacheController : Controller
     {
-        private IOcelotCache<CachedResponse> _cache;
+        private readonly IOcelotCache<CachedResponse> _cache;
 
         public OutputCacheController(IOcelotCache<CachedResponse> cache)
         {

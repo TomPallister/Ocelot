@@ -1,20 +1,16 @@
-﻿using System.Collections.Generic;
-using Ocelot.Errors;
-
-namespace Ocelot.Middleware
+﻿namespace Ocelot.Middleware
 {
+    using Ocelot.Logging;
+
     public abstract class OcelotMiddleware
     {
-        protected OcelotMiddleware()
+        protected OcelotMiddleware(IOcelotLogger logger)
         {
-            MiddlewareName = this.GetType().Name;
+            Logger = logger;
+            MiddlewareName = GetType().Name;
         }
 
+        public IOcelotLogger Logger { get; }
         public string MiddlewareName { get; }
-
-        public void SetPipelineError(DownstreamContext context, List<Error> errors)
-        {
-            context.Errors = errors;
-        }
     }
 }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Ocelot.Errors;
-
-namespace Ocelot.Configuration.Validator
+﻿namespace Ocelot.Configuration.Validator
 {
+    using Errors;
+
     public class FileValidationFailedError : Error
     {
-        public FileValidationFailedError(string message) : base(message, OcelotErrorCode.FileValidationFailedError)
+        public FileValidationFailedError(string message)
+            : base(message, OcelotErrorCode.FileValidationFailedError, 404)
         {
         }
     }

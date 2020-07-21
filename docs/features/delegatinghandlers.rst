@@ -1,8 +1,8 @@
-Delegating Handers
-==================
+Delegating Handlers
+===================
 
-Ocelot allows the user to add delegating handlers to the HttpClient transport. This feature was requested `GitHub #208 <https://github.com/TomPallister/Ocelot/issues/208>`_ 
-and I decided that it was going to be useful in various ways. Since then we extended it in `GitHub #264 <https://github.com/TomPallister/Ocelot/issues/264>`_.
+Ocelot allows the user to add delegating handlers to the HttpClient transport. This feature was requested `GitHub #208 <https://github.com/ThreeMammals/Ocelot/issues/208>`_ 
+and I decided that it was going to be useful in various ways. Since then we extended it in `GitHub #264 <https://github.com/ThreeMammals/Ocelot/issues/264>`_.
 
 Usage
 ^^^^^
@@ -23,42 +23,27 @@ asp.net core container so you can inject any other services you have registered 
         }
     }
 
-Next you must add the handlers to Ocelot's container either as singleton like follows..
+Next you must add the handlers to Ocelot's container like below...
 
 .. code-block:: csharp
 
     services.AddOcelot()
-            .AddSingletonDelegatingHandler<FakeHandler>()
-            .AddSingletonDelegatingHandler<FakeHandlerTwo>()
+            .AddDelegatingHandler<FakeHandler>()
+            .AddDelegatingHandler<FakeHandlerTwo>()
 
-Or transient as below...
-
-.. code-block:: csharp
-
-    services.AddOcelot()
-            .AddTransientDelegatingHandler<FakeHandler>()
-            .AddTransientDelegatingHandler<FakeHandlerTwo>()
-
-Both of these Add methods have a default parameter called global which is set to false. If it is false then the intent of 
-the DelegatingHandler is to be applied to specific ReRoutes via configuration.json (more on that later). If it is set to true
-then it becomes a global handler and will be applied to all ReRoutes.
+Both of these Add methods have a default parameter called global which is set to false. If it is false then the intent of the DelegatingHandler is to be applied to specific Routes via ocelot.json (more on that later). If it is set to true
+then it becomes a global handler and will be applied to all Routes.
 
 e.g.
 
-.. code-block:: csharp
-
-    services.AddOcelot()
-            .AddSingletonDelegatingHandler<FakeHandler>(true)
-
-Or transient as below...
+As below...
 
 .. code-block:: csharp
 
     services.AddOcelot()
-            .AddTransientDelegatingHandler<FakeHandler>(true)
+            .AddDelegatingHandler<FakeHandler>(true)
 
-Finally if you want ReRoute specific DelegatingHandlers or to order your specific and / or global (more on this later) DelegatingHandlers
-then you must add the following json to the specific ReRoute in configuration.json. The names in the array must match the class names of your
+Finally if you want Route specific DelegatingHandlers or to order your specific and / or global (more on this later) DelegatingHandlers then you must add the following json to the specific Route in ocelot.json. The names in the array must match the class names of your
 DelegatingHandlers for Ocelot to match them together.
 
 .. code-block:: json
@@ -70,8 +55,8 @@ DelegatingHandlers for Ocelot to match them together.
 
 You can have as many DelegatingHandlers as you want and they are run in the following order:
 
-1. Any globals that are left in the order they were added to services and are not in the DelegatingHandlers array from configuration.json.
-2. Any non global DelegatingHandlers plus any globals that were in the DelegatingHandlers array from configuration.json ordered as they are in the DelegatingHandlers array.
+1. Any globals that are left in the order they were added to services and are not in the DelegatingHandlers array from ocelot.json.
+2. Any non global DelegatingHandlers plus any globals that were in the DelegatingHandlers array from ocelot.json ordered as they are in the DelegatingHandlers array.
 3. Tracing DelegatingHandler if enabled (see tracing docs).
 4. QoS DelegatingHandler if enabled (see QoS docs).
 5. The HttpClient sends the HttpRequestMessage.

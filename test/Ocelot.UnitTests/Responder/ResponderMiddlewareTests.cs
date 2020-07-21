@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
-using Ocelot.Middleware;
+﻿using Ocelot.Middleware;
 
 namespace Ocelot.UnitTests.Responder
 {
     using Microsoft.AspNetCore.Http;
-    using System.Net.Http;
-    using System.Threading.Tasks;
     using Moq;
     using Ocelot.DownstreamRouteFinder.Finder;
     using Ocelot.Errors;
     using Ocelot.Logging;
     using Ocelot.Responder;
     using Ocelot.Responder.Middleware;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+    using Ocelot.Infrastructure.RequestData;
     using TestStack.BDDfy;
     using Xunit;
+    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class ResponderMiddlewareTests
     {
@@ -22,14 +23,14 @@ namespace Ocelot.UnitTests.Responder
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
         private readonly ResponderMiddleware _middleware;
-        private readonly DownstreamContext _downstreamContext;
-        private OcelotRequestDelegate _next;
+        private RequestDelegate _next;
+        private HttpContext _httpContext;
 
         public ResponderMiddlewareTests()
         {
+            _httpContext = new DefaultHttpContext();
             _responder = new Mock<IHttpResponder>();
             _codeMapper = new Mock<IErrorsToHttpStatusCodeMapper>();
-            _downstreamContext = new DownstreamContext(new DefaultHttpContext());
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<ResponderMiddleware>()).Returns(_logger.Object);
@@ -40,8 +41,7 @@ namespace Ocelot.UnitTests.Responder
         [Fact]
         public void should_not_return_any_errors()
         {
-            this.Given(x => x.GivenTheHttpResponseMessageIs(new HttpResponseMessage()))
-                .And(x => x.GivenThereAreNoPipelineErrors())
+            this.Given(x => x.GivenTheHttpResponseMessageIs(new DownstreamResponse(new HttpResponseMessage())))
                 .When(x => x.WhenICallTheMiddleware())
                 .Then(x => x.ThenThereAreNoErrors())
                 .BDDfy();
@@ -50,8 +50,8 @@ namespace Ocelot.UnitTests.Responder
         [Fact]
         public void should_return_any_errors()
         {
-            this.Given(x => x.GivenTheHttpResponseMessageIs(new HttpResponseMessage()))
-                .And(x => x.GivenThereArePipelineErrors(new UnableToFindDownstreamRouteError()))
+            this.Given(x => x.GivenTheHttpResponseMessageIs(new DownstreamResponse(new HttpResponseMessage())))
+                .And(x => x.GivenThereArePipelineErrors(new UnableToFindDownstreamRouteError("/path", "GET")))
                 .When(x => x.WhenICallTheMiddleware())
                 .Then(x => x.ThenThereAreNoErrors())
                 .BDDfy();
@@ -59,17 +59,12 @@ namespace Ocelot.UnitTests.Responder
 
         private void WhenICallTheMiddleware()
         {
-            _middleware.Invoke(_downstreamContext).GetAwaiter().GetResult();
+            _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
         }
 
-        private void GivenTheHttpResponseMessageIs(HttpResponseMessage response)
+        private void GivenTheHttpResponseMessageIs(DownstreamResponse response)
         {
-            _downstreamContext.DownstreamResponse = response;
-        }
-
-        private void GivenThereAreNoPipelineErrors()
-        {
-            _downstreamContext.Errors = new List<Error>();
+            _httpContext.Items.UpsertDownstreamResponse(response);
         }
 
         private void ThenThereAreNoErrors()
@@ -79,7 +74,7 @@ namespace Ocelot.UnitTests.Responder
 
         private void GivenThereArePipelineErrors(Error error)
         {
-            _downstreamContext.Errors = new List<Error>(){error};
-        }  
+            _httpContext.Items.SetError(error);
+        }
     }
 }

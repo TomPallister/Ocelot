@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Ocelot.Configuration;
 using Ocelot.Responses;
+using System.Collections.Generic;
 
 namespace Ocelot.Headers
 {
@@ -11,7 +11,7 @@ namespace Ocelot.Headers
         {
             foreach (var f in fAndRs)
             {
-                if(context.Request.Headers.TryGetValue(f.Key, out var values))
+                if (context.Request.Headers.TryGetValue(f.Key, out var values))
                 {
                     var replaced = values[f.Index].Replace(f.Find, f.Replace);
                     context.Request.Headers.Remove(f.Key);

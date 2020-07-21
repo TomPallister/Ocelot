@@ -1,50 +1,69 @@
-using System.Collections.Generic;
 using Ocelot.Responses;
+using System.Collections.Generic;
 
 namespace Ocelot.DownstreamRouteFinder.UrlMatcher
 {
     public class UrlPathPlaceholderNameAndValueFinder : IPlaceholderNameAndValueFinder
     {
-        public Response<List<PlaceholderNameAndValue>> Find(string path, string pathTemplate)
+        public Response<List<PlaceholderNameAndValue>> Find(string path, string query, string pathTemplate)
         {
             var placeHolderNameAndValues = new List<PlaceholderNameAndValue>();
 
+            path = $"{path}{query}";
+
             int counterForPath = 0;
-         
+
+            var delimiter = '/';
+            var nextDelimiter = '/';
+
             for (int counterForTemplate = 0; counterForTemplate < pathTemplate.Length; counterForTemplate++)
             {
-                if ((path.Length > counterForPath) && CharactersDontMatch(pathTemplate[counterForTemplate], path[counterForPath]) && ContinueScanningUrl(counterForPath,path.Length))
+                if ((path.Length > counterForPath) && CharactersDontMatch(pathTemplate[counterForTemplate], path[counterForPath]) && ContinueScanningUrl(counterForPath, path.Length))
                 {
                     if (IsPlaceholder(pathTemplate[counterForTemplate]))
                     {
+                        //should_find_multiple_query_string make test pass
+                        if (PassedQueryString(pathTemplate, counterForTemplate))
+                        {
+                            delimiter = '&';
+                            nextDelimiter = '&';
+                        }
+
+                        //should_find_multiple_query_string_and_path makes test pass
+                        if (NotPassedQueryString(pathTemplate, counterForTemplate) && NoMoreForwardSlash(pathTemplate, counterForTemplate))
+                        {
+                            delimiter = '?';
+                            nextDelimiter = '?';
+                        }
+
                         var placeholderName = GetPlaceholderName(pathTemplate, counterForTemplate);
 
-                        var placeholderValue = GetPlaceholderValue(pathTemplate, placeholderName, path, counterForPath);
+                        var placeholderValue = GetPlaceholderValue(pathTemplate, query, placeholderName, path, counterForPath, delimiter);
 
                         placeHolderNameAndValues.Add(new PlaceholderNameAndValue(placeholderName, placeholderValue));
 
                         counterForTemplate = GetNextCounterPosition(pathTemplate, counterForTemplate, '}');
 
-                        counterForPath = GetNextCounterPosition(path, counterForPath, '/');
+                        counterForPath = GetNextCounterPosition(path, counterForPath, nextDelimiter);
 
                         continue;
                     }
 
                     return new OkResponse<List<PlaceholderNameAndValue>>(placeHolderNameAndValues);
                 }
-                else if(IsCatchAll(path, counterForPath, pathTemplate))
+                else if (IsCatchAll(path, counterForPath, pathTemplate))
                 {
                     var endOfPlaceholder = GetNextCounterPosition(pathTemplate, counterForTemplate, '}');
 
                     var placeholderName = GetPlaceholderName(pathTemplate, 1);
 
-                    if(NothingAfterFirstForwardSlash(path))
+                    if (NothingAfterFirstForwardSlash(path))
                     {
                         placeHolderNameAndValues.Add(new PlaceholderNameAndValue(placeholderName, ""));
                     }
                     else
                     {
-                        var placeholderValue = GetPlaceholderValue(pathTemplate, placeholderName, path, counterForPath + 1);
+                        var placeholderValue = GetPlaceholderValue(pathTemplate, query, placeholderName, path, counterForPath + 1, '?');
                         placeHolderNameAndValues.Add(new PlaceholderNameAndValue(placeholderName, placeholderValue));
                     }
 
@@ -57,10 +76,25 @@ namespace Ocelot.DownstreamRouteFinder.UrlMatcher
             return new OkResponse<List<PlaceholderNameAndValue>>(placeHolderNameAndValues);
         }
 
+        private static bool NoMoreForwardSlash(string pathTemplate, int counterForTemplate)
+        {
+            return !pathTemplate.Substring(counterForTemplate).Contains("/");
+        }
+
+        private static bool NotPassedQueryString(string pathTemplate, int counterForTemplate)
+        {
+            return !pathTemplate.Substring(0, counterForTemplate).Contains("?");
+        }
+
+        private static bool PassedQueryString(string pathTemplate, int counterForTemplate)
+        {
+            return pathTemplate.Substring(0, counterForTemplate).Contains("?");
+        }
+
         private bool IsCatchAll(string path, int counterForPath, string pathTemplate)
         {
-            return string.IsNullOrEmpty(path) || (path.Length > counterForPath && path[counterForPath] == '/') && pathTemplate.Length > 1 
-                     && pathTemplate.Substring(0, 2) == "/{" 
+            return string.IsNullOrEmpty(path) || (path.Length > counterForPath && path[counterForPath] == '/') && pathTemplate.Length > 1
+                     && pathTemplate.Substring(0, 2) == "/{"
                      && pathTemplate.IndexOf('}') == pathTemplate.Length - 1;
         }
 
@@ -69,11 +103,11 @@ namespace Ocelot.DownstreamRouteFinder.UrlMatcher
             return path.Length == 1 || path.Length == 0;
         }
 
-        private string GetPlaceholderValue(string urlPathTemplate, string variableName, string urlPath, int counterForUrl)
+        private string GetPlaceholderValue(string urlPathTemplate, string query, string variableName, string urlPath, int counterForUrl, char delimiter)
         {
-            var positionOfNextSlash = urlPath.IndexOf('/', counterForUrl);
+            var positionOfNextSlash = urlPath.IndexOf(delimiter, counterForUrl);
 
-            if (positionOfNextSlash == -1 || urlPathTemplate.Trim('/').EndsWith(variableName))
+            if (positionOfNextSlash == -1 || (urlPathTemplate.Trim(delimiter).EndsWith(variableName) && string.IsNullOrEmpty(query)))
             {
                 positionOfNextSlash = urlPath.Length;
             }
@@ -93,9 +127,9 @@ namespace Ocelot.DownstreamRouteFinder.UrlMatcher
         }
 
         private int GetNextCounterPosition(string urlTemplate, int counterForTemplate, char delimiter)
-        {                        
+        {
             var closingPlaceHolderPositionOnTemplate = urlTemplate.IndexOf(delimiter, counterForTemplate);
-            return closingPlaceHolderPositionOnTemplate + 1; 
+            return closingPlaceHolderPositionOnTemplate + 1;
         }
 
         private bool CharactersDontMatch(char characterOne, char characterTwo)

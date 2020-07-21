@@ -8,6 +8,8 @@
 
         private int _timeoutValue;
 
+        private string _key;
+
         public QoSOptionsBuilder WithExceptionsAllowedBeforeBreaking(int exceptionsAllowedBeforeBreaking)
         {
             _exceptionsAllowedBeforeBreaking = exceptionsAllowedBeforeBreaking;
@@ -26,9 +28,15 @@
             return this;
         }
 
+        public QoSOptionsBuilder WithKey(string input)
+        {
+            _key = input;
+            return this;
+        }
+
         public QoSOptions Build()
         {
-            return new QoSOptions(_exceptionsAllowedBeforeBreaking, _durationOfBreak, _timeoutValue);
+            return new QoSOptions(_exceptionsAllowedBeforeBreaking, _durationOfBreak, _timeoutValue, _key);
         }
     }
 }

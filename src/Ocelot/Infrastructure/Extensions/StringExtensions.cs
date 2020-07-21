@@ -22,7 +22,7 @@ namespace Ocelot.Infrastructure.Extensions
 
         public static string LastCharAsForwardSlash(this string source)
         {
-            if(source.EndsWith('/'))
+            if (source.EndsWith('/'))
             {
                 return source;
             }

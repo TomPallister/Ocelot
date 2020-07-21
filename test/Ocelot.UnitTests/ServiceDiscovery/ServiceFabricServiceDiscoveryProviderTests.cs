@@ -1,20 +1,12 @@
 ﻿namespace Ocelot.UnitTests.ServiceDiscovery
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using Consul;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
-    using Moq;
-    using Ocelot.Logging;
-    using Ocelot.ServiceDiscovery;
+    using Ocelot.ServiceDiscovery.Configuration;
+    using Ocelot.ServiceDiscovery.Providers;
     using Ocelot.Values;
-    using Xunit;
-    using TestStack.BDDfy;
     using Shouldly;
+    using System.Collections.Generic;
+    using TestStack.BDDfy;
+    using Xunit;
 
     public class ServiceFabricServiceDiscoveryProviderTests
     {

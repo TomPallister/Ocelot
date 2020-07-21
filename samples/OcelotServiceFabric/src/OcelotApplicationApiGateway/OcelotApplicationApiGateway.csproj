@@ -2,13 +2,13 @@
   <PropertyGroup>
     <Description>Stateless Web Service for Stateful OcelotApplicationApiGateway App</Description>
     <Authors> </Authors>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>OcelotApplicationApiGateway</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>OcelotApplicationApiGateway</PackageId>
   </PropertyGroup>
     <ItemGroup>
-    <None Update="configuration.json;appsettings.json;">
+    <None Update="ocelot.json;appsettings.json;">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

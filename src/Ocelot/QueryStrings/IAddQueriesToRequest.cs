@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using Ocelot.Configuration;
+﻿using Ocelot.Configuration;
+using Ocelot.Request.Middleware;
 using Ocelot.Responses;
-using System.Net.Http;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace Ocelot.QueryStrings
 {
     public interface IAddQueriesToRequest
     {
-        Response SetQueriesOnDownstreamRequest(List<ClaimToThing> claimsToThings, IEnumerable<Claim> claims, HttpRequestMessage downstreamRequest);
+        Response SetQueriesOnDownstreamRequest(List<ClaimToThing> claimsToThings, IEnumerable<Claim> claims, DownstreamRequest downstreamRequest);
     }
 }

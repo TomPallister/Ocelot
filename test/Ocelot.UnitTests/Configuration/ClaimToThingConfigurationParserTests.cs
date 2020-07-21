@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Ocelot.Configuration;
+﻿using Ocelot.Configuration;
 using Ocelot.Configuration.Parser;
 using Ocelot.Errors;
 using Ocelot.Responses;
 using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
 using TestStack.BDDfy;
 using Xunit;
 

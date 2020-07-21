@@ -1,18 +1,18 @@
-using System.Collections.Generic;
-using Ocelot.Configuration;
-using Ocelot.Configuration.Builder;
-using Ocelot.Configuration.Creator;
-using Ocelot.Configuration.File;
-using Shouldly;
-using TestStack.BDDfy;
-using Xunit;
-
 namespace Ocelot.UnitTests.Configuration
 {
+    using Ocelot.Configuration;
+    using Ocelot.Configuration.Builder;
+    using Ocelot.Configuration.Creator;
+    using Ocelot.Configuration.File;
+    using Shouldly;
+    using System.Collections.Generic;
+    using TestStack.BDDfy;
+    using Xunit;
+
     public class AuthenticationOptionsCreatorTests
     {
         private readonly AuthenticationOptionsCreator _authOptionsCreator;
-        private FileReRoute _fileReRoute;
+        private FileRoute _fileRoute;
         private AuthenticationOptions _result;
 
         public AuthenticationOptionsCreatorTests()
@@ -23,7 +23,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_return_auth_options()
         {
-            var fileReRoute = new FileReRoute()
+            var fileRoute = new FileRoute()
             {
                 AuthenticationOptions = new FileAuthenticationOptions
                 {
@@ -33,29 +33,29 @@ namespace Ocelot.UnitTests.Configuration
             };
 
             var expected = new AuthenticationOptionsBuilder()
-                    .WithAllowedScopes(fileReRoute.AuthenticationOptions?.AllowedScopes)
+                    .WithAllowedScopes(fileRoute.AuthenticationOptions?.AllowedScopes)
                     .WithAuthenticationProviderKey("Test")
                     .Build();
 
-            this.Given(x => x.GivenTheFollowing(fileReRoute))
+            this.Given(x => x.GivenTheFollowing(fileRoute))
                 .When(x => x.WhenICreateTheAuthenticationOptions())
                 .Then(x => x.ThenTheFollowingConfigIsReturned(expected))
                 .BDDfy();
         }
 
-        private void GivenTheFollowing(FileReRoute fileReRoute)
+        private void GivenTheFollowing(FileRoute fileRoute)
         {
-            _fileReRoute = fileReRoute;
+            _fileRoute = fileRoute;
         }
 
         private void WhenICreateTheAuthenticationOptions()
         {
-            _result = _authOptionsCreator.Create(_fileReRoute);
+            _result = _authOptionsCreator.Create(_fileRoute);
         }
 
         private void ThenTheFollowingConfigIsReturned(AuthenticationOptions expected)
         {
-           _result.AllowedScopes.ShouldBe(expected.AllowedScopes);
+            _result.AllowedScopes.ShouldBe(expected.AllowedScopes);
             _result.AuthenticationProviderKey.ShouldBe(expected.AuthenticationProviderKey);
         }
     }

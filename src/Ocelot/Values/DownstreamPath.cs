@@ -7,6 +7,6 @@
             Value = value;
         }
 
-        public string Value { get; private set; }
+        public string Value { get; }
     }
 }

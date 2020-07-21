@@ -1,12 +1,12 @@
-using System.Collections.Generic;
-using System.Net.Http;
-using Ocelot.Configuration;
-using Ocelot.Responses;
-
 namespace Ocelot.Headers
 {
+    using Ocelot.Configuration;
+    using Ocelot.Responses;
+    using System.Collections.Generic;
+    using Microsoft.AspNetCore.Http;
+
     public interface IHttpResponseHeaderReplacer
     {
-        Response Replace(HttpResponseMessage response, List<HeaderFindAndReplace> fAndRs, HttpRequestMessage httpRequestMessage);
+        public Response Replace(HttpContext httpContext, List<HeaderFindAndReplace> fAndRs);
     }
 }

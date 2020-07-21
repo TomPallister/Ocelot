@@ -1,7 +1,7 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using Ocelot.Middleware;
 using Ocelot.Responses;
 using Shouldly;
+using System.Collections.Generic;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -9,7 +9,7 @@ namespace Ocelot.UnitTests.Headers
 {
     public class RemoveHeadersTests
     {
-        private HttpResponseHeaders _headers;
+        private List<Header> _headers;
         private readonly Ocelot.Headers.RemoveOutputHeaders _removeOutputHeaders;
         private Response _result;
 
@@ -21,18 +21,18 @@ namespace Ocelot.UnitTests.Headers
         [Fact]
         public void should_remove_header()
         {
-            var httpResponse = new HttpResponseMessage()
+            var headers = new List<Header>()
             {
-                Headers = {{ "Transfer-Encoding", "chunked"}}
+                new Header("Transfer-Encoding", new List<string> {"chunked"})
             };
 
-            this.Given(x => x.GivenAHttpContext(httpResponse.Headers))
+            this.Given(x => x.GivenAHttpContext(headers))
                 .When(x => x.WhenIRemoveTheHeaders())
                 .Then(x => x.TheHeaderIsNoLongerInTheContext())
                 .BDDfy();
         }
 
-        private void GivenAHttpContext(HttpResponseHeaders headers)
+        private void GivenAHttpContext(List<Header> headers)
         {
             _headers = headers;
         }

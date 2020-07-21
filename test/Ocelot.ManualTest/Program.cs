@@ -1,13 +1,19 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
+﻿using Ocelot.Requester;
 
 namespace Ocelot.ManualTest
 {
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+    using Ocelot.DependencyInjection;
+    using Ocelot.Middleware;
+    using System;
+    using System.IO;
+    using System.Net.Http;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -21,28 +27,31 @@ namespace Ocelot.ManualTest
                         .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
                         .AddJsonFile("appsettings.json", true, true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                        .AddJsonFile("configuration.json")
+                        .AddJsonFile("ocelot.json", false, false)
                         .AddEnvironmentVariables();
                 })
-                .ConfigureServices(s => {
-                     s.AddAuthentication()
-                        .AddJwtBearer("TestKey", x =>
-                        {
-                            x.Authority = "test";
-                            x.Audience = "test";
-                        });
+                .ConfigureServices(s =>
+                {
+                    s.AddAuthentication();
+                       //.AddJwtBearer("TestKey", x =>
+                       //{
+                       //    x.Authority = "test";
+                       //    x.Audience = "test";
+                       //});
 
-                     s.AddOcelot()
-                         .AddCacheManager(x =>
-                         {
-                             x.WithDictionaryHandle();
-                         })
-                         .AddOpenTracing(option =>
-                         {
-                             option.CollectorUrl = "http://localhost:9618";
-                             option.Service = "Ocelot.ManualTest";
-                         })
-                         .AddAdministration("/administration", "secret");
+                    s.AddSingleton<QosDelegatingHandlerDelegate>((x, t) => new FakeHandler());
+                    s.AddOcelot()
+                       .AddDelegatingHandler<FakeHandler>(true);
+                    // .AddCacheManager(x =>
+                    // {
+                    //     x.WithDictionaryHandle();
+                    // })
+                    // .AddOpenTracing(option =>
+                    // {
+                    //     option.CollectorUrl = "http://localhost:9618";
+                    //     option.Service = "Ocelot.ManualTest";
+                    // })
+                    // .AddAdministration("/administration", "secret");
                 })
                 .ConfigureLogging((hostingContext, logging) =>
                 {
@@ -55,7 +64,18 @@ namespace Ocelot.ManualTest
                     app.UseOcelot().Wait();
                 })
                 .Build()
-                .Run();                
+                .Run();
+        }
+    }
+
+    public class FakeHandler : DelegatingHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Console.WriteLine(request.RequestUri);
+
+            //do stuff and optionally call the base handler..
+            return await base.SendAsync(request, cancellationToken);
         }
     }
 }

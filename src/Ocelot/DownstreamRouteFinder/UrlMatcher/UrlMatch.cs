@@ -4,9 +4,9 @@ namespace Ocelot.DownstreamRouteFinder.UrlMatcher
     {
         public UrlMatch(bool match)
         {
-            Match = match; 
+            Match = match;
         }
 
-        public bool Match {get;private set;}
+        public bool Match { get; private set; }
     }
 }

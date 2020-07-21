@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Ocelot.Configuration
+﻿namespace Ocelot.Configuration
 {
     public class RateLimitRule
     {
@@ -17,7 +15,7 @@ namespace Ocelot.Configuration
         public string Period { get; private set; }
 
         public double PeriodTimespan { get; private set; }
-        
+
         /// <summary>
         /// Maximum number of requests that a client can make in a defined period
         /// </summary>

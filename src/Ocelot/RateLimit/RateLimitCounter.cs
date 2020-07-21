@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Ocelot.RateLimit
 {
@@ -10,10 +8,11 @@ namespace Ocelot.RateLimit
     /// </summary>
     public struct RateLimitCounter
     {
-        public RateLimitCounter(DateTime timestamp, long totalRequest)
+        [JsonConstructor]
+        public RateLimitCounter(DateTime timestamp, long totalRequests)
         {
             Timestamp = timestamp;
-            TotalRequests = totalRequest;
+            TotalRequests = totalRequests;
         }
 
         public DateTime Timestamp { get; private set; }

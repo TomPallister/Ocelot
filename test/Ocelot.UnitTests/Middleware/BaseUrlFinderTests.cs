@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Memory;
-using Moq;
 using Ocelot.Middleware;
 using Shouldly;
+using System.Collections.Generic;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -22,7 +17,7 @@ namespace Ocelot.UnitTests.Middleware
 
         public BaseUrlFinderTests()
         {
-            _data = new List<KeyValuePair<string,string>>();
+            _data = new List<KeyValuePair<string, string>>();
         }
 
         [Fact]

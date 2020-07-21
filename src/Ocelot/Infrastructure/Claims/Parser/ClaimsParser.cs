@@ -1,6 +1,6 @@
 ﻿namespace Ocelot.Infrastructure.Claims.Parser
 {
-    using Errors;
+    using Microsoft.Extensions.Primitives;
     using Responses;
     using System.Collections.Generic;
     using System.Linq;
@@ -24,12 +24,9 @@
 
             var splits = claimResponse.Data.Split(delimiter.ToCharArray());
 
-            if (splits.Length < index || index < 0)
+            if (splits.Length <= index || index < 0)
             {
-                return new ErrorResponse<string>(new List<Error>
-                {
-                    new CannotFindClaimError($"Cannot find claim for key: {key}, delimiter: {delimiter}, index: {index}")
-                });
+                return new ErrorResponse<string>(new CannotFindClaimError($"Cannot find claim for key: {key}, delimiter: {delimiter}, index: {index}"));
             }
 
             var value = splits[index];
@@ -48,17 +45,14 @@
 
         private Response<string> GetValue(IEnumerable<Claim> claims, string key)
         {
-            var claim = claims.FirstOrDefault(c => c.Type == key);
+            var claimValues = claims.Where(c => c.Type == key).Select(c => c.Value).ToArray();
 
-            if (claim != null)
+            if (claimValues.Length > 0)
             {
-                return new OkResponse<string>(claim.Value);
+                return new OkResponse<string>(new StringValues(claimValues).ToString());
             }
 
-            return new ErrorResponse<string>(new List<Error>
-            {
-                new CannotFindClaimError($"Cannot find claim for key: {key}")
-            });
+            return new ErrorResponse<string>(new CannotFindClaimError($"Cannot find claim for key: {key}"));
         }
     }
 }

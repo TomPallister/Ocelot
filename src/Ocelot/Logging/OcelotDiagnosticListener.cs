@@ -1,18 +1,19 @@
-﻿using System;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DiagnosticAdapter;
-using Butterfly.Client.AspNetCore;
-using Butterfly.OpenTracing;
-
-namespace Ocelot.Logging
+﻿namespace Ocelot.Logging
 {
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.DiagnosticAdapter;
+    using System;
+
     public class OcelotDiagnosticListener
     {
-        private IOcelotLogger _logger;
+        private readonly IOcelotLogger _logger;
+        private readonly ITracer _tracer;
 
-        public OcelotDiagnosticListener(IOcelotLoggerFactory factory)
+        public OcelotDiagnosticListener(IOcelotLoggerFactory factory, IServiceProvider serviceProvider)
         {
             _logger = factory.CreateLogger<OcelotDiagnosticListener>();
+            _tracer = serviceProvider.GetService<ITracer>();
         }
 
         [DiagnosticName("Microsoft.AspNetCore.MiddlewareAnalysis.MiddlewareStarting")]
@@ -25,7 +26,7 @@ namespace Ocelot.Logging
         [DiagnosticName("Microsoft.AspNetCore.MiddlewareAnalysis.MiddlewareException")]
         public virtual void OnMiddlewareException(Exception exception, string name)
         {
-            _logger.LogTrace($"MiddlewareException: {name}; {exception.Message}");
+            _logger.LogTrace($"MiddlewareException: {name}; {exception.Message};");
         }
 
         [DiagnosticName("Microsoft.AspNetCore.MiddlewareAnalysis.MiddlewareFinished")]
@@ -37,8 +38,7 @@ namespace Ocelot.Logging
 
         private void Event(HttpContext httpContext, string @event)
         {
-            var span = httpContext.GetSpan();
-            span?.Log(LogField.CreateNew().Event(@event));
+            _tracer?.Event(httpContext, @event);
         }
     }
 }

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <Description>This package provides methods to integrate Butterfly tracing with Ocelot.</Description>
+    <AssemblyTitle>Ocelot.Tracing.Butterfly</AssemblyTitle>
+    <VersionPrefix>0.0.0-dev</VersionPrefix>
+    <AssemblyName>Ocelot.Tracing.Butterfly</AssemblyName>
+    <PackageId>Ocelot.Tracing.Butterfly</PackageId>
+    <PackageTags>API Gateway;.NET core; Butterfly; ButterflyAPM</PackageTags>
+    <PackageProjectUrl>https://github.com/ThreeMammals/Ocelot</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ThreeMammals/Ocelot</PackageProjectUrl>
+    <RuntimeIdentifiers>win10-x64;osx.10.11-x64;osx.10.12-x64;win7-x64</RuntimeIdentifiers>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Authors>Tom Pallister</Authors>
+    <CodeAnalysisRuleSet>..\..\codeanalysis.ruleset</CodeAnalysisRuleSet>
+    <RootNamespace>Ocelot.Tracing.Butterfly</RootNamespace>
+  </PropertyGroup>
+ <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ocelot\Ocelot.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Butterfly.Client" Version="0.0.8" />
+    <PackageReference Include="Butterfly.Client.AspNetCore" Version="0.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

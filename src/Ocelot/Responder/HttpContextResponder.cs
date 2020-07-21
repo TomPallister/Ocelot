@@ -1,17 +1,15 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Primitives;
+using Ocelot.Headers;
+using Ocelot.Middleware;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using Ocelot.Headers;
-using Ocelot.Responses;
 
 namespace Ocelot.Responder
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Cannot unit test things in this class due to methods not being implemented
     /// on .net concretes used for testing
@@ -25,7 +23,7 @@ namespace Ocelot.Responder
             _removeOutputHeaders = removeOutputHeaders;
         }
 
-        public async Task SetResponseOnHttpContext(HttpContext context, HttpResponseMessage response)
+        public async Task SetResponseOnHttpContext(HttpContext context, DownstreamResponse response)
         {
             _removeOutputHeaders.Remove(response.Headers);
 
@@ -34,47 +32,72 @@ namespace Ocelot.Responder
                 AddHeaderIfDoesntExist(context, httpResponseHeader);
             }
 
-            foreach (var httpResponseHeader in response.Content.Headers)
+            SetStatusCode(context, (int)response.StatusCode);
+
+            context.Response.HttpContext.Features.Get<IHttpResponseFeature>().ReasonPhrase = response.ReasonPhrase;
+
+            if (response.Content is null)
             {
-                AddHeaderIfDoesntExist(context, httpResponseHeader);
+                return;
             }
 
-            var content = await response.Content.ReadAsByteArrayAsync();
-
-            AddHeaderIfDoesntExist(context, new KeyValuePair<string, IEnumerable<string>>("Content-Length", new []{ content.Length.ToString() }) );
-
-            context.Response.OnStarting(state =>
+            foreach (var httpResponseHeader in response.Content.Headers)
             {
-                var httpContext = (HttpContext)state;
+                AddHeaderIfDoesntExist(context, new Header(httpResponseHeader.Key, httpResponseHeader.Value));
+            }
 
-                httpContext.Response.StatusCode = (int)response.StatusCode;
+            var content = await response.Content.ReadAsStreamAsync();
 
-                return Task.CompletedTask;
-            }, context);
+            if (response.Content.Headers.ContentLength != null)
+            {
+                AddHeaderIfDoesntExist(context, new Header("Content-Length", new[] { response.Content.Headers.ContentLength.ToString() }));
+            }
 
-            using (Stream stream = new MemoryStream(content))
+            using (content)
             {
                 if (response.StatusCode != HttpStatusCode.NotModified && context.Response.ContentLength != 0)
                 {
-                    await stream.CopyToAsync(context.Response.Body);
+                    await content.CopyToAsync(context.Response.Body);
                 }
             }
         }
 
         public void SetErrorResponseOnContext(HttpContext context, int statusCode)
         {
-            context.Response.OnStarting(x =>
-            {
-                context.Response.StatusCode = statusCode;
-                return Task.CompletedTask;
-            }, context);
+            SetStatusCode(context, statusCode);
         }
 
-        private static void AddHeaderIfDoesntExist(HttpContext context, KeyValuePair<string, IEnumerable<string>> httpResponseHeader)
+        public async Task SetErrorResponseOnContext(HttpContext context, DownstreamResponse response)
+        {
+            var content = await response.Content.ReadAsStreamAsync();
+
+            if (response.Content.Headers.ContentLength != null)
+            {
+                AddHeaderIfDoesntExist(context, new Header("Content-Length", new[] { response.Content.Headers.ContentLength.ToString() }));
+            }
+
+            using (content)
+            {
+                if (context.Response.ContentLength != 0)
+                {
+                    await content.CopyToAsync(context.Response.Body);
+                }
+            }
+        }
+
+        private void SetStatusCode(HttpContext context, int statusCode)
+        {
+            if (!context.Response.HasStarted)
+            {
+                context.Response.StatusCode = statusCode;
+            }
+        }
+
+        private static void AddHeaderIfDoesntExist(HttpContext context, Header httpResponseHeader)
         {
             if (!context.Response.Headers.ContainsKey(httpResponseHeader.Key))
             {
-                context.Response.Headers.Add(httpResponseHeader.Key, new StringValues(httpResponseHeader.Value.ToArray()));
+                context.Response.Headers.Add(httpResponseHeader.Key, new StringValues(httpResponseHeader.Values.ToArray()));
             }
         }
     }

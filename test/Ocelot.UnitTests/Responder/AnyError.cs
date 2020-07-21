@@ -2,13 +2,13 @@
 
 namespace Ocelot.UnitTests.Responder
 {
-    class AnyError : Error
+    internal class AnyError : Error
     {
-        public AnyError() : base("blahh", OcelotErrorCode.UnknownError)
+        public AnyError() : base("blahh", OcelotErrorCode.UnknownError, 404)
         {
         }
 
-        public AnyError(OcelotErrorCode errorCode) : base("blah", errorCode)
+        public AnyError(OcelotErrorCode errorCode) : base("blah", errorCode, 404)
         {
         }
     }

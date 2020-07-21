@@ -1,0 +1,24 @@
+version: "3.4"
+services:
+
+  tests:
+    build:
+      context: .
+      target: builder
+    volumes:
+      - type: bind
+        source: .
+        target: /results
+    command: test --logger:trx -r /results
+
+  benchmarks:
+    build:
+      context: .
+      target: builder
+      args:
+        build_configuration: Release
+    command: run -c Release --project test/Ocelot.Benchmarks/Ocelot.Benchmarks.csproj 0 1 2 3 4
+
+  manual-test:
+    build: .
+    ports: [ "5000:80" ]

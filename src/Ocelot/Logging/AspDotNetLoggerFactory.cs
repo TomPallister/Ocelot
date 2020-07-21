@@ -17,7 +17,7 @@ namespace Ocelot.Logging
         public IOcelotLogger CreateLogger<T>()
         {
             var logger = _loggerFactory.CreateLogger<T>();
-            return new AspDotNetLogger(logger, _scopedDataRepository, typeof(T).Name);
+            return new AspDotNetLogger(logger, _scopedDataRepository);
         }
     }
 }

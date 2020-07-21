@@ -1,32 +1,29 @@
-﻿using System;
-using Ocelot.Configuration.Builder;
+﻿using Ocelot.Configuration.Builder;
 using Ocelot.Configuration.File;
 
 namespace Ocelot.Configuration.Creator
 {
     public class RateLimitOptionsCreator : IRateLimitOptionsCreator
     {
-        public RateLimitOptions Create(FileReRoute fileReRoute, FileGlobalConfiguration globalConfiguration, bool enableRateLimiting)
+        public RateLimitOptions Create(FileRateLimitRule fileRateLimitRule, FileGlobalConfiguration globalConfiguration)
         {
-            RateLimitOptions rateLimitOption = null;
-
-            if (enableRateLimiting)
+            if (fileRateLimitRule != null && fileRateLimitRule.EnableRateLimiting)
             {
-                rateLimitOption = new RateLimitOptionsBuilder()
+                return new RateLimitOptionsBuilder()
                     .WithClientIdHeader(globalConfiguration.RateLimitOptions.ClientIdHeader)
-                    .WithClientWhiteList(fileReRoute.RateLimitOptions.ClientWhitelist)
+                    .WithClientWhiteList(() => fileRateLimitRule.ClientWhitelist)
                     .WithDisableRateLimitHeaders(globalConfiguration.RateLimitOptions.DisableRateLimitHeaders)
-                    .WithEnableRateLimiting(fileReRoute.RateLimitOptions.EnableRateLimiting)
+                    .WithEnableRateLimiting(fileRateLimitRule.EnableRateLimiting)
                     .WithHttpStatusCode(globalConfiguration.RateLimitOptions.HttpStatusCode)
                     .WithQuotaExceededMessage(globalConfiguration.RateLimitOptions.QuotaExceededMessage)
                     .WithRateLimitCounterPrefix(globalConfiguration.RateLimitOptions.RateLimitCounterPrefix)
-                    .WithRateLimitRule(new RateLimitRule(fileReRoute.RateLimitOptions.Period,
-                        fileReRoute.RateLimitOptions.PeriodTimespan,
-                        fileReRoute.RateLimitOptions.Limit))
+                    .WithRateLimitRule(new RateLimitRule(fileRateLimitRule.Period,
+                        fileRateLimitRule.PeriodTimespan,
+                        fileRateLimitRule.Limit))
                     .Build();
             }
 
-            return rateLimitOption;
+            return new RateLimitOptionsBuilder().WithEnableRateLimiting(false).Build();
         }
     }
 }

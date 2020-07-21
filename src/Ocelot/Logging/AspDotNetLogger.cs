@@ -1,7 +1,6 @@
-using System;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 using Ocelot.Infrastructure.RequestData;
+using System;
 
 namespace Ocelot.Logging
 {
@@ -9,56 +8,83 @@ namespace Ocelot.Logging
     {
         private readonly ILogger _logger;
         private readonly IRequestScopedDataRepository _scopedDataRepository;
+        private readonly Func<string, Exception, string> _func;
 
-        public string Name { get; }
-
-        public AspDotNetLogger(ILogger logger, IRequestScopedDataRepository scopedDataRepository, string typeName)
+        public AspDotNetLogger(ILogger logger, IRequestScopedDataRepository scopedDataRepository)
         {
-            Name = typeName;
             _logger = logger;
             _scopedDataRepository = scopedDataRepository;
+            _func = (state, exception) => 
+            {
+                if (exception == null)
+                {
+                    return state;
+                }
+                else
+                {
+                    return $"{state}, exception: {exception}";
+                }  
+            };
         }
 
-        public void LogTrace(string message, params object[] args)
-        {            
+        public void LogTrace(string message)
+        {
             var requestId = GetOcelotRequestId();
             var previousRequestId = GetOcelotPreviousRequestId();
-            _logger.LogTrace("requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message},", requestId, previousRequestId, new FormattedLogValues(message, args).ToString());
+
+            var state = $"requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}";
+
+            _logger.Log(LogLevel.Trace, default(EventId), state, null, _func);
         }
 
-        public void LogDebug(string message, params object[] args)
-        {            
+        public void LogDebug(string message)
+        {
             var requestId = GetOcelotRequestId();
             var previousRequestId = GetOcelotPreviousRequestId();
-            _logger.LogDebug("requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message},", requestId, previousRequestId, new FormattedLogValues(message, args).ToString());
+
+            var state = $"requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}";
+
+            _logger.Log(LogLevel.Debug, default(EventId), state, null, _func);
         }
 
-        public void LogInformation(string message, params object[] args)
-        {            
+        public void LogInformation(string message)
+        {
             var requestId = GetOcelotRequestId();
             var previousRequestId = GetOcelotPreviousRequestId();
-            _logger.LogInformation("requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message},", requestId, previousRequestId, new FormattedLogValues(message, args).ToString());
+
+            var state = $"requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}";
+
+            _logger.Log(LogLevel.Information, default(EventId), state, null, _func);           
+        }
+
+        public void LogWarning(string message)
+        {
+            var requestId = GetOcelotRequestId();
+            var previousRequestId = GetOcelotPreviousRequestId();
+
+            var state = $"requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}";
+
+            _logger.Log(LogLevel.Warning, default(EventId), state, null, _func);            
         }
 
         public void LogError(string message, Exception exception)
         {
             var requestId = GetOcelotRequestId();
             var previousRequestId = GetOcelotPreviousRequestId();
-            _logger.LogError("requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}, exception: {exception}", requestId, previousRequestId, message, exception);
-        }
 
-        public void LogError(string message, params object[] args)
-        {
-            var requestId = GetOcelotRequestId();
-            var previousRequestId = GetOcelotPreviousRequestId();
-            _logger.LogError("requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}", requestId, previousRequestId, new FormattedLogValues(message, args).ToString());
+            var state = $"requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}";
+
+            _logger.Log(LogLevel.Error,default(EventId), state, exception, _func);
         }
 
         public void LogCritical(string message, Exception exception)
         {
             var requestId = GetOcelotRequestId();
             var previousRequestId = GetOcelotPreviousRequestId();
-            _logger.LogError("requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}", requestId, previousRequestId, message);
+
+            var state = $"requestId: {requestId}, previousRequestId: {previousRequestId}, message: {message}";
+
+            _logger.Log(LogLevel.Critical, default(EventId), state, exception, _func);
         }
 
         private string GetOcelotRequestId()

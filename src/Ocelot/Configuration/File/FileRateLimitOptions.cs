@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Ocelot.Configuration.File
+﻿namespace Ocelot.Configuration.File
 {
     public class FileRateLimitOptions
     {
@@ -14,7 +9,7 @@ namespace Ocelot.Configuration.File
 
         /// <summary>
         /// Gets or sets a value that will be used as a formatter for the QuotaExceeded response message.
-        /// If none specified the default will be: 
+        /// If none specified the default will be:
         /// API calls quota exceeded! maximum admitted {0} per {1}
         /// </summary>
         public string QuotaExceededMessage { get; set; }
@@ -32,6 +27,6 @@ namespace Ocelot.Configuration.File
         /// <summary>
         /// Gets or sets the HTTP Status code returned when rate limiting occurs, by default value is set to 429 (Too Many Requests)
         /// </summary>
-        public int HttpStatusCode { get;  set; } = 429;
+        public int HttpStatusCode { get; set; } = 429;
     }
 }

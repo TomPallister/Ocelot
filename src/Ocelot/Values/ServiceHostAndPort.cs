@@ -8,7 +8,13 @@
             DownstreamPort = downstreamPort;
         }
 
-        public string DownstreamHost { get; private set; }
-        public int DownstreamPort { get; private set; }
+        public ServiceHostAndPort(string downstreamHost, int downstreamPort, string scheme)
+            : this(downstreamHost, downstreamPort) => Scheme = scheme;
+
+        public string DownstreamHost { get; }
+
+        public int DownstreamPort { get; }
+
+        public string Scheme { get; }
     }
 }

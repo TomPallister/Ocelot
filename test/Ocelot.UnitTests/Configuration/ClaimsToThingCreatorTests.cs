@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using Ocelot.Configuration;
 using Ocelot.Configuration.Creator;
@@ -8,6 +6,8 @@ using Ocelot.Errors;
 using Ocelot.Logging;
 using Ocelot.Responses;
 using Shouldly;
+using System.Collections.Generic;
+using System.Linq;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace Ocelot.UnitTests.Configuration
     public class ClaimsToThingCreatorTests
     {
         private readonly Mock<IClaimToThingConfigurationParser> _configParser;
-        private Dictionary<string,string> _claimsToThings;
+        private Dictionary<string, string> _claimsToThings;
         private ClaimsToThingCreator _claimsToThingsCreator;
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private List<ClaimToThing> _result;
@@ -36,13 +36,13 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_return_claims_to_things()
         {
-            var userInput = new Dictionary<string,string>()
+            var userInput = new Dictionary<string, string>()
             {
                 {"CustomerId", "Claims[CustomerId] > value"}
             };
 
             var claimsToThing = new OkResponse<ClaimToThing>(new ClaimToThing("CustomerId", "CustomerId", "", 0));
-                    
+
             this.Given(x => x.GivenTheFollowingDictionary(userInput))
                 .And(x => x.GivenTheConfigHeaderExtractorReturns(claimsToThing))
                 .When(x => x.WhenIGetTheThings())
@@ -54,13 +54,13 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_log_error_if_cannot_parse_claim_to_thing()
         {
-             var userInput = new Dictionary<string,string>()
+            var userInput = new Dictionary<string, string>()
             {
                 {"CustomerId", "Claims[CustomerId] > value"}
             };
 
             var claimsToThing = new ErrorResponse<ClaimToThing>(It.IsAny<Error>());
-                    
+
             this.Given(x => x.GivenTheFollowingDictionary(userInput))
                 .And(x => x.GivenTheConfigHeaderExtractorReturns(claimsToThing))
                 .When(x => x.WhenIGetTheThings())
@@ -72,7 +72,7 @@ namespace Ocelot.UnitTests.Configuration
         private void ThenTheLoggerIsCalledCorrectly()
         {
             _logger
-                .Verify(x => x.LogDebug(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+                .Verify(x => x.LogDebug(It.IsAny<string>()), Times.Once);
         }
 
         private void ThenClaimsToThingsAreReturned()
@@ -80,7 +80,7 @@ namespace Ocelot.UnitTests.Configuration
             _result.Count.ShouldBeGreaterThan(0);
         }
 
-        private void GivenTheFollowingDictionary(Dictionary<string,string> claimsToThings)
+        private void GivenTheFollowingDictionary(Dictionary<string, string> claimsToThings)
         {
             _claimsToThings = claimsToThings;
         }

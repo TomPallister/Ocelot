@@ -1,4 +1,3 @@
-using Ocelot.Errors;
 using Ocelot.Infrastructure.RequestData;
 using Shouldly;
 using Xunit;

@@ -1,12 +1,11 @@
-using Xunit;
-using Shouldly;
-using Ocelot.Headers.Middleware;
-using TestStack.BDDfy;
 using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
-using Ocelot.Responses;
 using Ocelot.Configuration;
 using Ocelot.Headers;
+using Ocelot.Responses;
+using Shouldly;
+using System.Collections.Generic;
+using TestStack.BDDfy;
+using Xunit;
 
 namespace Ocelot.UnitTests.Headers
 {
@@ -55,7 +54,7 @@ namespace Ocelot.UnitTests.Headers
 
         private void ThenTheHeadersAreNotReplaced()
         {
-             _result.ShouldBeOfType<OkResponse>();
+            _result.ShouldBeOfType<OkResponse>();
             foreach (var f in _fAndRs)
             {
                 _context.Request.Headers.TryGetValue(f.Key, out var values);

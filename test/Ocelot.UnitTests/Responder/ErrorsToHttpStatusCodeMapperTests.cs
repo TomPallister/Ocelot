@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using Ocelot.Errors;
+﻿using Ocelot.Errors;
 using Ocelot.Responder;
 using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Net;
 using TestStack.BDDfy;
 using Xunit;
 
@@ -32,7 +32,7 @@ namespace Ocelot.UnitTests.Responder
         [InlineData(OcelotErrorCode.ClaimValueNotAuthorisedError)]
         [InlineData(OcelotErrorCode.ScopeNotAuthorisedError)]
         [InlineData(OcelotErrorCode.UnauthorizedError)]
-        [InlineData(OcelotErrorCode.UserDoesNotHaveClaimError)] 
+        [InlineData(OcelotErrorCode.UserDoesNotHaveClaimError)]
         public void should_return_forbidden(OcelotErrorCode errorCode)
         {
             ShouldMapErrorToStatusCode(errorCode, HttpStatusCode.Forbidden);
@@ -43,6 +43,22 @@ namespace Ocelot.UnitTests.Responder
         public void should_return_service_unavailable(OcelotErrorCode errorCode)
         {
             ShouldMapErrorToStatusCode(errorCode, HttpStatusCode.ServiceUnavailable);
+        }
+
+        [Theory]
+        [InlineData(OcelotErrorCode.UnableToCompleteRequestError)]
+        [InlineData(OcelotErrorCode.CouldNotFindLoadBalancerCreator)]
+        [InlineData(OcelotErrorCode.ErrorInvokingLoadBalancerCreator)]
+        public void should_return_internal_server_error(OcelotErrorCode errorCode)
+        {
+            ShouldMapErrorToStatusCode(errorCode, HttpStatusCode.InternalServerError);
+        }
+
+        [Theory]
+        [InlineData(OcelotErrorCode.ConnectionToDownstreamServiceError)]
+        public void should_return_bad_gateway_error(OcelotErrorCode errorCode)
+        {
+            ShouldMapErrorToStatusCode(errorCode, HttpStatusCode.BadGateway);
         }
 
         [Theory]
@@ -60,13 +76,11 @@ namespace Ocelot.UnitTests.Responder
         [InlineData(OcelotErrorCode.RateLimitOptionsError)]
         [InlineData(OcelotErrorCode.ServicesAreEmptyError)]
         [InlineData(OcelotErrorCode.ServicesAreNullError)]
-        [InlineData(OcelotErrorCode.UnableToCompleteRequestError)]
         [InlineData(OcelotErrorCode.UnableToCreateAuthenticationHandlerError)]
         [InlineData(OcelotErrorCode.UnableToFindDownstreamRouteError)]
         [InlineData(OcelotErrorCode.UnableToFindLoadBalancerError)]
         [InlineData(OcelotErrorCode.UnableToFindServiceDiscoveryProviderError)]
         [InlineData(OcelotErrorCode.UnableToFindQoSProviderError)]
-        [InlineData(OcelotErrorCode.UnableToSetConfigInConsulError)]
         [InlineData(OcelotErrorCode.UnknownError)]
         [InlineData(OcelotErrorCode.UnmappableRequestError)]
         [InlineData(OcelotErrorCode.UnsupportedAuthenticationProviderError)]
@@ -108,7 +122,7 @@ namespace Ocelot.UnitTests.Responder
             var errors = new List<OcelotErrorCode>
             {
                 OcelotErrorCode.CannotAddDataError,
-                OcelotErrorCode.RequestTimedOutError
+                OcelotErrorCode.RequestTimedOutError,
             };
 
             ShouldMapErrorsToStatusCode(errors, HttpStatusCode.ServiceUnavailable);
@@ -120,7 +134,7 @@ namespace Ocelot.UnitTests.Responder
             // If this test fails then it's because the number of error codes has changed.
             // You should make the appropriate changes to the test cases here to ensure
             // they cover all the error codes, and then modify this assertion.
-            Enum.GetNames(typeof(OcelotErrorCode)).Length.ShouldBe(34, "Looks like the number of error codes has changed. Do you need to modify ErrorsToHttpStatusCodeMapper?");
+            Enum.GetNames(typeof(OcelotErrorCode)).Length.ShouldBe(41, "Looks like the number of error codes has changed. Do you need to modify ErrorsToHttpStatusCodeMapper?");
         }
 
         private void ShouldMapErrorToStatusCode(OcelotErrorCode errorCode, HttpStatusCode expectedHttpStatusCode)
@@ -132,7 +146,7 @@ namespace Ocelot.UnitTests.Responder
         {
             var errors = new List<Error>();
 
-            foreach(var errorCode in errorCodes)
+            foreach (var errorCode in errorCodes)
             {
                 errors.Add(new AnyError(errorCode));
             }
