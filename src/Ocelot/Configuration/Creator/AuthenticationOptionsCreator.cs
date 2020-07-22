@@ -1,12 +1,18 @@
 using Ocelot.Configuration.File;
+using System.Linq;
 
 namespace Ocelot.Configuration.Creator
 {
     public class AuthenticationOptionsCreator : IAuthenticationOptionsCreator
     {
-        public AuthenticationOptions Create(FileRoute route)
+        public AuthenticationOptions Create(FileAuthenticationOptions routeAuthOptions, 
+                                            FileAuthenticationOptions globalConfAuthOptions)
         {
-            return new AuthenticationOptions(route.AuthenticationOptions.AllowedScopes, route.AuthenticationOptions.AuthenticationProviderKey);
+            var routeAuthOptionsEmpty = string.IsNullOrEmpty(routeAuthOptions.AuthenticationProviderKey);
+            
+            var resultAuthOptions = routeAuthOptionsEmpty ? globalConfAuthOptions : routeAuthOptions;
+            
+            return new AuthenticationOptions(resultAuthOptions.AllowedScopes, resultAuthOptions.AuthenticationProviderKey);
         }
     }
 }

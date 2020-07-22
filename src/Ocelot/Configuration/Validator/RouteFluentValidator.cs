@@ -9,13 +9,11 @@
     using System.Threading.Tasks;
 
     public class RouteFluentValidator : AbstractValidator<FileRoute>
-    {
-        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
-
-        public RouteFluentValidator(IAuthenticationSchemeProvider authenticationSchemeProvider, HostAndPortValidator hostAndPortValidator, FileQoSOptionsFluentValidator fileQoSOptionsFluentValidator)
-        {
-            _authenticationSchemeProvider = authenticationSchemeProvider;
-
+    {        
+        public RouteFluentValidator(HostAndPortValidator hostAndPortValidator, 
+            FileQoSOptionsFluentValidator fileQoSOptionsFluentValidator,
+            FileAuthenticationOptionsValidator fileAuthenticationOptionsValidator)
+        {           
             RuleFor(route => route.QoSOptions)
                 .SetValidator(fileQoSOptionsFluentValidator);
 
@@ -69,8 +67,7 @@
             });
 
             RuleFor(route => route.AuthenticationOptions)
-                .MustAsync(IsSupportedAuthenticationProviders)
-                .WithMessage("{PropertyName} {PropertyValue} is unsupported authentication provider");
+                .SetValidator(fileAuthenticationOptionsValidator);
 
             When(route => string.IsNullOrEmpty(route.ServiceName), () =>
             {
@@ -88,21 +85,7 @@
             {
                 RuleFor(r => r.DownstreamHttpVersion).Matches("^[0-9]([.,][0-9]{1,1})?$");
             });
-        }
-
-        private async Task<bool> IsSupportedAuthenticationProviders(FileAuthenticationOptions authenticationOptions, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrEmpty(authenticationOptions.AuthenticationProviderKey))
-            {
-                return true;
-            }
-
-            var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
-
-            var supportedSchemes = schemes.Select(scheme => scheme.Name).ToList();
-
-            return supportedSchemes.Contains(authenticationOptions.AuthenticationProviderKey);
-        }
+        }        
 
         private static bool IsValidPeriod(FileRateLimitRule rateLimitOptions)
         {

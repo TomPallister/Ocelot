@@ -9,6 +9,7 @@
             LoadBalancerOptions = new FileLoadBalancerOptions();
             QoSOptions = new FileQoSOptions();
             HttpHandlerOptions = new FileHttpHandlerOptions();
+            AuthenticationOptions = new FileAuthenticationOptions();
         }
 
         public string RequestIdKey { get; set; }
@@ -28,5 +29,7 @@
         public FileHttpHandlerOptions HttpHandlerOptions { get; set; }
 
         public string DownstreamHttpVersion { get; set; }
+
+        public FileAuthenticationOptions AuthenticationOptions { get; set; }
     }
 }

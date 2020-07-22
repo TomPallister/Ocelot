@@ -73,7 +73,7 @@ namespace Ocelot.Configuration.Creator
 
         private DownstreamRoute SetUpDownstreamRoute(FileRoute fileRoute, FileGlobalConfiguration globalConfiguration)
         {
-            var fileRouteOptions = _fileRouteOptionsCreator.Create(fileRoute);
+            var fileRouteOptions = _fileRouteOptionsCreator.Create(fileRoute, globalConfiguration);
 
             var requestIdKey = _requestIdKeyCreator.Create(fileRoute, globalConfiguration);
 
@@ -81,7 +81,7 @@ namespace Ocelot.Configuration.Creator
 
             var upstreamTemplatePattern = _upstreamTemplatePatternCreator.Create(fileRoute);
 
-            var authOptionsForRoute = _authOptionsCreator.Create(fileRoute);
+            var authOptionsForRoute = _authOptionsCreator.Create(fileRoute.AuthenticationOptions, globalConfiguration.AuthenticationOptions);
 
             var claimsToHeaders = _claimsToThingCreator.Create(fileRoute.AddHeadersToRequest);
 

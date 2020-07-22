@@ -74,6 +74,7 @@ namespace Ocelot.DependencyInjection
             Services.TryAddSingleton<RouteFluentValidator>();
             Services.TryAddSingleton<FileGlobalConfigurationFluentValidator>();
             Services.TryAddSingleton<FileQoSOptionsFluentValidator>();
+            Services.TryAddSingleton<FileAuthenticationOptionsValidator>();
             Services.TryAddSingleton<IClaimsToThingCreator, ClaimsToThingCreator>();
             Services.TryAddSingleton<IAuthenticationOptionsCreator, AuthenticationOptionsCreator>();
             Services.TryAddSingleton<IUpstreamTemplatePatternCreator, UpstreamTemplatePatternCreator>();

@@ -4,6 +4,6 @@ namespace Ocelot.Configuration.Creator
 {
     public interface IRouteOptionsCreator
     {
-        RouteOptions Create(FileRoute fileRoute);
+        RouteOptions Create(FileRoute fileRoute, FileGlobalConfiguration globalConfiguration);
     }
 }

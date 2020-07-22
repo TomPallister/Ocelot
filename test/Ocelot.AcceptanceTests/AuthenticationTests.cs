@@ -126,7 +126,7 @@ namespace Ocelot.AcceptanceTests
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
                 .BDDfy();
-        }
+        }        
 
         [Fact]
         public void should_return_response_401_using_identity_server_with_token_requested_for_other_api()
@@ -253,6 +253,97 @@ namespace Ocelot.AcceptanceTests
                 .And(x => _steps.GivenThePostHasContent("postContent"))
                 .When(x => _steps.WhenIPostUrlOnTheApiGateway("/"))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.Created))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_use_global_authentication_and_return_401_when_no_token()
+        {
+            int port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                   {
+                       new FileRoute
+                       {
+                           DownstreamPathTemplate = _downstreamServicePath,
+                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           {
+                               new FileHostAndPort
+                               {
+                                   Host =_downstreamServiceHost,
+                                   Port = port,
+                               },
+                           },
+                           DownstreamScheme = _downstreamServiceScheme,
+                           UpstreamPathTemplate = "/",
+                           UpstreamHttpMethod = new List<string> { "Get" },
+                       },
+                   },
+                GlobalConfiguration = new FileGlobalConfiguration
+                {
+                    AuthenticationOptions = new FileAuthenticationOptions
+                    {
+                        AuthenticationProviderKey = "Test",
+                    },
+                },
+            };
+
+            this.Given(x => x.GivenThereIsAnIdentityServerOn(_identityServerRootUrl, "api", "api2", AccessTokenType.Jwt))
+                .And(x => x.GivenThereIsAServiceRunningOn($"{_downstreamServiceUrl}{port}", 200, "Hello from Laura"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning(_options, "Test"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.Unauthorized))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_allow_anonymous_route_and_return_200_when_global_authentication_options_and_no_token()
+        {
+            int port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                   {
+                       new FileRoute
+                       {
+                           DownstreamPathTemplate = _downstreamServicePath,
+                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           {
+                               new FileHostAndPort
+                               {
+                                   Host =_downstreamServiceHost,
+                                   Port = port,
+                               },
+                           },
+                           DownstreamScheme = _downstreamServiceScheme,
+                           UpstreamPathTemplate = "/",
+                           UpstreamHttpMethod = new List<string> { "Get" },
+                           AuthenticationOptions = new FileAuthenticationOptions
+                           {
+                               AllowAnonymousForGlobalAuthenticationOptions = true,
+                           },
+                       },
+                   },
+                GlobalConfiguration = new FileGlobalConfiguration
+                {
+                    AuthenticationOptions = new FileAuthenticationOptions
+                    {
+                        AuthenticationProviderKey = "Test",
+                    },
+                },
+            };
+
+            this.Given(x => x.GivenThereIsAnIdentityServerOn(_identityServerRootUrl, "api", "api2", AccessTokenType.Jwt))
+                .And(x => x.GivenThereIsAServiceRunningOn($"{_downstreamServiceUrl}{port}", 200, "Hello from Laura"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning(_options, "Test"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
                 .BDDfy();
         }
 
