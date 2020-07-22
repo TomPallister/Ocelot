@@ -44,6 +44,61 @@ If a Route is authenticated Ocelot will invoke whatever scheme is associated wit
 
 If you want to configure AuthenticationOptions the same for all Routes, do it in GlobalConfiguration the same way as for Route. If there are AuthenticationOptions configured both for GlobalConfiguration and Route (AuthenticationProviderKey is set), the Route section has priority. If you want to exclude route from global AuthenticationOptions, you can do that by setting AllowAnonymousForGlobalAuthenticationOptions to true in the route AuthenticationOptions - then this route will not be authenticated.
 
+In the following example the first route will be authenticated with TestKeyGlobal provider key, the second one - with TestKey provider key, the others will not be authenticated.
+
+.. code-block:: json
+
+	"Routes": [
+		{
+			"DownstreamPathTemplate": "/abc",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "localhost",
+					"Port": 54001
+				}],
+			"UpstreamPathTemplate": "/abc",
+			"UpstreamHttpMethod": [ "Get" ]
+		},
+		{
+			"DownstreamPathTemplate": "/def",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+				{
+					"Host": "localhost",
+					"Port": 54001
+				}],
+			"UpstreamPathTemplate": "/def",
+			"UpstreamHttpMethod": [ "Get" ],
+			"AuthenticationOptions": {
+				"AuthenticationProviderKey": "TestKey",
+				"AllowedScopes": []
+			}
+		},
+		{
+			"DownstreamPathTemplate": "/{action}",
+			"DownstreamScheme": "http",
+			"DownstreamHostAndPorts": [
+			{
+				"Host": "localhost",
+				"Port": 54001
+			}],
+			"UpstreamPathTemplate": "/{action}",
+			"UpstreamHttpMethod": [ "Get" ],
+			"AuthenticationOptions": {
+				"AllowAnonymousForGlobalAuthenticationOptions": true
+			}
+		}
+	],
+	"GlobalConfiguration": {
+		"BaseUrl": "http://fake.test.com",
+		"AuthenticationOptions": {
+			"AuthenticationProviderKey": "TestKeyGlobal",
+			"AllowedScopes": []
+		}
+	}
+
+
 JWT Tokens
 ^^^^^^^^^^
 
