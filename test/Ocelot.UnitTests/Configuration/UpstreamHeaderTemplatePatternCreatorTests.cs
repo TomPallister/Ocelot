@@ -34,7 +34,7 @@ namespace Ocelot.UnitTests.Configuration
 
             this.Given(x => x.GivenTheFollowingFileRoute(fileRoute))
                 .When(x => x.WhenICreateTheTemplatePattern())
-                .Then(x => x.ThenTheFollowingIsReturned("country", "^(?i)any text {.+} and other {.+} and {.+} the end$"))
+                .Then(x => x.ThenTheFollowingIsReturned("country", "^(?i)any text (?<cc>.+) and other (?<version>.+) and (?<bob>.+) the end$"))
                 .BDDfy();
         }
 

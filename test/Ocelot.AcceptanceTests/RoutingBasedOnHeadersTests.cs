@@ -493,7 +493,7 @@ namespace Ocelot.AcceptanceTests
                     {
                         new FileRoute
                         {
-                            DownstreamPathTemplate = "/",
+                            DownstreamPathTemplate = "/{country_code}/{version}/{aa}",
                             DownstreamScheme = "http",
                             DownstreamHostAndPorts = new List<FileHostAndPort>
                             {
@@ -503,7 +503,7 @@ namespace Ocelot.AcceptanceTests
                                     Port = port,
                                 },
                             },
-                            UpstreamPathTemplate = "/",
+                            UpstreamPathTemplate = "/{aa}",
                             UpstreamHttpMethod = new List<string> { "Get" },
                             UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
@@ -513,11 +513,11 @@ namespace Ocelot.AcceptanceTests
                     },
             };
 
-            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/pl", 200, "Hello from Laura"))
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/pl/v1/bb", 200, "Hello from Laura"))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
                 .And(x => _steps.GivenIAddAHeader(headerName, "start_pl_version_v1_end"))
-                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/bb"))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
                 .BDDfy();
