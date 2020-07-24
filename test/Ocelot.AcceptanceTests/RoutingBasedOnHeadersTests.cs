@@ -482,7 +482,7 @@ namespace Ocelot.AcceptanceTests
         }
 
         [Fact]
-        public void should_match_one_header_value_with_placeholder()
+        public void should_match_header_and_url_placeholders()
         {
             var port = RandomPortFinder.GetRandomPort();
             var headerName = "country_code";
@@ -507,7 +507,7 @@ namespace Ocelot.AcceptanceTests
                             UpstreamHttpMethod = new List<string> { "Get" },
                             UpstreamHeaderTemplates = new Dictionary<string, string>()
                             {
-                                [headerName] = "start_{country_code}_version_{version}_end",
+                                [headerName] = "start_{header:country_code}_version_{header:version}_end",
                             },
                         },
                     },
@@ -518,6 +518,48 @@ namespace Ocelot.AcceptanceTests
                 .And(x => _steps.GivenOcelotIsRunning())
                 .And(x => _steps.GivenIAddAHeader(headerName, "start_pl_version_v1_end"))
                 .When(x => _steps.WhenIGetUrlOnTheApiGateway("/bb"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_match_header_with_braces()
+        {
+            var port = RandomPortFinder.GetRandomPort();
+            var headerName = "country_code";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/aa",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = "/",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
+                            {
+                                [headerName] = "my_{header}",
+                            },
+                        },
+                    },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/aa", 200, "Hello from Laura"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenIAddAHeader(headerName, "my_{header}"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
                 .BDDfy();

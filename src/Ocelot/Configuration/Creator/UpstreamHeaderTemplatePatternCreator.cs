@@ -11,7 +11,7 @@ namespace Ocelot.Configuration.Creator
         private const string RegExMatchOneOrMoreOfEverything = ".+";
         private const string RegExMatchEndString = "$";
         private const string RegExIgnoreCase = "(?i)";
-        private const string RegExPlaceholders = @"(\{.*?\})";
+        private const string RegExPlaceholders = @"(\{header:.*?\})";
 
         public Dictionary<string, UpstreamHeaderTemplate> Create(IRoute route)
         {
@@ -34,7 +34,7 @@ namespace Ocelot.Configuration.Creator
                 {
                     var indexOfPlaceholder = headerTemplateValue.IndexOf(placeholders[i]);
 
-                    var placeholderName = placeholders[i].Substring(1, placeholders[i].Length - 2); // remove { brackets
+                    var placeholderName = placeholders[i][8..^1]; // remove "{header:" and "}"
                     headerTemplateValue = headerTemplateValue.Replace(placeholders[i], "(?<"+placeholderName+">"+RegExMatchOneOrMoreOfEverything+")");                   
                 }
 
