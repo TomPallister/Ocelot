@@ -25,6 +25,12 @@
             var services = await _services();
             lock (_lock)
             {
+                if (services.Count < 1)
+                {
+                    //When the downstream service is not found, LeastConnection prompts Warn and RoundRobin throws an exception。eg:/favicon.ico
+                    return new ErrorResponse<ServiceHostAndPort>(new ServicesAreEmptyError($"services were empty for {httpContext.Request.Path}"));
+                }
+
                 if (_last >= services.Count)
                 {
                     _last = 0;
