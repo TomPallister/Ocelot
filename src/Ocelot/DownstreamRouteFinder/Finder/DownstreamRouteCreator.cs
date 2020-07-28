@@ -46,9 +46,6 @@
 
             var upstreamPathTemplate = new UpstreamPathTemplateBuilder().WithOriginalValue(upstreamUrlPath).Build();
 
-            //TODO
-            var upstreamHeaderTemplates = new Dictionary<string, UpstreamHeaderTemplate>();
-
             var downstreamRouteBuilder = new DownstreamRouteBuilder()
                 .WithServiceName(serviceName)
                 .WithLoadBalancerKey(loadBalancerKey)
@@ -59,8 +56,7 @@
                 .WithDownstreamScheme(configuration.DownstreamScheme)
                 .WithLoadBalancerOptions(configuration.LoadBalancerOptions)
                 .WithDownstreamHttpVersion(configuration.DownstreamHttpVersion)
-                .WithUpstreamPathTemplate(upstreamPathTemplate)
-                .WithUpstreamHeaders(upstreamHeaderTemplates);
+                .WithUpstreamPathTemplate(upstreamPathTemplate);
 
             var rateLimitOptions = configuration.Routes != null
                 ? configuration.Routes
@@ -81,7 +77,6 @@
                 .WithDownstreamRoute(downstreamRoute)
                 .WithUpstreamHttpMethod(new List<string>() { upstreamHttpMethod })
                 .WithUpstreamPathTemplate(upstreamPathTemplate)
-                .WithUpstreamHeaders(upstreamHeaderTemplates)
                 .Build();
 
             downstreamRouteHolder = new OkResponse<DownstreamRouteHolder>(new DownstreamRouteHolder(new List<PlaceholderNameAndValue>(), route));
