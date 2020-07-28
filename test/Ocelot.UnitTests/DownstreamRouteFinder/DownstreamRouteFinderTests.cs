@@ -15,6 +15,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
 {
     using Ocelot.DownstreamRouteFinder.HeaderMatcher;
     using System;
+    using System.Linq;
 
     public class DownstreamRouteFinderTests
     {
@@ -731,19 +732,21 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
             {
                 ["header1"] = "headerValue1",
                 ["header2"] = "headerValue2",
+                ["header3"] = "headerValue3",
             };
             var upstreamHeadersConfig = new Dictionary<string, UpstreamHeaderTemplate>()
             {
                 ["header1"] = new UpstreamHeaderTemplate("headerValue1", "headerValue1"),
                 ["header2"] = new UpstreamHeaderTemplate("headerValue2", "headerValue2"),
             };
+            var urlPlaceholders = new List<PlaceholderNameAndValue> { new PlaceholderNameAndValue("url", "urlValue") };
+            var headerPlaceholders = new List<PlaceholderNameAndValue> { new PlaceholderNameAndValue("header", "headerValue") };
 
             this.Given(x => x.GivenThereIsAnUpstreamUrlPath("matchInUrlMatcher/"))
                 .And(x => GivenTheUpstreamHeadersIs(upstreamHeaders))
                 .And(x => x.GivenTheTemplateVariableAndNameFinderReturns(
-                    new OkResponse<List<PlaceholderNameAndValue>>(
-                        new List<PlaceholderNameAndValue>())))
-                .And(x => x.GivenTheHeaderPlaceholderAndNameFinderReturns(new List<PlaceholderNameAndValue>()))
+                    new OkResponse<List<PlaceholderNameAndValue>>(urlPlaceholders)))
+                .And(x => x.GivenTheHeaderPlaceholderAndNameFinderReturns(headerPlaceholders))
                 .And(x => x.GivenTheConfigurationIs(new List<Route>
                     {
                         new RouteBuilder()
@@ -764,7 +767,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 .When(x => x.WhenICallTheFinder())
                 .Then(
                     x => x.ThenTheFollowingIsReturned(new DownstreamRouteHolder(
-                        new List<PlaceholderNameAndValue>(),
+                        urlPlaceholders.Union(headerPlaceholders).ToList(),
                         new RouteBuilder()
                             .WithDownstreamRoute(new DownstreamRouteBuilder()
                                 .WithDownstreamPathTemplate("someDownstreamPath")
