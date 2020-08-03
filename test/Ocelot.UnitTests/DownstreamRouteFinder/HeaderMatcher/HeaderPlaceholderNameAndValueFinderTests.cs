@@ -42,7 +42,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder.HeaderMatcher
         {
             var upstreamHeaderTemplates = new Dictionary<string, UpstreamHeaderTemplate>
             {
-                ["country"] = new UpstreamHeaderTemplate("^(?i)(?<countrycode>.+)$", "{jeader:countrycode}"),
+                ["country"] = new UpstreamHeaderTemplate("^(?i)(?<countrycode>.+)$", "{header:countrycode}"),
             };
             var upstreamHeaders = new Dictionary<string, string>
             {
