@@ -482,6 +482,147 @@ namespace Ocelot.AcceptanceTests
         }
 
         [Fact]
+        public void should_match_header_placeholder()
+        {
+            var port = RandomPortFinder.GetRandomPort();
+            var headerName = "Region";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/api.internal-{code}/products",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = "/products",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
+                            {
+                                [headerName] = "{header:code}",
+                            },
+                        },
+                    },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/api.internal-uk/products", 200, "Hello from UK"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenIAddAHeader(headerName, "uk"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/products"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from UK"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_match_header_placeholder_not_in_downstream_path()
+        {
+            var port = RandomPortFinder.GetRandomPort();
+            var headerName = "ProductName";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/products-info",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = "/products",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
+                            {
+                                [headerName] = "product-{header:everything}",
+                            },
+                        },
+                    },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/products-info", 200, "Hello from products"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenIAddAHeader(headerName, "product-Camera"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/products"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from products"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_distinguish_route_for_different_roles()
+        {
+            var port = RandomPortFinder.GetRandomPort();
+            var headerName = "Origin";
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/products-admin",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = "/products",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                            UpstreamHeaderTemplates = new Dictionary<string, string>()
+                            {
+                                [headerName] = "admin.xxx.com",
+                            },
+                        },
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = "/products",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = "/products",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                        },
+                    },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/products-admin", 200, "Hello from products admin"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .And(x => _steps.GivenIAddAHeader(headerName, "admin.xxx.com"))
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/products"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from products admin"))
+                .BDDfy();
+        }
+
+        [Fact]
         public void should_match_header_and_url_placeholders()
         {
             var port = RandomPortFinder.GetRandomPort();
