@@ -114,7 +114,7 @@ namespace Ocelot.Configuration
         public bool DangerousAcceptAnyServerCertificateValidator { get; }
         public SecurityOptions SecurityOptions { get; }
         public string DownstreamHttpMethod { get; }
-        public Version DownstreamHttpVersion { get;  }
+        public Version DownstreamHttpVersion { get; }
         public Dictionary<string, UpstreamHeaderTemplate> UpstreamHeaders { get; }
     }
 }

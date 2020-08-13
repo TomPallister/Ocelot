@@ -827,7 +827,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
                 .When(x => x.WhenICallTheFinder())
                 .Then(x => x.ThenAnErrorResponseIsReturned())
                 .BDDfy();
-        }        
+        }
 
         private void GivenTheUpstreamHostIs(string upstreamHost)
         {

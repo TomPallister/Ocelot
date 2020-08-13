@@ -19,7 +19,7 @@ namespace Ocelot.DownstreamRouteFinder.HeaderMatcher
                 var upstreamHeader = upstreamHeaders[templateHeader.Key];
                 var matches = templateHeader.Value.Pattern.Matches(upstreamHeader);
                 var placeholders = matches.SelectMany(g => g.Groups as IEnumerable<Group>).Where(g => g.Name != "0")
-                                          .Select(g => new PlaceholderNameAndValue("{"+g.Name+"}", g.Value));
+                                          .Select(g => new PlaceholderNameAndValue("{" + g.Name + "}", g.Value));
                 placeholderNameAndValuesList.AddRange(placeholders);
             }
 

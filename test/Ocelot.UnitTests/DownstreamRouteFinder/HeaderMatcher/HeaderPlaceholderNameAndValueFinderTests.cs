@@ -198,7 +198,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder.HeaderMatcher
         {
             _result.ShouldNotBeNull();
             _result.Count.ShouldBe(expected.Count);
-            _result.ForEach(x => expected.Any(e => e.Name == x.Name && e.Value == x.Value).ShouldBeTrue());                
+            _result.ForEach(x => expected.Any(e => e.Name == x.Name && e.Value == x.Value).ShouldBeTrue());
         }
     }
 }

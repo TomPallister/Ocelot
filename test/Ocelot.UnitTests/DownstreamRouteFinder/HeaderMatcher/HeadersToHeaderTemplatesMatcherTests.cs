@@ -151,7 +151,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder.HeaderMatcher
             };
 
             var templateHeaders = new Dictionary<string, UpstreamHeaderTemplate>()
-            {                
+            {
                 ["secondHeader"] = new UpstreamHeaderTemplate("^(?i)secondHeaderValue$", "secondHeaderValue"),
                 ["thirdHeader"] = new UpstreamHeaderTemplate("^(?i)thirdHeaderValue$", "thirdHeaderValue"),
                 ["anyHeader"] = new UpstreamHeaderTemplate("^(?i)anyHeaderValue$", "anyHeaderValue"),

@@ -137,6 +137,62 @@ If you do not set UpstreamHost on a Route then any host header will match it. Th
 
 This feature was requested as part of `Issue 216 <https://github.com/ThreeMammals/Ocelot/pull/216>`_ .
 
+Upstream Headers
+^^^^^^^^^^^^^^^^
+
+Additionally to routing by UpstreamPathTemplate, you can define UpstreamHeaderTemplates. Then to match a route, all the headers from this section must exist in the request headers.
+
+The example:
+
+.. code-block:: json
+
+    {
+        "DownstreamPathTemplate": "/",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+                {
+                    "Host": "10.0.10.1",
+                    "Port": 80,
+                }
+            ],
+        "UpstreamPathTemplate": "/",
+        "UpstreamHttpMethod": [ "Get" ],
+        "UpstreamHeaderTemplates": {
+            "country": "uk",
+            "version": "v1"
+        }
+    }
+
+In this case the route will be matched only if a request has both headers set to the configured values.
+
+You can use placeholders in your UpstreamHeaderTemplates in the following way:
+
+.. code-block:: json
+
+    {
+        "DownstreamPathTemplate": "/{versionnumber}/api",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+                {
+                    "Host": "10.0.10.1",
+                    "Port": 80,
+                }
+            ],
+        "UpstreamPathTemplate": "/api",
+        "UpstreamHttpMethod": [ "Get" ],
+        "UpstreamHeaderTemplates": {
+            "version": "{header:versionnumber}"
+        }
+    }
+
+In this case the whole value for the request header "version" will be placed into the DownstreamPathTemplate. If you need, you can specify more complex upstream header template with placeholders like e.g. "version-{header:version}_country-{header:country}".
+
+Placeholders do not have to exist in DownstreamPathTemplate. This case may be used to require specific header no matter what the value it contains.
+
+UpstreamHeaderTemplates section can be used also for Aggregates.
+
+This feature was requested in `Issue 360 <https://github.com/ThreeMammals/Ocelot/pull/360>`_ .
+
 Priority
 ^^^^^^^^
 

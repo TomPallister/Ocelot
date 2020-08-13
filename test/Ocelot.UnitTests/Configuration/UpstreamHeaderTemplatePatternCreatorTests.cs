@@ -1,4 +1,5 @@
-﻿using Ocelot.Configuration.Creator;
+﻿
+using Ocelot.Configuration.Creator;
 using Ocelot.Configuration.File;
 using Ocelot.Values;
 using Shouldly;
@@ -114,7 +115,7 @@ namespace Ocelot.UnitTests.Configuration
             {
                 UpstreamHeaderTemplates = new Dictionary<string, string>
                 {
-                    ["country"] = "any text {header:cc} and other {header:version} and {header:bob} the end",                    
+                    ["country"] = "any text {header:cc} and other {header:version} and {header:bob} the end",
                 },
             };
 

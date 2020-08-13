@@ -11,12 +11,12 @@ namespace Ocelot.DownstreamRouteFinder.Finder
     public class DownstreamRouteFinder : IDownstreamRouteProvider
     {
         private readonly IUrlPathToUrlTemplateMatcher _urlMatcher;
-        private readonly IPlaceholderNameAndValueFinder _placeholderNameAndValueFinder;        
+        private readonly IPlaceholderNameAndValueFinder _placeholderNameAndValueFinder;
         private readonly IHeadersToHeaderTemplatesMatcher _headersMatcher;
         private readonly IHeaderPlaceholderNameAndValueFinder _headerPlaceholderNameAndValueFinder;
 
         public DownstreamRouteFinder(
-            IUrlPathToUrlTemplateMatcher urlMatcher, 
+            IUrlPathToUrlTemplateMatcher urlMatcher,
             IPlaceholderNameAndValueFinder urlPathPlaceholderNameAndValueFinder,
             IHeadersToHeaderTemplatesMatcher headersMatcher,
             IHeaderPlaceholderNameAndValueFinder headerPlaceholderNameAndValueFinder
@@ -28,7 +28,7 @@ namespace Ocelot.DownstreamRouteFinder.Finder
             _headerPlaceholderNameAndValueFinder = headerPlaceholderNameAndValueFinder;
         }
 
-        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string httpMethod, 
+        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string httpMethod,
             IInternalConfiguration configuration, string upstreamHost, Dictionary<string, string> upstreamHeaders)
         {
             var downstreamRoutes = new List<DownstreamRouteHolder>();

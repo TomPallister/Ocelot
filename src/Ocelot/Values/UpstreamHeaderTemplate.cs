@@ -7,7 +7,7 @@ namespace Ocelot.Values
 {
     public class UpstreamHeaderTemplate
     {
-        public string Template { get; }        
+        public string Template { get; }
 
         public string OriginalValue { get; }
 
@@ -15,7 +15,7 @@ namespace Ocelot.Values
 
         public UpstreamHeaderTemplate(string template, string originalValue)
         {
-            Template = template;            
+            Template = template;
             OriginalValue = originalValue;
             Pattern = template == null ?
                 new Regex("$^", RegexOptions.Compiled | RegexOptions.Singleline) :

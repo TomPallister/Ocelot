@@ -9,7 +9,6 @@ namespace Ocelot.Configuration.Creator
     public class UpstreamHeaderTemplatePatternCreator : IUpstreamHeaderTemplatePatternCreator
     {
         private const string RegExMatchOneOrMoreOfEverything = ".+";
-        private const string RegExMatchEndString = "$";
         private const string RegExIgnoreCase = "(?i)";
         private const string RegExPlaceholders = @"(\{header:.*?\})";
 
@@ -25,9 +24,10 @@ namespace Ocelot.Configuration.Creator
 
                 Regex expression = new Regex(RegExPlaceholders);
                 MatchCollection matches = expression.Matches(headerTemplateValue);
+
                 if (matches.Count > 0)
                 {
-                    placeholders.AddRange(matches.Select(m => m.Groups[1].Value));               
+                    placeholders.AddRange(matches.Select(m => m.Groups[1].Value));
                 }
 
                 for (int i = 0; i < placeholders.Count; i++)
@@ -35,17 +35,17 @@ namespace Ocelot.Configuration.Creator
                     var indexOfPlaceholder = headerTemplateValue.IndexOf(placeholders[i]);
 
                     var placeholderName = placeholders[i][8..^1]; // remove "{header:" and "}"
-                    headerTemplateValue = headerTemplateValue.Replace(placeholders[i], "(?<"+placeholderName+">"+RegExMatchOneOrMoreOfEverything+")");                   
+                    headerTemplateValue = headerTemplateValue.Replace(placeholders[i], "(?<" + placeholderName + ">" + RegExMatchOneOrMoreOfEverything + ")");
                 }
 
                 var template = route.RouteIsCaseSensitive
-                ? $"^{headerTemplateValue}{RegExMatchEndString}"
-                : $"^{RegExIgnoreCase}{headerTemplateValue}{RegExMatchEndString}";
+                ? $"^{headerTemplateValue}$"
+                : $"^{RegExIgnoreCase}{headerTemplateValue}$";
 
                 resultHeaderTemplates.Add(headerTemplate.Key, new UpstreamHeaderTemplate(template, headerTemplate.Value));
             }
 
             return resultHeaderTemplates;
-        }        
+        }
     }
 }
