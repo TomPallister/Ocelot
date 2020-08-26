@@ -36,22 +36,19 @@ If you are using secured web sockets, use the "wss" scheme.
 
 .. code-block:: json
 
-   {
-  "ReRoutes": [
-    {
-      "DownstreamPathTemplate": "/{catchAll}",
-      "DownstreamScheme": "wss",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 50000
+       {
+            "DownstreamPathTemplate": "/wss",
+            "UpstreamPathTemplate": "/",
+            "DownstreamScheme": "wss",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 5001
+                }
+            ],
         }
-      ],
-      "UpstreamPathTemplate": "/gateway/{catchAll}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
-    }
- ]
-   }
+        
+
 
 With this configuration set Ocelot will match any websocket traffic that comes in on / and proxy it to localhost:5001/ws. To make this clearer Ocelot will receive messages from the upstream client, proxy these to the downstream service, receive messages from the downstream service and proxy these to the upstream client.
 
