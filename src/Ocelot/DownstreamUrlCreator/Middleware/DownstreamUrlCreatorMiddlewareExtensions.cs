@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Builder;
-using Ocelot.Middleware.Pipeline;
-
 namespace Ocelot.DownstreamUrlCreator.Middleware
 {
+    using Microsoft.AspNetCore.Builder;
+
     public static class DownstreamUrlCreatorMiddlewareExtensions
     {
-        public static IOcelotPipelineBuilder UseDownstreamUrlCreatorMiddleware(this IOcelotPipelineBuilder builder)
+        public static IApplicationBuilder UseDownstreamUrlCreatorMiddleware(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<DownstreamUrlCreatorMiddleware>();
         }

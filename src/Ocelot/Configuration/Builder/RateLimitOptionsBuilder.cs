@@ -7,7 +7,6 @@ namespace Ocelot.Configuration.Builder
     {
         private bool _enableRateLimiting;
         private string _clientIdHeader;
-        private List<string> _clientWhitelist;
         private Func<List<string>> _getClientWhitelist;
         private bool _disableRateLimitHeaders;
         private string _quotaExceededMessage;

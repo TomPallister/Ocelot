@@ -11,7 +11,7 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Ocelot" Version="5.5.1" />
-    <PackageReference Include="GraphQL" Version="2.0.0-alpha-870" />
+    <PackageReference Include="Ocelot" Version="14.0.9" />
+    <PackageReference Include="GraphQL" Version="2.4.0" />
   </ItemGroup>
 </Project>

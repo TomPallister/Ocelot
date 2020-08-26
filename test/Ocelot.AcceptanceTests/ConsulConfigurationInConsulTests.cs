@@ -39,9 +39,9 @@
 
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                     {
-                        new FileReRoute
+                        new FileRoute
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
@@ -61,6 +61,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -91,6 +92,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -101,9 +103,9 @@
 
             var consulConfig = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/status",
                         DownstreamScheme = "http",
@@ -123,6 +125,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -152,6 +155,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -162,9 +166,9 @@
 
             var consulConfig = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/status",
                         DownstreamScheme = "http",
@@ -184,6 +188,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -192,9 +197,9 @@
 
             var secondConsulConfig = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/status",
                         DownstreamScheme = "http",
@@ -214,6 +219,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider()
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }
@@ -255,9 +261,9 @@
 
             var consulConfig = new FileConfiguration
             {
-                DynamicReRoutes = new List<FileDynamicReRoute>
+                DynamicRoutes = new List<FileDynamicRoute>
                 {
-                    new FileDynamicReRoute
+                    new FileDynamicRoute
                     {
                         ServiceName = serviceName,
                         RateLimitRule = new FileRateLimitRule()
@@ -274,6 +280,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     },
@@ -295,6 +302,7 @@
                 {
                     ServiceDiscoveryProvider = new FileServiceDiscoveryProvider
                     {
+                        Scheme = "http",
                         Host = "localhost",
                         Port = consulPort
                     }

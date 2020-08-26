@@ -66,7 +66,7 @@ namespace Ocelot.UnitTests.Configuration.Validation
 
         private void ThenTheErrorIs()
         {
-            _result.Errors[0].ErrorMessage.ShouldBe("Unable to start Ocelot because either a ReRoute or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?");
+            _result.Errors[0].ErrorMessage.ShouldBe("Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?");
         }
 
         private void ThenTheResultIsInValid()

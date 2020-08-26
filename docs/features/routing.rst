@@ -1,21 +1,19 @@
 Routing
 =======
 
-Ocelot's primary functionality is to take incoming http requests and forward them on
-to a downstream service. Ocelot currently only supports this in the form of another http request (in the future
+Ocelot's primary functionality is to take incoming http requests and forward them on to a downstream service. Ocelot currently only supports this in the form of another http request (in the future
 this could be any transport mechanism). 
 
-Ocelot's describes the routing of one request to another as a ReRoute. In order to get 
-anything working in Ocelot you need to set up a ReRoute in the configuration.
+Ocelot's describes the routing of one request to another as a Route. In order to get anything working in Ocelot you need to set up a Route in the configuration.
 
 .. code-block:: json
 
     {
-        "ReRoutes": [
+        "Routes": [
         ]
     }
 
-To configure a ReRoute you need to add one to the ReRoutes json array.
+To configure a Route you need to add one to the Routes json array.
 
 .. code-block:: json
 
@@ -34,16 +32,13 @@ To configure a ReRoute you need to add one to the ReRoutes json array.
 
 The DownstreamPathTemplate, DownstreamScheme and DownstreamHostAndPorts define the URL that a request will be forwarded to. 
 
-DownstreamHostAndPorts is a collection that defines the host and port of any downstream services that you wish to forward requests to. 
-Usually this will just contain a single entry but sometimes you might want to load balance requests to your downstream services and Ocelot allows you add more than one entry and then select a load balancer.
+DownstreamHostAndPorts is a collection that defines the host and port of any downstream services that you wish to forward requests to. Usually this will just contain a single entry but sometimes you might want to load balance requests to your downstream services and Ocelot allows you add more than one entry and then select a load balancer.
 
-The UpstreamPathTemplate is the URL that Ocelot will use to identify which DownstreamPathTemplate to use for a given request. 
-The UpstreamHttpMethod is used so Ocelot can distinguish between requests with different HTTP verbs to the same URL. You can set a specific list of HTTP Methods or set an empty list to allow any of them. 
+The UpstreamPathTemplate is the URL that Ocelot will use to identify which DownstreamPathTemplate to use for a given request. The UpstreamHttpMethod is used so Ocelot can distinguish between requests with different HTTP verbs to the same URL. You can set a specific list of HTTP Methods or set an empty list to allow any of them. 
 
-In Ocelot you can add placeholders for variables to your Templates in the form of {something}.
-The placeholder variable needs to be present in both the DownstreamPathTemplate and UpstreamPathTemplate properties. When it is Ocelot will attempt to substitute the value in the UpstreamPathTemplate placeholder into the DownstreamPathTemplate for each request Ocelot processes.
+In Ocelot you can add placeholders for variables to your Templates in the form of {something}. The placeholder variable needs to be present in both the DownstreamPathTemplate and UpstreamPathTemplate properties. When it is Ocelot will attempt to substitute the value in the UpstreamPathTemplate placeholder into the DownstreamPathTemplate for each request Ocelot processes.
 
-You can also do a catch all type of ReRoute e.g. 
+You can also do a catch all type of Route e.g. 
 
 .. code-block:: json
 
@@ -65,11 +60,11 @@ This will forward any path + query string combinations to the downstream service
 
 The default ReRouting configuration is case insensitive!
 
-In order to change this you can specify on a per ReRoute basis the following setting.
+In order to change this you can specify on a per Route basis the following setting.
 
 .. code-block:: json
 
-    "ReRouteIsCaseSensitive": true
+    "RouteIsCaseSensitive": true
 
 This means that when Ocelot tries to match the incoming upstream url with an upstream template the
 evaluation will be case sensitive. 
@@ -96,7 +91,7 @@ If you set up your config like below, all requests will be proxied straight thro
         "UpstreamHttpMethod": [ "Get" ]
     }
 
-The catch all has a lower priority than any other ReRoute. If you also have the ReRoute below in your config then Ocelot would match it before the catch all. 
+The catch all has a lower priority than any other Route. If you also have the Route below in your config then Ocelot would match it before the catch all. 
 
 .. code-block:: json
 
@@ -116,7 +111,7 @@ The catch all has a lower priority than any other ReRoute. If you also have the 
 Upstream Host 
 ^^^^^^^^^^^^^
 
-This feature allows you to have ReRoutes based on the upstream host. This works by looking at the host header the client has used and then using this as part of the information we use to identify a ReRoute.
+This feature allows you to have Routes based on the upstream host. This works by looking at the host header the client has used and then using this as part of the information we use to identify a Route.
 
 In order to use this feature please add the following to your config.
 
@@ -136,16 +131,16 @@ In order to use this feature please add the following to your config.
         "UpstreamHost": "somedomain.com"
     }
 
-The ReRoute above will only be matched when the host header value is somedomain.com.
+The Route above will only be matched when the host header value is somedomain.com.
 
-If you do not set UpstreamHost on a ReRoute then any host header will match it. This means that if you have two ReRoutes that are the same, apart from the UpstreamHost, where one is null and the other set Ocelot will favour the one that has been set. 
+If you do not set UpstreamHost on a Route then any host header will match it. This means that if you have two Routes that are the same, apart from the UpstreamHost, where one is null and the other set Ocelot will favour the one that has been set. 
 
 This feature was requested as part of `Issue 216 <https://github.com/ThreeMammals/Ocelot/pull/216>`_ .
 
 Priority
 ^^^^^^^^
 
-You can define the order you want your ReRoutes to match the Upstream HttpRequest by including a "Priority" property in ocelot.json
+You can define the order you want your Routes to match the Upstream HttpRequest by including a "Priority" property in ocelot.json
 See `Issue 270 <https://github.com/ThreeMammals/Ocelot/pull/270>`_ for reference
 
 .. code-block:: json
@@ -154,8 +149,7 @@ See `Issue 270 <https://github.com/ThreeMammals/Ocelot/pull/270>`_ for reference
         "Priority": 0
     }
 
-0 is the lowest priority, Ocelot will always use 0 for /{catchAll} ReRoutes and this is still hardcoded. After that you are free
-to set any priority you wish.
+0 is the lowest priority, Ocelot will always use 0 for /{catchAll} Routes and this is still hardcoded. After that you are free to set any priority you wish.
 
 e.g. you could have
 
@@ -175,15 +169,14 @@ and
         "Priority": 1
     }
 
-In the example above if you make a request into Ocelot on /goods/delete Ocelot will match /goods/delete ReRoute. Previously it would have
-matched /goods/{catchAll} (because this is the first ReRoute in the list!).
+In the example above if you make a request into Ocelot on /goods/delete Ocelot will match /goods/delete Route. Previously it would have matched /goods/{catchAll} (because this is the first Route in the list!).
 
 Dynamic Routing
 ^^^^^^^^^^^^^^^
 
 This feature was requested in `issue 340 <https://github.com/ThreeMammals/Ocelot/issues/340>`_. 
 
-The idea is to enable dynamic routing when using a service discovery provider so you don't have to provide the ReRoute config. See the docs :ref:`service-discovery` if 
+The idea is to enable dynamic routing when using a service discovery provider so you don't have to provide the Route config. See the docs :ref:`service-discovery` if 
 this sounds interesting to you.
 
 Query Strings
@@ -194,7 +187,7 @@ Ocelot allows you to specify a query string as part of the DownstreamPathTemplat
 .. code-block:: json
 
     {
-        "ReRoutes": [
+        "Routes": [
             {
                 "DownstreamPathTemplate": "/api/subscriptions/{subscriptionId}/updates?unitId={unitId}",
                 "UpstreamPathTemplate": "/api/units/{subscriptionId}/{unitId}/updates",
@@ -221,7 +214,7 @@ Ocelot will also allow you to put query string parameters in the UpstreamPathTem
 .. code-block:: json
 
     {
-        "ReRoutes": [
+        "Routes": [
             {
                 "DownstreamPathTemplate": "/api/units/{subscriptionId}/{unitId}/updates",
                 "UpstreamPathTemplate": "/api/subscriptions/{subscriptionId}/updates?unitId={unitId}",

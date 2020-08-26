@@ -47,9 +47,18 @@ namespace Ocelot.UnitTests.Responder
 
         [Theory]
         [InlineData(OcelotErrorCode.UnableToCompleteRequestError)]
+        [InlineData(OcelotErrorCode.CouldNotFindLoadBalancerCreator)]
+        [InlineData(OcelotErrorCode.ErrorInvokingLoadBalancerCreator)]
         public void should_return_internal_server_error(OcelotErrorCode errorCode)
         {
             ShouldMapErrorToStatusCode(errorCode, HttpStatusCode.InternalServerError);
+        }
+
+        [Theory]
+        [InlineData(OcelotErrorCode.ConnectionToDownstreamServiceError)]
+        public void should_return_bad_gateway_error(OcelotErrorCode errorCode)
+        {
+            ShouldMapErrorToStatusCode(errorCode, HttpStatusCode.BadGateway);
         }
 
         [Theory]
@@ -113,7 +122,7 @@ namespace Ocelot.UnitTests.Responder
             var errors = new List<OcelotErrorCode>
             {
                 OcelotErrorCode.CannotAddDataError,
-                OcelotErrorCode.RequestTimedOutError
+                OcelotErrorCode.RequestTimedOutError,
             };
 
             ShouldMapErrorsToStatusCode(errors, HttpStatusCode.ServiceUnavailable);
@@ -125,7 +134,7 @@ namespace Ocelot.UnitTests.Responder
             // If this test fails then it's because the number of error codes has changed.
             // You should make the appropriate changes to the test cases here to ensure
             // they cover all the error codes, and then modify this assertion.
-            Enum.GetNames(typeof(OcelotErrorCode)).Length.ShouldBe(38, "Looks like the number of error codes has changed. Do you need to modify ErrorsToHttpStatusCodeMapper?");
+            Enum.GetNames(typeof(OcelotErrorCode)).Length.ShouldBe(41, "Looks like the number of error codes has changed. Do you need to modify ErrorsToHttpStatusCodeMapper?");
         }
 
         private void ShouldMapErrorToStatusCode(OcelotErrorCode errorCode, HttpStatusCode expectedHttpStatusCode)

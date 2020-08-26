@@ -51,7 +51,7 @@ Please note this project never goes out to another service, it just gets the dat
 
 ```json
 {
-    "ReRoutes": [
+    "Routes": [
         {
             "DownstreamPathTemplate": "/graphql",
             "DownstreamScheme": "http",

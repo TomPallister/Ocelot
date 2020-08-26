@@ -3,7 +3,7 @@ HTTP Method Transformation
 
 Ocelot allows the user to change the HTTP request method that will be used when making a request to a downstream service.
 
-This achieved by setting the following ReRoute configuration:
+This achieved by setting the following Route configuration:
 
 .. code-block:: json
 
@@ -23,6 +23,6 @@ This achieved by setting the following ReRoute configuration:
         ],
     }
 
-The key property here is DownstreamHttpMethod which is set as POST and the ReRoute will only match on GET as set by UpstreamHttpMethod.
+The key property here is DownstreamHttpMethod which is set as POST and the Route will only match on GET as set by UpstreamHttpMethod.
 
 This feature can be useful when interacting with downstream apis that only support POST and you want to present some kind of RESTful interface.

@@ -25,6 +25,7 @@
         private readonly string _serviceName;
         private readonly int _port;
         private readonly string _consulHost;
+        private readonly string _consulScheme;
         private readonly string _fakeConsulServiceDiscoveryUrl;
         private List<Service> _services;
         private readonly Mock<IOcelotLoggerFactory> _factory;
@@ -37,14 +38,15 @@
             _serviceName = "test";
             _port = 8500;
             _consulHost = "localhost";
-            _fakeConsulServiceDiscoveryUrl = $"http://{_consulHost}:{_port}";
+            _consulScheme = "http";
+            _fakeConsulServiceDiscoveryUrl = $"{_consulScheme}://{_consulHost}:{_port}";
             _serviceEntries = new List<ServiceEntry>();
             _factory = new Mock<IOcelotLoggerFactory>();
             _clientFactory = new ConsulClientFactory();
             _logger = new Mock<IOcelotLogger>();
             _factory.Setup(x => x.CreateLogger<Consul>()).Returns(_logger.Object);
             _factory.Setup(x => x.CreateLogger<PollConsul>()).Returns(_logger.Object);
-            var config = new ConsulRegistryConfiguration(_consulHost, _port, _serviceName, null);
+            var config = new ConsulRegistryConfiguration(_consulScheme, _consulHost, _port, _serviceName, null);
             _provider = new Consul(config, _factory.Object, _clientFactory);
         }
 
@@ -74,7 +76,7 @@
         public void should_use_token()
         {
             var token = "test token";
-            var config = new ConsulRegistryConfiguration(_consulHost, _port, _serviceName, token);
+            var config = new ConsulRegistryConfiguration(_consulScheme, _consulHost, _port, _serviceName, token);
             _provider = new Consul(config, _factory.Object, _clientFactory);
 
             var serviceEntryOne = new ServiceEntry()

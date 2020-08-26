@@ -8,6 +8,7 @@ namespace Ocelot.Configuration.Creator
         public ServiceProviderConfiguration Create(FileGlobalConfiguration globalConfiguration)
         {
             var port = globalConfiguration?.ServiceDiscoveryProvider?.Port ?? 0;
+            var scheme = globalConfiguration?.ServiceDiscoveryProvider?.Scheme ?? "http";
             var host = globalConfiguration?.ServiceDiscoveryProvider?.Host ?? "localhost";
             var type = !string.IsNullOrEmpty(globalConfiguration?.ServiceDiscoveryProvider?.Type)
                 ? globalConfiguration?.ServiceDiscoveryProvider?.Type
@@ -16,6 +17,7 @@ namespace Ocelot.Configuration.Creator
             var k8snamespace = globalConfiguration?.ServiceDiscoveryProvider?.Namespace ?? string.Empty;
 
             return new ServiceProviderConfigurationBuilder()
+                .WithScheme(scheme)
                 .WithHost(host)
                 .WithPort(port)
                 .WithType(type)

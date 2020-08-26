@@ -74,9 +74,9 @@
                 GlobalConfiguration = new FileGlobalConfiguration
                 {
                 },
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -91,7 +91,7 @@
                         UpstreamHttpMethod = new List<string> { "get" },
                         UpstreamPathTemplate = "/"
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -141,9 +141,9 @@
 
             var updatedConfiguration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>()
+                Routes = new List<FileRoute>()
                 {
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -158,7 +158,7 @@
                         UpstreamHttpMethod = new List<string> { "get" },
                         UpstreamPathTemplate = "/"
                     },
-                    new FileReRoute()
+                    new FileRoute()
                     {
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
@@ -226,7 +226,7 @@
 
                         var okResult = JsonConvert.DeserializeObject<OkResponse<UpdateFileConfiguration>>(content);
 
-                        if (okResult.Command.Configuration.ReRoutes.Count == 2)
+                        if (okResult.Command.Configuration.Routes.Count == 2)
                         {
                             return true;
                         }
@@ -280,20 +280,20 @@
                         response.GlobalConfiguration.ServiceDiscoveryProvider.Host.ShouldBe(expecteds.Configuration.GlobalConfiguration.ServiceDiscoveryProvider.Host);
                         response.GlobalConfiguration.ServiceDiscoveryProvider.Port.ShouldBe(expecteds.Configuration.GlobalConfiguration.ServiceDiscoveryProvider.Port);
 
-                        for (var i = 0; i < response.ReRoutes.Count; i++)
+                        for (var i = 0; i < response.Routes.Count; i++)
                         {
-                            for (var j = 0; j < response.ReRoutes[i].DownstreamHostAndPorts.Count; j++)
+                            for (var j = 0; j < response.Routes[i].DownstreamHostAndPorts.Count; j++)
                             {
-                                var res = response.ReRoutes[i].DownstreamHostAndPorts[j];
-                                var expected = expecteds.Configuration.ReRoutes[i].DownstreamHostAndPorts[j];
+                                var res = response.Routes[i].DownstreamHostAndPorts[j];
+                                var expected = expecteds.Configuration.Routes[i].DownstreamHostAndPorts[j];
                                 res.Host.ShouldBe(expected.Host);
                                 res.Port.ShouldBe(expected.Port);
                             }
 
-                            response.ReRoutes[i].DownstreamPathTemplate.ShouldBe(expecteds.Configuration.ReRoutes[i].DownstreamPathTemplate);
-                            response.ReRoutes[i].DownstreamScheme.ShouldBe(expecteds.Configuration.ReRoutes[i].DownstreamScheme);
-                            response.ReRoutes[i].UpstreamPathTemplate.ShouldBe(expecteds.Configuration.ReRoutes[i].UpstreamPathTemplate);
-                            response.ReRoutes[i].UpstreamHttpMethod.ShouldBe(expecteds.Configuration.ReRoutes[i].UpstreamHttpMethod);
+                            response.Routes[i].DownstreamPathTemplate.ShouldBe(expecteds.Configuration.Routes[i].DownstreamPathTemplate);
+                            response.Routes[i].DownstreamScheme.ShouldBe(expecteds.Configuration.Routes[i].DownstreamScheme);
+                            response.Routes[i].UpstreamPathTemplate.ShouldBe(expecteds.Configuration.Routes[i].UpstreamPathTemplate);
+                            response.Routes[i].UpstreamHttpMethod.ShouldBe(expecteds.Configuration.Routes[i].UpstreamHttpMethod);
                         }
 
                         passed++;

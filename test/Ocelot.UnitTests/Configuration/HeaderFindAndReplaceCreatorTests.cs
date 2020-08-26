@@ -16,7 +16,7 @@ namespace Ocelot.UnitTests.Configuration
     public class HeaderFindAndReplaceCreatorTests
     {
         private HeaderFindAndReplaceCreator _creator;
-        private FileReRoute _reRoute;
+        private FileRoute _route;
         private HeaderTransformations _result;
         private Mock<IPlaceholders> _placeholders;
         private Mock<IOcelotLoggerFactory> _factory;
@@ -34,7 +34,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_create()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 UpstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -60,7 +60,7 @@ namespace Ocelot.UnitTests.Configuration
                 new HeaderFindAndReplace("Bop", "e", "r", 0)
             };
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .When(x => WhenICreate())
                 .Then(x => ThenTheFollowingUpstreamIsReturned(upstream))
                 .Then(x => ThenTheFollowingDownstreamIsReturned(downstream))
@@ -73,7 +73,7 @@ namespace Ocelot.UnitTests.Configuration
             const string key = "X-Forwarded-For";
             const string value = "{RemoteIpAddress}";
 
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 UpstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -83,7 +83,7 @@ namespace Ocelot.UnitTests.Configuration
 
             var expected = new AddHeader(key, value);
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .When(x => WhenICreate())
                 .Then(x => ThenTheFollowingAddHeaderToUpstreamIsReturned(expected))
                 .BDDfy();
@@ -92,7 +92,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_use_base_url_placeholder()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 DownstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -105,7 +105,7 @@ namespace Ocelot.UnitTests.Configuration
                 new HeaderFindAndReplace("Location", "http://www.bbc.co.uk/", "http://ocelot.com/", 0),
             };
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .And(x => GivenTheBaseUrlIs("http://ocelot.com/"))
                 .When(x => WhenICreate())
                 .Then(x => ThenTheFollowingDownstreamIsReturned(downstream))
@@ -115,7 +115,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_log_errors_and_not_add_headers()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 DownstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -131,7 +131,7 @@ namespace Ocelot.UnitTests.Configuration
             {
             };
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .And(x => GivenTheBaseUrlErrors())
                 .When(x => WhenICreate())
                 .Then(x => ThenTheFollowingDownstreamIsReturned(expected))
@@ -149,7 +149,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_use_base_url_partial_placeholder()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 DownstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -162,7 +162,7 @@ namespace Ocelot.UnitTests.Configuration
                 new HeaderFindAndReplace("Location", "http://www.bbc.co.uk/pay", "http://ocelot.com/pay", 0),
             };
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .And(x => GivenTheBaseUrlIs("http://ocelot.com/"))
                 .When(x => WhenICreate())
                 .Then(x => ThenTheFollowingDownstreamIsReturned(downstream))
@@ -172,7 +172,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_add_trace_id_header()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 DownstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -182,7 +182,7 @@ namespace Ocelot.UnitTests.Configuration
 
             var expected = new AddHeader("Trace-Id", "{TraceId}");
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .And(x => GivenTheBaseUrlIs("http://ocelot.com/"))
                 .When(x => WhenICreate())
                 .Then(x => ThenTheFollowingAddHeaderToDownstreamIsReturned(expected))
@@ -192,7 +192,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_add_downstream_header_as_is_when_no_replacement_is_given()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 DownstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -202,7 +202,7 @@ namespace Ocelot.UnitTests.Configuration
 
             var expected = new AddHeader("X-Custom-Header", "Value");
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .And(x => WhenICreate())
                 .Then(x => x.ThenTheFollowingAddHeaderToDownstreamIsReturned(expected))
                 .BDDfy();
@@ -211,7 +211,7 @@ namespace Ocelot.UnitTests.Configuration
         [Fact]
         public void should_add_upstream_header_as_is_when_no_replacement_is_given()
         {
-            var reRoute = new FileReRoute
+            var route = new FileRoute
             {
                 UpstreamHeaderTransform = new Dictionary<string, string>
                 {
@@ -221,7 +221,7 @@ namespace Ocelot.UnitTests.Configuration
 
             var expected = new AddHeader("X-Custom-Header", "Value");
 
-            this.Given(x => GivenTheReRoute(reRoute))
+            this.Given(x => GivenTheRoute(route))
                 .And(x => WhenICreate())
                 .Then(x => x.ThenTheFollowingAddHeaderToUpstreamIsReturned(expected))
                 .BDDfy();
@@ -264,14 +264,14 @@ namespace Ocelot.UnitTests.Configuration
             }
         }
 
-        private void GivenTheReRoute(FileReRoute reRoute)
+        private void GivenTheRoute(FileRoute route)
         {
-            _reRoute = reRoute;
+            _route = route;
         }
 
         private void WhenICreate()
         {
-            _result = _creator.Create(_reRoute);
+            _result = _creator.Create(_route);
         }
 
         private void ThenTheFollowingUpstreamIsReturned(List<HeaderFindAndReplace> expecteds)

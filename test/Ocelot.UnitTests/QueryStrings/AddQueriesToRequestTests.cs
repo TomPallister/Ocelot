@@ -186,7 +186,7 @@ namespace Ocelot.UnitTests.QueryStrings
         private class AnyError : Error
         {
             public AnyError()
-                : base("blahh", OcelotErrorCode.UnknownError)
+                : base("blahh", OcelotErrorCode.UnknownError, 404)
             {
             }
         }

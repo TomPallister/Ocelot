@@ -43,9 +43,9 @@ namespace Ocelot.IntegrationTests
         {
             var configuration = new FileConfiguration
             {
-                ReRoutes = new List<FileReRoute>
+                Routes = new List<FileRoute>
                 {
-                    new FileReRoute
+                    new FileRoute
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
@@ -161,7 +161,7 @@ namespace Ocelot.IntegrationTests
             text = File.ReadAllText(configurationPath);
         }
 
-        public async Task WhenIGetUrlOnTheApiGateway(string url)
+        private async Task WhenIGetUrlOnTheApiGateway(string url)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             _response = await _httpClient.SendAsync(request);

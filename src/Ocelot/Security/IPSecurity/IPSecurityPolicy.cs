@@ -1,17 +1,17 @@
-﻿using Ocelot.Configuration;
-using Ocelot.Middleware;
-using Ocelot.Responses;
-using System.Net;
-using System.Threading.Tasks;
-
-namespace Ocelot.Security.IPSecurity
+﻿namespace Ocelot.Security.IPSecurity
 {
+    using Microsoft.AspNetCore.Http;
+    using Ocelot.Configuration;
+    using Ocelot.Middleware;
+    using Ocelot.Responses;
+    using System.Threading.Tasks;
+
     public class IPSecurityPolicy : ISecurityPolicy
     {
-        public async Task<Response> Security(DownstreamContext context)
+        public async Task<Response> Security(DownstreamRoute downstreamRoute, HttpContext httpContext)
         {
-            IPAddress clientIp = context.HttpContext.Connection.RemoteIpAddress;
-            SecurityOptions securityOptions = context.DownstreamReRoute.SecurityOptions;
+            var clientIp = httpContext.Connection.RemoteIpAddress;
+            var securityOptions = downstreamRoute.SecurityOptions;
             if (securityOptions == null)
             {
                 return new OkResponse();

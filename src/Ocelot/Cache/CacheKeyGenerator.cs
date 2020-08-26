@@ -1,18 +1,18 @@
-﻿using Ocelot.Middleware;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ocelot.Cache
+﻿namespace Ocelot.Cache
 {
+    using Ocelot.Request.Middleware;
+    using System.Text;
+    using System.Threading.Tasks;
+
     public class CacheKeyGenerator : ICacheKeyGenerator
     {
-        public string GenerateRequestCacheKey(DownstreamContext context)
+        public string GenerateRequestCacheKey(DownstreamRequest downstreamRequest)
         {
             string hashedContent = null;
-            StringBuilder downStreamUrlKeyBuilder = new StringBuilder($"{context.DownstreamRequest.Method}-{context.DownstreamRequest.OriginalString}");
-            if (context.DownstreamRequest.Content != null)
+            StringBuilder downStreamUrlKeyBuilder = new StringBuilder($"{downstreamRequest.Method}-{downstreamRequest.OriginalString}");
+            if (downstreamRequest.Content != null)
             {
-                string requestContentString = Task.Run(async () => await context.DownstreamRequest.Content.ReadAsStringAsync()).Result;
+                string requestContentString = Task.Run(async () => await downstreamRequest.Content.ReadAsStringAsync()).Result;
                 downStreamUrlKeyBuilder.Append(requestContentString);
             }
 

@@ -6,6 +6,6 @@ namespace Ocelot.Requester.QoS
 
     public interface IQoSFactory
     {
-        Response<DelegatingHandler> Get(DownstreamReRoute request);
+        Response<DelegatingHandler> Get(DownstreamRoute request);
     }
 }

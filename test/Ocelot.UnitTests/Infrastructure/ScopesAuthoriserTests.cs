@@ -116,7 +116,7 @@ namespace Ocelot.UnitTests.Infrastructure
 
     public class FakeError : Error
     {
-        public FakeError() : base("fake error", OcelotErrorCode.CannotAddDataError)
+        public FakeError() : base("fake error", OcelotErrorCode.CannotAddDataError, 404)
         {
         }
     }
