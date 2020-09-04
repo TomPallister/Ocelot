@@ -1,4 +1,5 @@
 using Ocelot.Responses;
+using System;
 using System.Collections.Generic;
 
 namespace Ocelot.DownstreamRouteFinder.UrlMatcher
@@ -66,6 +67,32 @@ namespace Ocelot.DownstreamRouteFinder.UrlMatcher
                         var placeholderValue = GetPlaceholderValue(pathTemplate, query, placeholderName, path, counterForPath + 1, '?');
                         placeHolderNameAndValues.Add(new PlaceholderNameAndValue(placeholderName, placeholderValue));
                     }
+
+                    counterForTemplate = endOfPlaceholder;
+                }
+                else if (TemplateDoesNotEndInForwardSlash(pathTemplate) && IsLastPlaceholder(path, counterForPath, pathTemplate))
+                {
+                    //should_find_multiple_query_string make test pass
+                    if (PassedQueryString(pathTemplate, counterForTemplate))
+                    {
+                        delimiter = '&';
+                        nextDelimiter = '&';
+                    }
+
+                    //should_find_multiple_query_string_and_path makes test pass
+                    if (NotPassedQueryString(pathTemplate, counterForTemplate) && NoMoreForwardSlash(pathTemplate, counterForTemplate))
+                    {
+                        delimiter = '?';
+                        nextDelimiter = '?';
+                    }
+
+                    var placeholderName = GetPlaceholderName(pathTemplate, counterForTemplate);
+
+                    var placeholderValue = GetPlaceholderValue(pathTemplate, query, placeholderName, path, counterForPath, delimiter);
+
+                    placeHolderNameAndValues.Add(new PlaceholderNameAndValue(placeholderName, placeholderValue));
+
+                    var endOfPlaceholder = GetNextCounterPosition(pathTemplate, counterForTemplate, '}');
 
                     counterForTemplate = endOfPlaceholder;
                 }
@@ -145,6 +172,17 @@ namespace Ocelot.DownstreamRouteFinder.UrlMatcher
         private bool IsPlaceholder(char character)
         {
             return character == '{';
+        }
+
+        private bool IsLastPlaceholder(string path, int counterForPath, string pathTemplate)
+        {
+            return path.Length <= counterForPath && pathTemplate.Length > 1 && pathTemplate.Substring(counterForPath, 2) == "/{" 
+                && pathTemplate.IndexOf('}') == pathTemplate.Length - 1;
+        }
+
+        private bool TemplateDoesNotEndInForwardSlash(string pathTemplate)
+        {
+            return !pathTemplate.EndsWith('/');
         }
     }
 }
