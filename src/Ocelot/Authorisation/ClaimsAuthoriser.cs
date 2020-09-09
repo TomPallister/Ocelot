@@ -70,6 +70,13 @@
                     else
                     {
                         // static claim
+                        
+                        //if required value is not specified
+                        if (string.IsNullOrEmpty(required.Value))
+                        {
+                            continue;
+                        }
+                        
                         var authorised = values.Data.Contains(required.Value);
                         if (!authorised)
                         {
