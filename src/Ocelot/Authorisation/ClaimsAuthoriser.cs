@@ -1,4 +1,6 @@
-﻿namespace Ocelot.Authorisation
+﻿using System;
+
+namespace Ocelot.Authorisation
 {
     using Ocelot.Infrastructure.Claims.Parser;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
@@ -11,6 +13,7 @@
     public class ClaimsAuthoriser : IClaimsAuthoriser
     {
         private readonly IClaimsParser _claimsParser;
+        private readonly Regex _regexAuthorize = new Regex(@"^{(?<variable>.+)}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
         public ClaimsAuthoriser(IClaimsParser claimsParser)
         {
@@ -35,7 +38,7 @@
                 if (values.Data != null)
                 {
                     // dynamic claim
-                    var match = Regex.Match(required.Value, @"^{(?<variable>.+)}$");
+                    var match = _regexAuthorize.Match(required.Value);
                     if (match.Success)
                     {
                         var variableName = match.Captures[0].Value;

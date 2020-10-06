@@ -1,9 +1,11 @@
+using System;
 using System.Text.RegularExpressions;
 
 namespace Ocelot.Values
 {
     public class UpstreamPathTemplate
     {
+        private static readonly Regex _reg = new Regex("$^", RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100));
         public UpstreamPathTemplate(string template, int priority, bool containsQueryString, string originalValue)
         {
             Template = template;
@@ -11,8 +13,8 @@ namespace Ocelot.Values
             ContainsQueryString = containsQueryString;
             OriginalValue = originalValue;
             Pattern = template == null ?
-                new Regex("$^", RegexOptions.Compiled | RegexOptions.Singleline) :
-                new Regex(template, RegexOptions.Compiled | RegexOptions.Singleline);
+                _reg :
+                new Regex(template, RegexOptions.Compiled | RegexOptions.Singleline, TimeSpan.FromMilliseconds(100));
         }
 
         public string Template { get; }
