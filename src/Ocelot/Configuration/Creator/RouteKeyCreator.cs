@@ -13,7 +13,17 @@ namespace Ocelot.Configuration.Creator
                 return $"{nameof(CookieStickySessions)}:{fileRoute.LoadBalancerOptions.Key}";
             }
 
-            return $"{fileRoute.UpstreamPathTemplate}|{string.Join(",", fileRoute.UpstreamHttpMethod)}|{string.Join(",", fileRoute.DownstreamHostAndPorts.Select(x => $"{x.Host}:{x.Port}"))}";
+            return $"{fileRoute.UpstreamPathTemplate}|{ToUpstreamHttpMethodPart(fileRoute)}|{ToDownstreamHostPart(fileRoute)}";
+        }
+
+        private static string ToDownstreamHostPart(FileRoute fileRoute)
+        {
+            return string.Join(",", fileRoute.DownstreamHostAndPorts.Select(x => string.IsNullOrWhiteSpace(x.GlobalHostKey) ? $"{x.Host}:{x.Port}": x.GlobalHostKey));
+        }
+
+        private static string ToUpstreamHttpMethodPart(FileRoute fileRoute)
+        {
+            return string.Join(",", fileRoute.UpstreamHttpMethod);
         }
 
         private bool IsStickySession(FileRoute fileRoute)

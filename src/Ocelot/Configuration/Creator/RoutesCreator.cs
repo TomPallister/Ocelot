@@ -101,7 +101,7 @@ namespace Ocelot.Configuration.Creator
 
             var hAndRs = _headerFAndRCreator.Create(fileRoute);
 
-            var downstreamAddresses = _downstreamAddressesCreator.Create(fileRoute);
+            var downstreamAddresses = _downstreamAddressesCreator.Create(fileRoute, globalConfiguration);
 
             var lbOptions = _loadBalancerOptionsCreator.Create(fileRoute.LoadBalancerOptions);
 

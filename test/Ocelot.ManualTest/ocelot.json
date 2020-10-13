@@ -94,8 +94,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 443
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts",
@@ -115,8 +114,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts/{postId}",
@@ -139,8 +137,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts/{postId}/comments",
@@ -161,8 +158,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/comments",
@@ -178,8 +174,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts",
@@ -195,8 +190,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts/{postId}",
@@ -212,8 +206,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts/{postId}",
@@ -229,8 +222,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts/{postId}",
@@ -246,8 +238,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/products",
@@ -264,8 +255,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/products/{productId}",
@@ -277,8 +267,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/products",
@@ -294,8 +283,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/products/{productId}",
@@ -312,8 +300,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
+          "GlobalHostKey": "JsonPlaceholderService"
         }
       ],
       "UpstreamPathTemplate": "/posts/",
@@ -340,6 +327,12 @@
   ],
 
   "GlobalConfiguration": {
-    "RequestIdKey": "ot-traceid"
+    "RequestIdKey": "ot-traceid",
+    "DownstreamHosts": {
+      "JsonPlaceholderService": {
+        "Host": "jsonplaceholder.typicode.com",
+        "Port": 80
+      }
+    } 
   }
 }
