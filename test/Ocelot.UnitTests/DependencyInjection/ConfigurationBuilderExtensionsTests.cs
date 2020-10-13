@@ -121,9 +121,9 @@
                         {
                             "UpstreamHttpMethod"
                         },
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "Host",
                                 Port = 80
@@ -147,9 +147,9 @@
                         {
                             "UpstreamHttpMethodB"
                         },
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "HostB",
                                 Port = 80
@@ -166,9 +166,9 @@
                         {
                             "UpstreamHttpMethodBB"
                         },
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "HostBB",
                                 Port = 80
@@ -217,9 +217,9 @@
                             {
                                 "UpstreamHttpMethodSpec"
                             },
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "HostSpec",
                                     Port = 80

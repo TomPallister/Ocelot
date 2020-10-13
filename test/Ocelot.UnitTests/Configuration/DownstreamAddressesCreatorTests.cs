@@ -41,9 +41,9 @@ namespace Ocelot.UnitTests.Configuration
         {
             var route = new FileRoute
             {
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "test",
                         Port = 80
@@ -67,14 +67,14 @@ namespace Ocelot.UnitTests.Configuration
         {
             var route = new FileRoute
             {
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "test",
                         Port = 80
                     },
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "west",
                         Port = 443

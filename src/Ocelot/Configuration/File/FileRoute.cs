@@ -19,7 +19,7 @@
             AuthenticationOptions = new FileAuthenticationOptions();
             HttpHandlerOptions = new FileHttpHandlerOptions();
             UpstreamHeaderTransform = new Dictionary<string, string>();
-            DownstreamHostAndPorts = new List<FileHostAndPort>();
+            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>();
             DelegatingHandlers = new List<string>();
             LoadBalancerOptions = new FileLoadBalancerOptions();
             SecurityOptions = new FileSecurityOptions();
@@ -48,7 +48,7 @@
         public FileRateLimitRule RateLimitOptions { get; set; }
         public FileAuthenticationOptions AuthenticationOptions { get; set; }
         public FileHttpHandlerOptions HttpHandlerOptions { get; set; }
-        public List<FileHostAndPort> DownstreamHostAndPorts { get; set; }
+        public List<FileDownstreamHostConfig> DownstreamHostAndPorts { get; set; }
         public string UpstreamHost { get; set; }
         public string Key { get; set; }
         public List<string> DelegatingHandlers { get; set; }

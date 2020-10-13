@@ -56,9 +56,9 @@ namespace Ocelot.AcceptanceTests
                        new FileRoute
                        {
                            DownstreamPathTemplate = _downstreamServicePath,
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                            {
-                               new FileHostAndPort
+                               new FileDownstreamHostConfig
                                {
                                    Host =_downstreamServiceHost,
                                    Port = port,
@@ -97,9 +97,9 @@ namespace Ocelot.AcceptanceTests
                        new FileRoute
                        {
                            DownstreamPathTemplate = _downstreamServicePath,
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                            {
-                               new FileHostAndPort
+                               new FileDownstreamHostConfig
                                {
                                    Host =_downstreamServiceHost,
                                    Port = port,
@@ -140,9 +140,9 @@ namespace Ocelot.AcceptanceTests
                        new FileRoute
                        {
                            DownstreamPathTemplate = _downstreamServicePath,
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                            {
-                               new FileHostAndPort
+                               new FileDownstreamHostConfig
                                {
                                    Host =_downstreamServiceHost,
                                    Port = port,
@@ -182,9 +182,9 @@ namespace Ocelot.AcceptanceTests
                        new FileRoute
                        {
                            DownstreamPathTemplate = _downstreamServicePath,
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                            {
-                               new FileHostAndPort
+                               new FileDownstreamHostConfig
                                {
                                    Host =_downstreamServiceHost,
                                    Port = port,
@@ -225,9 +225,9 @@ namespace Ocelot.AcceptanceTests
                        new FileRoute
                        {
                            DownstreamPathTemplate = _downstreamServicePath,
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
+                           DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                            {
-                               new FileHostAndPort
+                               new FileDownstreamHostConfig
                                {
                                    Host =_downstreamServiceHost,
                                    Port = port,

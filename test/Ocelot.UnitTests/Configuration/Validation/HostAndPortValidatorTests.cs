@@ -11,7 +11,7 @@ namespace Ocelot.UnitTests.Configuration.Validation
     {
         private HostAndPortValidator _validator;
         private ValidationResult _result;
-        private FileHostAndPort _hostAndPort;
+        private FileDownstreamHostConfig _downstreamHostConfig;
 
         public HostAndPortValidatorTests()
         {
@@ -23,7 +23,7 @@ namespace Ocelot.UnitTests.Configuration.Validation
         [InlineData("")]
         public void should_be_invalid_because_host_empty(string host)
         {
-            var fileHostAndPort = new FileHostAndPort
+            var fileHostAndPort = new FileDownstreamHostConfig
             {
                 Host = host
             };
@@ -38,7 +38,7 @@ namespace Ocelot.UnitTests.Configuration.Validation
         [Fact]
         public void should_be_valid_because_host_set()
         {
-            var fileHostAndPort = new FileHostAndPort
+            var fileHostAndPort = new FileDownstreamHostConfig
             {
                 Host = "test"
             };
@@ -49,14 +49,14 @@ namespace Ocelot.UnitTests.Configuration.Validation
                 .BDDfy();
         }
 
-        private void GivenThe(FileHostAndPort hostAndPort)
+        private void GivenThe(FileDownstreamHostConfig downstreamHostConfig)
         {
-            _hostAndPort = hostAndPort;
+            _downstreamHostConfig = downstreamHostConfig;
         }
 
         private void WhenIValidate()
         {
-            _result = _validator.Validate(_hostAndPort);
+            _result = _validator.Validate(_downstreamHostConfig);
         }
 
         private void ThenTheResultIsValid()

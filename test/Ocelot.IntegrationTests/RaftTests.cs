@@ -78,9 +78,9 @@
                 {
                     new FileRoute()
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "127.0.0.1",
                                 Port = 80,
@@ -93,9 +93,9 @@
                     },
                     new FileRoute()
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "123.123.123",
                                 Port = 443,
@@ -145,9 +145,9 @@
                 {
                     new FileRoute()
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "127.0.0.1",
                                 Port = 80,
@@ -160,9 +160,9 @@
                     },
                     new FileRoute()
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "123.123.123",
                                 Port = 443,

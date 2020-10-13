@@ -60,9 +60,9 @@ namespace Ocelot.UnitTests.Configuration
                 {
                     new FileRoute
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "test"
                             }
@@ -86,9 +86,9 @@ namespace Ocelot.UnitTests.Configuration
                 {
                     new FileRoute
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "test"
                             }
@@ -112,9 +112,9 @@ namespace Ocelot.UnitTests.Configuration
                 {
                     new FileRoute
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "test"
                             }
