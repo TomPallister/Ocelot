@@ -46,14 +46,14 @@ namespace Ocelot.AcceptanceTests
                                 Key = "sessionid",
                                 Expiry = 300000
                             },
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortOne
                                 },
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortTwo
@@ -97,14 +97,14 @@ namespace Ocelot.AcceptanceTests
                                 Key = "sessionid",
                                 Expiry = 300000
                             },
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortOne
                                 },
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortTwo
@@ -123,14 +123,14 @@ namespace Ocelot.AcceptanceTests
                                 Key = "bestid",
                                 Expiry = 300000
                             },
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortTwo
                                 },
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortOne
@@ -175,14 +175,14 @@ namespace Ocelot.AcceptanceTests
                                 Key = "sessionid",
                                 Expiry = 300000
                             },
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortOne
                                 },
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortTwo
@@ -201,14 +201,14 @@ namespace Ocelot.AcceptanceTests
                                 Key = "sessionid",
                                 Expiry = 300000
                             },
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortTwo
                                 },
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = downstreamPortOne

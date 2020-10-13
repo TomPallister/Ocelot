@@ -259,9 +259,9 @@
             {
                 DownstreamPathTemplate = "/test",
                 UpstreamPathTemplate = "/test",
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "localhost",
                         Port = 5000
@@ -288,9 +288,9 @@
                 {
                     AuthenticationProviderKey = key
                 },
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "localhost",
                         Port = 5000
@@ -322,9 +322,9 @@
             {
                 DownstreamPathTemplate = "/test",
                 UpstreamPathTemplate = "/test",
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "localhost",
                         Port = 5000,
@@ -352,9 +352,9 @@
             {
                 DownstreamPathTemplate = "/test",
                 UpstreamPathTemplate = "/test",
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "localhost",
                         Port = 5000,

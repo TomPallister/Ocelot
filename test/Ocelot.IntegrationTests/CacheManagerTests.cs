@@ -52,9 +52,9 @@ namespace Ocelot.IntegrationTests
                 {
                     new FileRoute()
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "localhost",
                                 Port = 80,
@@ -71,9 +71,9 @@ namespace Ocelot.IntegrationTests
                     },
                     new FileRoute()
                     {
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "localhost",
                                 Port = 80,

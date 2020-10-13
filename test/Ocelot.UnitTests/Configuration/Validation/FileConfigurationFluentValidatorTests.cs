@@ -239,9 +239,9 @@
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "localhost",
                                 Port = 51878,
@@ -277,9 +277,9 @@
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "localhost",
                                 Port = 51878,
@@ -318,9 +318,9 @@
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "localhost",
                                 Port = 51878,
@@ -357,9 +357,9 @@
                     {
                         DownstreamPathTemplate = "/",
                         DownstreamScheme = "http",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "localhost",
                                 Port = 51878,
@@ -399,9 +399,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51878,
@@ -415,9 +415,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51880,
@@ -460,9 +460,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51878,
@@ -476,9 +476,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51880,
@@ -523,9 +523,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51878,
@@ -539,9 +539,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51880,
@@ -585,9 +585,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51878,
@@ -601,9 +601,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51880,
@@ -657,9 +657,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51878,
@@ -703,9 +703,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51878,
@@ -719,9 +719,9 @@
                         {
                             DownstreamPathTemplate = "/",
                             DownstreamScheme = "http",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "localhost",
                                     Port = 51880,
@@ -793,9 +793,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk"
                             }
@@ -859,9 +859,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "//api/prod/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                                 Port = 80
@@ -887,9 +887,9 @@
                     {
                         DownstreamPathTemplate = "//api/products/",
                         UpstreamPathTemplate = "/api/prod/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                                 Port = 80
@@ -915,9 +915,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -970,9 +970,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bb.co.uk"
                             }
@@ -982,9 +982,9 @@
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bb.co.uk"
                             }
@@ -1009,9 +1009,9 @@
                         {
                             DownstreamPathTemplate = "/api/products/",
                             UpstreamPathTemplate = "/asdf/",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "bb.co.uk"
                                 }
@@ -1022,9 +1022,9 @@
                         {
                             DownstreamPathTemplate = "/www/test/",
                             UpstreamPathTemplate = "/asdf/",
-                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                             {
-                                new FileHostAndPort
+                                new FileDownstreamHostConfig
                                 {
                                     Host = "bb.co.uk"
                                 }
@@ -1049,9 +1049,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1062,9 +1062,9 @@
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1091,9 +1091,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1104,9 +1104,9 @@
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Post"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1130,9 +1130,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1144,9 +1144,9 @@
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1173,9 +1173,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1187,9 +1187,9 @@
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1215,9 +1215,9 @@
                     {
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1229,9 +1229,9 @@
                     {
                         DownstreamPathTemplate = "/www/test/",
                         UpstreamPathTemplate = "/asdf/",
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1257,9 +1257,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1290,9 +1290,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk",
                             }
@@ -1355,9 +1355,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = downstreamHost,
                             }
@@ -1383,9 +1383,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "bbc.co.uk"
                             }
@@ -1410,9 +1410,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort
+                            new FileDownstreamHostConfig
                             {
                                 Host = "test"
                             }
@@ -1437,7 +1437,7 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
                         }
                     }
@@ -1461,9 +1461,9 @@
                         DownstreamPathTemplate = "/api/products/",
                         UpstreamPathTemplate = "/asdf/",
                         UpstreamHttpMethod = new List<string> {"Get"},
-                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                         {
-                            new FileHostAndPort()
+                            new FileDownstreamHostConfig()
                         }
                     }
                 }
@@ -1485,9 +1485,9 @@
                     {
                         DownstreamPathTemplate = "/bar/{everything}",
                         DownstreamScheme = "http",
-                        DownstreamHostAndPorts = new List<FileHostAndPort> 
+                        DownstreamHostAndPorts = new List<FileDownstreamHostConfig> 
                         { 
-                            new FileHostAndPort() { Host = "a.b.cd" },
+                            new FileDownstreamHostConfig() { Host = "a.b.cd" },
                         },
                         UpstreamPathTemplate = "/foo/bar/{everything}/{everything}",
                         UpstreamHttpMethod = new List<string> { "Get" },

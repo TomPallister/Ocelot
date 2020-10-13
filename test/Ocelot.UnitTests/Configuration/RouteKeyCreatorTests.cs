@@ -45,14 +45,14 @@ namespace Ocelot.UnitTests.Configuration
             {
                 UpstreamPathTemplate = "/api/product",
                 UpstreamHttpMethod = new List<string> { "GET", "POST", "PUT" },
-                DownstreamHostAndPorts = new List<FileHostAndPort>
+                DownstreamHostAndPorts = new List<FileDownstreamHostConfig>
                 {
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "localhost",
                         Port = 123
                     },
-                    new FileHostAndPort
+                    new FileDownstreamHostConfig
                     {
                         Host = "localhost",
                         Port = 123
