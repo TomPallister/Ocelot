@@ -26,6 +26,8 @@
 
         public async Task<List<Service>> Get()
         {
+            _logger.LogDebug($"Querying Consul {(_consul as ConsulClient)?.Config.Address} about a service: {_config.KeyOfServiceInConsul}");
+
             var queryResult = await _consul.Health.Service(_config.KeyOfServiceInConsul, string.Empty, true);
 
             var services = new List<Service>();
@@ -44,6 +46,8 @@
                         var serviceNode = nodes.Response.FirstOrDefault(n => n.Address == serviceEntry.Service.Address);
                         services.Add(BuildService(serviceEntry, serviceNode));
                     }
+
+                    _logger.LogDebug($"Consul answer: Address: {serviceEntry.Service.Address}, Port: {serviceEntry.Service.Port}");
                 }
                 else
                 {
