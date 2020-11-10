@@ -102,7 +102,7 @@ namespace Ocelot.AcceptanceTests
 
                 if (waitingTime > MAX_WAITING_TIME)
                 {
-                    throw new TimeoutException(notifier.Name + $" did not sent notification within {MAX_WAITING_TIME}s.");
+                    throw new TimeoutException(notifier.Name + $" did not sent notification within {MAX_WAITING_TIME / 1000}s.");
                 }
             }
         }
