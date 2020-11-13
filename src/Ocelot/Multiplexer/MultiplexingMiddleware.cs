@@ -178,6 +178,7 @@
             target.Request.PathBase = source.Request.PathBase;
             target.Request.Protocol = source.Request.Protocol;
             target.Request.Query = source.Request.Query;
+            target.Request.Form = source.Request.Form;
             target.Request.QueryString = source.Request.QueryString;
             target.Request.Scheme = source.Request.Scheme;
             target.Request.IsHttps = source.Request.IsHttps;
