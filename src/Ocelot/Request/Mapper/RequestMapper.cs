@@ -37,11 +37,7 @@
                 return new ErrorResponse<HttpRequestMessage>(new UnmappableRequestError(ex));
             }
         }
-        private bool IsMultipartContentType(string contentType)
-        {
-            return !string.IsNullOrEmpty(contentType)
-                   && contentType.IndexOf("multipart/form-data", StringComparison.OrdinalIgnoreCase) >= 0;
-        }
+
         private async Task<HttpContent> MapContent(HttpRequest request)
         {
             if (request.Body == null || (request.Body.CanSeek && request.Body.Length <= 0))
@@ -50,43 +46,12 @@
             }
 
             // Never change this to StreamContent again, I forgot it doesnt work in #464.
-            HttpContent content = null;
-            // Never change this to StreamContent again, I forgot it doesnt work in #464.
+            var content = new ByteArrayContent(await ToByteArray(request.Body));
 
-
-            if (this.IsMultipartContentType(request.ContentType))
+            if (!string.IsNullOrEmpty(request.ContentType))
             {
-                content = new MultipartFormDataContent();
-                if (request.Form != null && request.Form.Files != null)
-                {
-                    foreach (var f in request.Form.Files)
-                    {
-                        using (var memStream = new MemoryStream())
-                        {
-                            await f.CopyToAsync(memStream);
-                            var fileContent = new ByteArrayContent(memStream.ToArray());
-                            ((MultipartFormDataContent)content).Add(fileContent, f.Name, f.FileName);
-                        }
-
-                    }
-                }
-                if (request.Form != null)
-                {
-                    foreach (var key in request.Form.Keys)
-                    {
-                        var strContent = new StringContent(request.Form[key]);
-                        ((MultipartFormDataContent)content).Add(strContent, key);
-                    }
-                }
-            }
-            else
-            {
-                content = new ByteArrayContent(await ToByteArray(request.Body));
-                if (!string.IsNullOrEmpty(request.ContentType))
-                {
-                    content.Headers
-                        .TryAddWithoutValidation("Content-Type", new[] { request.ContentType });
-                }
+                content.Headers
+                    .TryAddWithoutValidation("Content-Type", new[] { request.ContentType });
             }
 
             AddHeaderIfExistsOnRequest("Content-Language", content, request);
