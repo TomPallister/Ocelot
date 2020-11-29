@@ -31,9 +31,9 @@ The user can set functions against the following.
 
 * AuthenticationMiddleware - This overrides Ocelots authentication middleware.
 
-* PreAuthorisationMiddleware - This allows the user to run pre authorisation logic and then call Ocelot's authorisation middleware.
+* PreAuthorizationMiddleware - This allows the user to run pre authorization logic and then call Ocelot's authorization middleware.
 
-* AuthorisationMiddleware - This overrides Ocelots authorisation middleware.
+* AuthorizationMiddleware - This overrides Ocelots authorization middleware.
 
 * PreQueryStringBuilderMiddleware - This allows the user to manipulate the query string on the http request before it is passed to Ocelots request creator.
 

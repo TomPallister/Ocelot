@@ -1,7 +1,7 @@
 Authentication
 ==============
 
-In order to authenticate Routes and subsequently use any of Ocelot's claims based features such as authorisation or modifying the request with values from the token. Users must register authentication services in their Startup.cs as usual but they provide a scheme (authentication provider key) with each registration e.g.
+In order to authenticate Routes and subsequently use any of Ocelot's claims based features such as authorization or modifying the request with values from the token. Users must register authentication services in their Startup.cs as usual but they provide a scheme (authentication provider key) with each registration e.g.
 
 .. code-block:: csharp
 

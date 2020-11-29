@@ -3,7 +3,7 @@ Claims Transformation
 
 Ocelot allows the user to access claims and transform them into headers, query string parameters, other claims and change downstream paths. This is only available once a user has been authenticated.
 
-After the user is authenticated we run the claims to claims transformation middleware. This allows the user to transform claims before the authorisation middleware is called. After the user is authorised first we call the claims to headers middleware, thenthe claims to query string parameters middleware, and Finally the claims to downstream pathmiddleware.
+After the user is authenticated we run the claims to claims transformation middleware. This allows the user to transform claims before the authorization middleware is called. After the user is authorised first we call the claims to headers middleware, thenthe claims to query string parameters middleware, and Finally the claims to downstream pathmiddleware.
 
 The syntax for performing the transforms is the same for each process. In the Route configuration a json dictionary is added with a specific name either AddClaimsToRequest, AddHeadersToRequest, AddQueriesToRequest, or ChangeDownstreamPathTemplate.
 

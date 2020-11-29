@@ -102,7 +102,7 @@ Unfortunately a lot of Ocelot's features are non websocket specific such as head
 9. Claims Transformation
 10. Caching
 11. Authentication - If anyone requests it we might be able to do something with basic authentication.
-12. Authorisation
+12. Authorization
 
 I'm not 100% sure what will happen with this feature when it get's into the wild so please make sure you test thoroughly! 
 
