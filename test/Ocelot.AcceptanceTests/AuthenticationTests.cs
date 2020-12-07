@@ -256,6 +256,46 @@ namespace Ocelot.AcceptanceTests
                 .BDDfy();
         }
 
+        [Fact]
+        public void should_return_www_authenticate_header_on_401()
+        {
+            int port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = _downstreamServicePath,
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host =_downstreamServiceHost,
+                                Port = port,
+                            },
+                        },
+                        DownstreamScheme = _downstreamServiceScheme,
+                        UpstreamPathTemplate = "/",
+                        UpstreamHttpMethod = new List<string> { "Get" },
+                        AuthenticationOptions = new FileAuthenticationOptions
+                        {
+                            AuthenticationProviderKey = "Test",
+                        },
+                    },
+                },
+            };
+            
+            this.Given(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunningWithJwtAuth("Test"))
+                .And(x => _steps.GivenIHaveNoTokenForMyRequest())
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.Unauthorized))
+                .And(x => _steps.ThenTheResponseShouldContainAuthChallenge())
+                .BDDfy();
+        }
+        
         private void GivenThereIsAServiceRunningOn(string url, int statusCode, string responseBody)
         {
             _serviceHandler.GivenThereIsAServiceRunningOn(url, async context =>

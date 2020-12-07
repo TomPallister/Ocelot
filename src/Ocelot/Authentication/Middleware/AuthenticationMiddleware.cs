@@ -43,6 +43,15 @@
 
                     Logger.LogWarning($"Client has NOT been authenticated for {httpContext.Request.Path} and pipeline error set. {error}");
 
+                    // Perform a challenge. This populates the WWW-Authenticate header on the response
+                    await httpContext.ChallengeAsync(downstreamRoute.AuthenticationOptions.AuthenticationProviderKey);
+                    
+                    // Since the response gets re-created down the pipeline, we store the challenge in the Items, so we can re-apply it when sending the response
+                    if (httpContext.Response.Headers.TryGetValue("WWW-Authenticate", out var authenticateHeader))
+                    {
+                        httpContext.Items.SetAuthChallenge(authenticateHeader);
+                    }
+                    
                     httpContext.Items.SetError(error);
                 }
             }

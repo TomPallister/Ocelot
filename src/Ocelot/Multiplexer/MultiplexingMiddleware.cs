@@ -210,6 +210,8 @@
             httpContext.Items.UpsertDownstreamRequest(finished.Items.DownstreamRequest());
 
             httpContext.Items.UpsertDownstreamResponse(finished.Items.DownstreamResponse());
+            
+            httpContext.Items.SetAuthChallenge(finished.Items.AuthChallenge());
         }
 
         private async Task<HttpContext> Fire(HttpContext httpContext, RequestDelegate next)

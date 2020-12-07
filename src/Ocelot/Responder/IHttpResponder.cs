@@ -11,5 +11,7 @@
         void SetErrorResponseOnContext(HttpContext context, int statusCode);
 
         Task SetErrorResponseOnContext(HttpContext context, DownstreamResponse response);
+        
+        void SetAuthChallengeOnContext(HttpContext context, string challenge);
     }
 }
