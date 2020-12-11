@@ -147,7 +147,7 @@ Then you need to create a class that implements the ILoadBalancer interface. Bel
                 _services = services;
             }
 
-            public async Task<Response<ServiceHostAndPort>> Lease(DownstreamContext downstreamContext, HttpContext httpContext)
+            public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
             {
                 var services = await _services();
                 lock (_lock)
