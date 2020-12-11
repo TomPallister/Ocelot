@@ -40,7 +40,7 @@
                             {
                                 Host = "localhost",
                                 Port = port,
-                            }
+                            },
                         },
                         DownstreamScheme = "http",
                         UpstreamPathTemplate = "/",
@@ -48,10 +48,10 @@
                         QoSOptions = new FileQoSOptions
                         {
                             TimeoutValue = 1000,
-                            ExceptionsAllowedBeforeBreaking = 10
-                        }
-                    }
-                }
+                            ExceptionsAllowedBeforeBreaking = 10,
+                        },
+                    },
+                },
             };
 
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", 200, string.Empty, 10))
@@ -81,7 +81,7 @@
                             {
                                 Host = "localhost",
                                 Port = port,
-                            }
+                            },
                         },
                         DownstreamScheme = "http",
                         UpstreamPathTemplate = "/",
@@ -89,10 +89,9 @@
                         QoSOptions = new FileQoSOptions
                         {
                             TimeoutValue = 10,
-                            ExceptionsAllowedBeforeBreaking = 10
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", 201, string.Empty, 1000))
@@ -123,7 +122,7 @@
                             {
                                 Host = "localhost",
                                 Port = port,
-                            }
+                            },
                         },
                         UpstreamPathTemplate = "/",
                         UpstreamHttpMethod = new List<string> { "Get" },
@@ -131,10 +130,10 @@
                         {
                             ExceptionsAllowedBeforeBreaking = 1,
                             TimeoutValue = 500,
-                            DurationOfBreak = 1000
+                            DurationOfBreak = 1000,
                         },
-                    }
-                }
+                    },
+                },
             };
 
             this.Given(x => x.GivenThereIsAPossiblyBrokenServiceRunningOn($"http://localhost:{port}", "Hello from Laura"))

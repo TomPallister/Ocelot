@@ -24,9 +24,18 @@ namespace Ocelot.Provider.Polly
         {
             try
             {
-                return await Policy
-                    .WrapAsync(_qoSProvider.CircuitBreaker.Policies)
-                    .ExecuteAsync(() => base.SendAsync(request, cancellationToken));
+                IAsyncPolicy policy;
+
+                if (_qoSProvider.CircuitBreaker.Policies.Length == 1)
+                {
+                    policy = _qoSProvider.CircuitBreaker.Policies[0];
+                }
+                else
+                {
+                    policy = Policy.WrapAsync(_qoSProvider.CircuitBreaker.Policies);
+                }
+
+                return await policy.ExecuteAsync(() => base.SendAsync(request, cancellationToken));
             }
             catch (BrokenCircuitException ex)
             {
