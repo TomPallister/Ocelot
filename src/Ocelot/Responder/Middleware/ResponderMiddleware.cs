@@ -64,6 +64,15 @@ namespace Ocelot.Responder.Middleware
                 var downstreamResponse = context.Items.DownstreamResponse();
                 _responder.SetErrorResponseOnContext(context, downstreamResponse);
             }
+            
+            if (errors.Any(e => e.Code == OcelotErrorCode.UnauthenticatedError))
+            {
+                var challenge = context.Items.AuthChallenge();
+                if (!string.IsNullOrEmpty(challenge))
+                {
+                    _responder.SetAuthChallengeOnContext(context, challenge);
+                }
+            }
         }
     }
 }
