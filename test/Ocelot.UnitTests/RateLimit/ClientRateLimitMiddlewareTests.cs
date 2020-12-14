@@ -28,6 +28,7 @@ namespace Ocelot.UnitTests.RateLimit
         private IRateLimitCounterHandler _rateLimitCounterHandler;
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
+        private Mock<IHttpContextAccessor> _httpContextAccessor;
         private readonly ClientRateLimitMiddleware _middleware;
         private RequestDelegate _next;
         private DownstreamResponse _downstreamResponse;
@@ -42,7 +43,8 @@ namespace Ocelot.UnitTests.RateLimit
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<ClientRateLimitMiddleware>()).Returns(_logger.Object);
             _next = context => Task.CompletedTask;
-            _middleware = new ClientRateLimitMiddleware(_next, _loggerFactory.Object, _rateLimitCounterHandler);
+            _httpContextAccessor = new Mock<IHttpContextAccessor>();
+            _middleware = new ClientRateLimitMiddleware(_next, _loggerFactory.Object, _rateLimitCounterHandler, _httpContextAccessor.Object);
         }
 
         [Fact]
@@ -107,6 +109,9 @@ namespace Ocelot.UnitTests.RateLimit
                 httpContext.Request.Headers.TryAdd("ClientId", clientId);
                 httpContexts.Add(httpContext);
             }
+
+            var httpContextSeq = _httpContextAccessor.SetupSequence(x => x.HttpContext);
+            httpContexts.ForEach(x => httpContextSeq.Returns(x));
 
             foreach (var httpContext in httpContexts)
             {

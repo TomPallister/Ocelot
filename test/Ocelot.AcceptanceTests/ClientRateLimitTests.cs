@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Http;
     using Ocelot.Configuration.File;
+    using Ocelot.Values;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -200,6 +201,118 @@
                 .And(x => _steps.GivenOcelotIsRunning())
                 .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 4))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(200))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_set_ratelimiting_headers_on_response_when_DisableRateLimitHeaders_set_to_false()
+        {
+            int port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/ClientRateLimit",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "localhost",
+                                Port = port,
+                            },
+                        },
+                        DownstreamScheme = "http",
+                        UpstreamPathTemplate = "/api/ClientRateLimit",
+                        UpstreamHttpMethod = new List<string> { "Get" },                            
+                        RateLimitOptions = new FileRateLimitRule()
+                        {
+                            EnableRateLimiting = true,
+                            ClientWhitelist = new List<string>(),
+                            Limit = 3,
+                            Period = "1s",
+                            PeriodTimespan = 1000,
+                        },
+                    },
+                },
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    RateLimitOptions = new FileRateLimitOptions()
+                    {
+                        DisableRateLimitHeaders = false,
+                        QuotaExceededMessage = "",
+                        HttpStatusCode = 428,
+                    },
+                },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/api/ClientRateLimit"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 1))
+                .Then(x => _steps.ThenRateLimitingHeadersExistInResponse(true))
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 2))
+                .Then(x => _steps.ThenRateLimitingHeadersExistInResponse(true))
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 1))
+                .Then(x => _steps.ThenRateLimitingHeadersExistInResponse(false))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_not_set_ratelimiting_headers_on_response_when_DisableRateLimitHeaders_set_to_true()
+        {
+            int port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/ClientRateLimit",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "localhost",
+                                Port = port,
+                            },
+                        },
+                        DownstreamScheme = "http",
+                        UpstreamPathTemplate = "/api/ClientRateLimit",
+                        UpstreamHttpMethod = new List<string> { "Get" },
+                        RateLimitOptions = new FileRateLimitRule()
+                        {
+                            EnableRateLimiting = true,
+                            ClientWhitelist = new List<string>(),
+                            Limit = 3,
+                            Period = "1s",
+                            PeriodTimespan = 1000,
+                        },
+                    },
+                },
+                GlobalConfiguration = new FileGlobalConfiguration()
+                {
+                    RateLimitOptions = new FileRateLimitOptions()
+                    {
+                        DisableRateLimitHeaders = true,
+                        QuotaExceededMessage = "",
+                        HttpStatusCode = 428,
+                    },
+                },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", "/api/ClientRateLimit"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 1))
+                .Then(x => _steps.ThenRateLimitingHeadersExistInResponse(false))
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 2))
+                .Then(x => _steps.ThenRateLimitingHeadersExistInResponse(false))
+                .When(x => _steps.WhenIGetUrlOnTheApiGatewayMultipleTimesForRateLimit("/api/ClientRateLimit", 1))
+                .Then(x => _steps.ThenRateLimitingHeadersExistInResponse(false))
                 .BDDfy();
         }
 

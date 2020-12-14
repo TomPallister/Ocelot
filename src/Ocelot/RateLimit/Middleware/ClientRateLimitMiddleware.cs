@@ -14,14 +14,17 @@
     {
         private readonly RequestDelegate _next;
         private readonly ClientRateLimitProcessor _processor;
+        private IHttpContextAccessor _httpContextAccessor;
 
         public ClientRateLimitMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
-            IRateLimitCounterHandler counterHandler)
+            IRateLimitCounterHandler counterHandler, 
+            IHttpContextAccessor httpContextAccessor)
                 : base(loggerFactory.CreateLogger<ClientRateLimitMiddleware>())
         {
             _next = next;
             _processor = new ClientRateLimitProcessor(counterHandler);
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -80,8 +83,9 @@
             //set X-Rate-Limit headers for the longest period
             if (!options.DisableRateLimitHeaders)
             {
-                var headers = _processor.GetRateLimitHeaders(httpContext, identity, options);
-                httpContext.Response.OnStarting(SetRateLimitHeaders, state: headers);
+                var originalHttpContext = _httpContextAccessor.HttpContext;
+                var headers = _processor.GetRateLimitHeaders(originalHttpContext, identity, options);
+                originalHttpContext.Response.OnStarting(SetRateLimitHeaders, state: headers);
             }
 
             await _next.Invoke(httpContext);

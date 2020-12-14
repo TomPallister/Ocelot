@@ -1089,6 +1089,13 @@ namespace Ocelot.AcceptanceTests
             responseStatusCode.ShouldBe(expectedHttpStatusCode);
         }
 
+        public void ThenRateLimitingHeadersExistInResponse(bool headersExist)
+        {
+            _response.Headers.Contains("X-Rate-Limit-Limit").ShouldBe(headersExist);
+            _response.Headers.Contains("X-Rate-Limit-Remaining").ShouldBe(headersExist);
+            _response.Headers.Contains("X-Rate-Limit-Reset").ShouldBe(headersExist);
+        }
+
         public void Dispose()
         {
             _ocelotClient?.Dispose();
