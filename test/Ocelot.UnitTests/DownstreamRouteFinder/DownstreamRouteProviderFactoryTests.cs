@@ -13,6 +13,7 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
     using System.Collections.Generic;
     using TestStack.BDDfy;
     using Xunit;
+    using Ocelot.DownstreamRouteFinder.HeaderMatcher;
 
     public class DownstreamRouteProviderFactoryTests
     {
@@ -26,7 +27,9 @@ namespace Ocelot.UnitTests.DownstreamRouteFinder
         {
             var services = new ServiceCollection();
             services.AddSingleton<IPlaceholderNameAndValueFinder, UrlPathPlaceholderNameAndValueFinder>();
+            services.AddSingleton<IHeaderPlaceholderNameAndValueFinder, HeaderPlaceholderNameAndValueFinder>();
             services.AddSingleton<IUrlPathToUrlTemplateMatcher, RegExUrlMatcher>();
+            services.AddSingleton<IHeadersToHeaderTemplatesMatcher, HeadersToHeaderTemplatesMatcher>();
             services.AddSingleton<IQoSOptionsCreator, QoSOptionsCreator>();
             services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteFinder>();
             services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteCreator>();

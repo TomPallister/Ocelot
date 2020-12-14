@@ -20,6 +20,7 @@
         private Mock<IClaimsToThingCreator> _cthCreator;
         private Mock<IAuthenticationOptionsCreator> _aoCreator;
         private Mock<IUpstreamTemplatePatternCreator> _utpCreator;
+        private Mock<IUpstreamHeaderTemplatePatternCreator> _uhtpCreator;
         private Mock<IRequestIdKeyCreator> _ridkCreator;
         private Mock<IQoSOptionsCreator> _qosoCreator;
         private Mock<IRouteOptionsCreator> _rroCreator;
@@ -49,6 +50,7 @@
         private List<Route> _result;
         private SecurityOptions _securityOptions;
         private Version _expectedVersion;
+        private Dictionary<string, UpstreamHeaderTemplate> _uht;
 
         public RoutesCreatorTests()
         {
@@ -67,6 +69,7 @@
             _rrkCreator = new Mock<IRouteKeyCreator>();
             _soCreator = new Mock<ISecurityOptionsCreator>();
             _versionCreator = new Mock<IVersionCreator>();
+            _uhtpCreator = new Mock<IUpstreamHeaderTemplatePatternCreator>();
 
             _creator = new RoutesCreator(
                 _cthCreator.Object,
@@ -83,7 +86,8 @@
                 _lboCreator.Object,
                 _rrkCreator.Object,
                 _soCreator.Object,
-                _versionCreator.Object
+                _versionCreator.Object,
+                _uhtpCreator.Object
                 );
         }
 
@@ -174,6 +178,7 @@
             _ht = new HeaderTransformations(new List<HeaderFindAndReplace>(), new List<HeaderFindAndReplace>(), new List<AddHeader>(), new List<AddHeader>());
             _dhp = new List<DownstreamHostAndPort>();
             _lbo = new LoadBalancerOptionsBuilder().Build();
+            _uht = new Dictionary<string, UpstreamHeaderTemplate>();
 
             _rroCreator.Setup(x => x.Create(It.IsAny<FileRoute>())).Returns(_rro);
             _ridkCreator.Setup(x => x.Create(It.IsAny<FileRoute>(), It.IsAny<FileGlobalConfiguration>())).Returns(_requestId);
@@ -189,6 +194,7 @@
             _daCreator.Setup(x => x.Create(It.IsAny<FileRoute>())).Returns(_dhp);
             _lboCreator.Setup(x => x.Create(It.IsAny<FileLoadBalancerOptions>())).Returns(_lbo);
             _versionCreator.Setup(x => x.Create(It.IsAny<string>())).Returns(_expectedVersion);
+            _uhtpCreator.Setup(x => x.Create(It.IsAny<FileRoute>())).Returns(_uht);
         }
 
         private void ThenTheRoutesAreCreated()
@@ -258,6 +264,7 @@
             _result[routeIndex].UpstreamHost.ShouldBe(expected.UpstreamHost);
             _result[routeIndex].DownstreamRoute.Count.ShouldBe(1);
             _result[routeIndex].UpstreamTemplatePattern.ShouldBe(_upt);
+            _result[routeIndex].UpstreamHeaderTemplates.ShouldBe(_uht);
         }
 
         private void ThenTheDepsAreCalledFor(FileRoute fileRoute, FileGlobalConfiguration globalConfig)

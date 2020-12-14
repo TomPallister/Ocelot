@@ -1244,7 +1244,7 @@
                 .Then(x => x.ThenTheResultIsValid())
                 .BDDfy();
         }
-        
+
         [Fact]
         public void configuration_is_invalid_with_invalid_rate_limit_configuration()
         {
@@ -1485,8 +1485,8 @@
                     {
                         DownstreamPathTemplate = "/bar/{everything}",
                         DownstreamScheme = "http",
-                        DownstreamHostAndPorts = new List<FileHostAndPort> 
-                        { 
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
                             new FileHostAndPort() { Host = "a.b.cd" },
                         },
                         UpstreamPathTemplate = "/foo/bar/{everything}/{everything}",
@@ -1497,6 +1497,201 @@
                 .When(x => x.WhenIValidateTheConfiguration())
                 .Then(x => x.ThenTheResultIsNotValid())
                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /foo/bar/{everything}/{everything} has duplicated placeholder"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void configuration_is_not_valid_when_upstream_headers_the_same()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header1", "value1" },
+                            { "header2", "value2" },
+                        },
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header2", "value2" },
+                            { "header1", "value1" },
+                        },
+                    },
+                },
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsNotValid())
+                 .And(x => x.ThenTheErrorMessageAtPositionIs(0, "route /asdf/ has duplicate"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void configuration_is_valid_when_upstream_headers_not_the_same()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header1", "value1" },
+                            { "header2", "value2" },
+                        },
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header2", "value2" },
+                            { "header1", "valueDIFFERENT" },
+                        },
+                    },
+                },
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsValid())
+                .BDDfy();
+        }
+
+        [Fact]
+        public void configuration_is_valid_when_upstream_headers_count_not_the_same()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header1", "value1" },
+                            { "header2", "value2" },
+                        },
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header2", "value2" },
+                        },
+                    },
+                },
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsValid())
+                .BDDfy();
+        }
+
+        [Fact]
+        public void configuration_is_valid_when_one_upstream_headers_empty_and_other_not_empty()
+        {
+            this.Given(x => x.GivenAConfiguration(new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/api/products/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                        UpstreamHeaderTemplates = new Dictionary<string, string>
+                        {
+                            { "header1", "value1" },
+                            { "header2", "value2" },
+                        },
+                    },
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/www/test/",
+                        UpstreamPathTemplate = "/asdf/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "bbc.co.uk",
+                            },
+                        },
+                        UpstreamHttpMethod = new List<string> {"Get"},
+                    },
+                },
+            }))
+                .When(x => x.WhenIValidateTheConfiguration())
+                .Then(x => x.ThenTheResultIsValid())
                 .BDDfy();
         }
 

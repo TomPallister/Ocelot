@@ -9,6 +9,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Ocelot.DownstreamRouteFinder.UrlMatcher;
+    using Ocelot.Values;
 
     public class DownstreamRouteCreator : IDownstreamRouteProvider
     {
@@ -21,7 +22,7 @@
             _cache = new ConcurrentDictionary<string, OkResponse<DownstreamRouteHolder>>();
         }
 
-        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string upstreamHttpMethod, IInternalConfiguration configuration, string upstreamHost)
+        public Response<DownstreamRouteHolder> Get(string upstreamUrlPath, string upstreamQueryString, string upstreamHttpMethod, IInternalConfiguration configuration, string upstreamHost, Dictionary<string, string> upstreamHeaders)
         {
             var serviceName = GetServiceName(upstreamUrlPath);
 

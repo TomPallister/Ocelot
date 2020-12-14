@@ -16,16 +16,20 @@ namespace Ocelot.UnitTests.Configuration
     {
         private readonly AggregatesCreator _creator;
         private readonly Mock<IUpstreamTemplatePatternCreator> _utpCreator;
+        private readonly Mock<IUpstreamHeaderTemplatePatternCreator> _uhtpCreator;
         private FileConfiguration _fileConfiguration;
         private List<Route> _routes;
         private List<Route> _result;
         private UpstreamPathTemplate _aggregate1Utp;
         private UpstreamPathTemplate _aggregate2Utp;
+        private Dictionary<string, UpstreamHeaderTemplate> _headerTemplates1;
+        private Dictionary<string, UpstreamHeaderTemplate> _headerTemplates2;
 
         public AggregatesCreatorTests()
         {
             _utpCreator = new Mock<IUpstreamTemplatePatternCreator>();
-            _creator = new AggregatesCreator(_utpCreator.Object);
+            _uhtpCreator = new Mock<IUpstreamHeaderTemplatePatternCreator>();
+            _creator = new AggregatesCreator(_utpCreator.Object, _uhtpCreator.Object);
         }
 
         [Fact]
@@ -89,6 +93,7 @@ namespace Ocelot.UnitTests.Configuration
             this.Given(_ => GivenThe(fileConfig))
                 .And(_ => GivenThe(routes))
                 .And(_ => GivenTheUtpCreatorReturns())
+                .And(_ => GivenTheUhtpCreatorReturns())
                 .When(_ => WhenICreate())
                 .Then(_ => ThenTheUtpCreatorIsCalledCorrectly())
                 .And(_ => ThenTheAggregatesAreCreated())
@@ -103,6 +108,7 @@ namespace Ocelot.UnitTests.Configuration
             _result[0].UpstreamHttpMethod.ShouldContain(x => x == HttpMethod.Get);
             _result[0].UpstreamHost.ShouldBe(_fileConfiguration.Aggregates[0].UpstreamHost);
             _result[0].UpstreamTemplatePattern.ShouldBe(_aggregate1Utp);
+            _result[0].UpstreamHeaderTemplates.ShouldBe(_headerTemplates1);
             _result[0].Aggregator.ShouldBe(_fileConfiguration.Aggregates[0].Aggregator);
             _result[0].DownstreamRoute.ShouldContain(x => x == _routes[0].DownstreamRoute[0]);
             _result[0].DownstreamRoute.ShouldContain(x => x == _routes[1].DownstreamRoute[0]);
@@ -110,6 +116,7 @@ namespace Ocelot.UnitTests.Configuration
             _result[1].UpstreamHttpMethod.ShouldContain(x => x == HttpMethod.Get);
             _result[1].UpstreamHost.ShouldBe(_fileConfiguration.Aggregates[1].UpstreamHost);
             _result[1].UpstreamTemplatePattern.ShouldBe(_aggregate2Utp);
+            _result[1].UpstreamHeaderTemplates.ShouldBe(_headerTemplates2);
             _result[1].Aggregator.ShouldBe(_fileConfiguration.Aggregates[1].Aggregator);
             _result[1].DownstreamRoute.ShouldContain(x => x == _routes[2].DownstreamRoute[0]);
             _result[1].DownstreamRoute.ShouldContain(x => x == _routes[3].DownstreamRoute[0]);
@@ -129,6 +136,16 @@ namespace Ocelot.UnitTests.Configuration
             _utpCreator.SetupSequence(x => x.Create(It.IsAny<IRoute>()))
                 .Returns(_aggregate1Utp)
                 .Returns(_aggregate2Utp);
+        }
+
+        private void GivenTheUhtpCreatorReturns()
+        {
+            _headerTemplates1 = new Dictionary<string, UpstreamHeaderTemplate>();
+            _headerTemplates2 = new Dictionary<string, UpstreamHeaderTemplate>();
+
+            _uhtpCreator.SetupSequence(x => x.Create(It.IsAny<IRoute>()))
+                .Returns(_headerTemplates1)
+                .Returns(_headerTemplates2);
         }
 
         private void ThenTheResultIsEmpty()

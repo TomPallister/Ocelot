@@ -43,6 +43,7 @@ namespace Ocelot.DependencyInjection
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
+    using Ocelot.DownstreamRouteFinder.HeaderMatcher;
 
     public class OcelotBuilder : IOcelotBuilder
     {
@@ -77,6 +78,7 @@ namespace Ocelot.DependencyInjection
             Services.TryAddSingleton<IClaimsToThingCreator, ClaimsToThingCreator>();
             Services.TryAddSingleton<IAuthenticationOptionsCreator, AuthenticationOptionsCreator>();
             Services.TryAddSingleton<IUpstreamTemplatePatternCreator, UpstreamTemplatePatternCreator>();
+            Services.TryAddSingleton<IUpstreamHeaderTemplatePatternCreator, UpstreamHeaderTemplatePatternCreator>();
             Services.TryAddSingleton<IRequestIdKeyCreator, RequestIdKeyCreator>();
             Services.TryAddSingleton<IServiceProviderConfigurationCreator, ServiceProviderConfigurationCreator>();
             Services.TryAddSingleton<IQoSOptionsCreator, QoSOptionsCreator>();
@@ -104,7 +106,9 @@ namespace Ocelot.DependencyInjection
             Services.TryAddSingleton<IChangeDownstreamPathTemplate, ChangeDownstreamPathTemplate>();
             Services.TryAddSingleton<IClaimsParser, ClaimsParser>();
             Services.TryAddSingleton<IUrlPathToUrlTemplateMatcher, RegExUrlMatcher>();
+            Services.TryAddSingleton<IHeadersToHeaderTemplatesMatcher, HeadersToHeaderTemplatesMatcher>();
             Services.TryAddSingleton<IPlaceholderNameAndValueFinder, UrlPathPlaceholderNameAndValueFinder>();
+            Services.TryAddSingleton<IHeaderPlaceholderNameAndValueFinder, HeaderPlaceholderNameAndValueFinder>();
             Services.TryAddSingleton<IDownstreamPathPlaceholderReplacer, DownstreamTemplatePathPlaceholderReplacer>();
             Services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteFinder>();
             Services.AddSingleton<IDownstreamRouteProvider, DownstreamRouteCreator>();
@@ -151,7 +155,7 @@ namespace Ocelot.DependencyInjection
                   .AddApplicationPart(assembly)
                   .AddControllersAsServices()
                   .AddAuthorization()
-                  .AddNewtonsoftJson(); 
+                  .AddNewtonsoftJson();
 
             Services.AddLogging();
             Services.AddMiddlewareAnalysis();
@@ -178,8 +182,8 @@ namespace Ocelot.DependencyInjection
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) => new T());
             return this;
         }
-        
-        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc) 
+
+        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc)
             where T : ILoadBalancer
         {
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) =>
@@ -187,7 +191,7 @@ namespace Ocelot.DependencyInjection
             return this;
         }
 
-        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc) 
+        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc)
             where T : ILoadBalancer
         {
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) =>
@@ -208,7 +212,7 @@ namespace Ocelot.DependencyInjection
         {
             Services.AddSingleton<ILoadBalancerCreator>(provider =>
                 new DelegateInvokingLoadBalancerCreator<T>(
-                    (route, serviceDiscoveryProvider) => 
+                    (route, serviceDiscoveryProvider) =>
                         loadBalancerFactoryFunc(provider, route, serviceDiscoveryProvider)));
             return this;
         }
@@ -272,8 +276,8 @@ namespace Ocelot.DependencyInjection
 
             Services.Replace(ServiceDescriptor.Describe(
                 typeof(IPlaceholders),
-                s => (IPlaceholders) objectFactory(s,
-                    new[] {CreateInstance(s, wrappedDescriptor)}),
+                s => (IPlaceholders)objectFactory(s,
+                    new[] { CreateInstance(s, wrappedDescriptor) }),
                 wrappedDescriptor.Lifetime
             ));
 

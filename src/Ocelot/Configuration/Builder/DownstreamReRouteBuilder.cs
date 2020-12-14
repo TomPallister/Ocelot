@@ -44,6 +44,7 @@ namespace Ocelot.Configuration.Builder
         private SecurityOptions _securityOptions;
         private string _downstreamHttpMethod;
         private Version _downstreamHttpVersion;
+        private Dictionary<string, UpstreamHeaderTemplate> _upstreamHeaders;
 
         public DownstreamRouteBuilder()
         {
@@ -263,6 +264,12 @@ namespace Ocelot.Configuration.Builder
             return this;
         }
 
+        public DownstreamRouteBuilder WithUpstreamHeaders(Dictionary<string, UpstreamHeaderTemplate> input)
+        {
+            _upstreamHeaders = input;
+            return this;
+        }
+
         public DownstreamRoute Build()
         {
             return new DownstreamRoute(
@@ -299,7 +306,8 @@ namespace Ocelot.Configuration.Builder
                 _dangerousAcceptAnyServerCertificateValidator,
                 _securityOptions,
                 _downstreamHttpMethod,
-                _downstreamHttpVersion);
+                _downstreamHttpVersion,
+                _upstreamHeaders);
         }
     }
 }
