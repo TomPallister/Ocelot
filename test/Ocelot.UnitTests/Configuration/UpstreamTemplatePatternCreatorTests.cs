@@ -45,7 +45,7 @@ namespace Ocelot.UnitTests.Configuration
 
             this.Given(x => x.GivenTheFollowingFileRoute(fileRoute))
                 .When(x => x.WhenICreateTheTemplatePattern())
-                .Then(x => x.ThenTheFollowingIsReturned("^(?i)/orders/.+$"))
+                .Then(x => x.ThenTheFollowingIsReturned("^(?i)/orders(|/.+|/[\\?&#].+)$"))
                 .And(x => ThenThePriorityIs(0))
                 .BDDfy();
         }
@@ -77,7 +77,7 @@ namespace Ocelot.UnitTests.Configuration
 
             this.Given(x => x.GivenTheFollowingFileRoute(fileRoute))
                 .When(x => x.WhenICreateTheTemplatePattern())
-                .Then(x => x.ThenTheFollowingIsReturned("^(?i)/PRODUCTS/.+$"))
+                .Then(x => x.ThenTheFollowingIsReturned("^(?i)/PRODUCTS(|/.+|/[\\?&#].+)$"))
                 .And(x => ThenThePriorityIs(1))
                 .BDDfy();
         }
@@ -108,7 +108,7 @@ namespace Ocelot.UnitTests.Configuration
             };
             this.Given(x => x.GivenTheFollowingFileRoute(fileRoute))
                 .When(x => x.WhenICreateTheTemplatePattern())
-                .Then(x => x.ThenTheFollowingIsReturned("^/PRODUCTS/.+$"))
+                .Then(x => x.ThenTheFollowingIsReturned("^/PRODUCTS(|/.+|/[\\?&#].+)$"))
                 .And(x => ThenThePriorityIs(1))
                 .BDDfy();
         }
@@ -124,7 +124,7 @@ namespace Ocelot.UnitTests.Configuration
 
             this.Given(x => x.GivenTheFollowingFileRoute(fileRoute))
                 .When(x => x.WhenICreateTheTemplatePattern())
-                .Then(x => x.ThenTheFollowingIsReturned("^/api/products/.+$"))
+                .Then(x => x.ThenTheFollowingIsReturned("^/api/products(|/.+|/[\\?&#].+)$"))
                 .And(x => ThenThePriorityIs(1))
                 .BDDfy();
         }
@@ -140,7 +140,7 @@ namespace Ocelot.UnitTests.Configuration
 
             this.Given(x => x.GivenTheFollowingFileRoute(fileRoute))
                 .When(x => x.WhenICreateTheTemplatePattern())
-                .Then(x => x.ThenTheFollowingIsReturned("^/api/products/[^/]+/variants/.+$"))
+                .Then(x => x.ThenTheFollowingIsReturned("^/api/products/[^/]+/variants(|/.+|/[\\?&#].+)$"))
                 .And(x => ThenThePriorityIs(1))
                 .BDDfy();
         }

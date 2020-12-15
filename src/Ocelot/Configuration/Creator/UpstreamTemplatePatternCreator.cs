@@ -7,6 +7,7 @@ namespace Ocelot.Configuration.Creator
     public class UpstreamTemplatePatternCreator : IUpstreamTemplatePatternCreator
     {
         private const string RegExMatchOneOrMoreOfEverything = ".+";
+        private const string RegExMatchLastPlaceHolderZeroOrMoreOfEverything = "(|/.+|/[\\?&#].+)";
         private const string RegExMatchOneOrMoreOfEverythingUntilNextForwardSlash = "[^/]+";
         private const string RegExMatchEndString = "$";
         private const string RegExIgnoreCase = "(?i)";
@@ -50,7 +51,16 @@ namespace Ocelot.Configuration.Creator
                 var indexOfNextForwardSlash = upstreamTemplate.IndexOf("/", indexOfPlaceholder);
                 if (indexOfNextForwardSlash < indexOfPlaceholder || (containsQueryString && upstreamTemplate.IndexOf("?") < upstreamTemplate.IndexOf(placeholders[i])))
                 {
-                    upstreamTemplate = upstreamTemplate.Replace(placeholders[i], RegExMatchOneOrMoreOfEverything);
+                    if(upstreamTemplate[indexOfPlaceholder -1] == '/')
+                    {
+                        upstreamTemplate = upstreamTemplate.Remove(indexOfPlaceholder - 1, 1);                        
+                        upstreamTemplate = upstreamTemplate.Replace(placeholders[i], RegExMatchLastPlaceHolderZeroOrMoreOfEverything);
+                    }
+                    else
+                    {
+                        upstreamTemplate = upstreamTemplate.Replace(placeholders[i], RegExMatchOneOrMoreOfEverything);
+                    }
+                    
                 }
                 else
                 {
