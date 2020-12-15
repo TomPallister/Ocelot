@@ -108,6 +108,31 @@ In order to make an Aggregator you must implement this interface.
 
 With this feature you can pretty much do whatever you want because the HttpContext objects contain the results of all the aggregate requests. Please note if the HttpClient throws an exception when making a request to a Route in the aggregate then you will not get a HttpContext for it but you would for any that succeed. If it does throw an exception this will be logged.
 
+.. code-block:: csharp
+
+    public class MyAggregator : IDefinedAggregator
+    {
+        public async Task<DownstreamResponse> Aggregate(List<HttpContext> responseHttpContexts)
+        {
+            var responses = responseHttpContexts.Select(x => x.Items.DownstreamResponse());
+
+            var statusCodes = responses.Select(x => x.StatusCode);
+            var headers = responses.SelectMany(x => x.Headers).ToList();
+            var contentList = new List<string>();
+            foreach (var response in responses)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                contentList.Add(content);
+            }
+
+            return new DownstreamResponse(
+                new StringContent(JsonConvert.SerializeObject(contentList)),
+                HttpStatusCode.OK,
+                headers,
+                "reason");
+        }
+    }
+
 Basic expecting JSON from Downstream Services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
