@@ -54,13 +54,27 @@ namespace Ocelot.ServiceDiscovery
             {
                 var provider = _delegates?.Invoke(_provider, config, route);
 
-                if (provider.GetType().Name.ToLower() == config.Type.ToLower())
+                if (MatchProviderName(config, provider))
                 {
                     return new OkResponse<IServiceDiscoveryProvider>(provider);
                 }
             }
 
             return new ErrorResponse<IServiceDiscoveryProvider>(new UnableToFindServiceDiscoveryProviderError($"Unable to find service discovery provider for type: {config.Type}"));
+        }
+
+        private static bool MatchProviderName(ServiceProviderConfiguration config, IServiceDiscoveryProvider provider)
+        {
+            var configTypeName = config.Type.ToLowerInvariant();
+            var providerTypeName = provider.GetType().Name.ToLowerInvariant();
+
+            return providerTypeName == configTypeName ||
+                providerTypeName == string.Concat(configTypeName, "provider") ||
+                providerTypeName == string.Concat(configTypeName, "discoveryprovider") ||
+                providerTypeName == string.Concat(configTypeName, "servicediscoveryprovider");
+
+
+
         }
     }
 }

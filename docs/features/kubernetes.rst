@@ -51,13 +51,14 @@ The following example shows how to set up a Route that will work in kubernetes. 
       "Port": 443,
       "Token": "txpc696iUhbVoudg164r93CxDTrKRVWG",
       "Namespace": "dev",
-      "Type": "kube"
+      "Type": "kubernetes"
     }
   }
 }
     
-Service deployment in Namespace Dev , ServiceDiscoveryProvider type is kube, you also can set pollkube ServiceDiscoveryProvider type.
-  Note: Host、 Port and Token are no longer in use。
+Service deployment in Namespace Dev, ServiceDiscoveryProvider type is kubernetes.
+
+You also can set pollkube ServiceDiscoveryProvider type. Note: Host, Port and Token are no longer in use。
 
 You use Ocelot to poll kubernetes for latest service information rather than per request. If you want to poll kubernetes for the latest services rather than per request (default behaviour) then you need to set the following configuration.
 

@@ -84,11 +84,41 @@ namespace Ocelot.UnitTests.ServiceDiscovery
                 .Build();
 
             this.Given(x => x.GivenTheRoute(serviceConfig, route))
-                .And(x => GivenAFakeDelegate())
+                .And(x => GivenAFakeDelegate<Fake>())
                 .When(x => x.WhenIGetTheServiceProvider())
-                .Then(x => x.ThenTheDelegateIsCalled())
+                .Then(x => x.ThenTheDelegateIsCalled<Fake>())
                 .BDDfy();
         }
+
+        [Fact]
+        public void should_return_provider_because_type_matches_any_name_searches_reflected_type_from_delegate()
+        {
+            var route = new DownstreamRouteBuilder()
+                .WithServiceName("product")
+                .WithUseServiceDiscovery(true)
+                .Build();
+
+            TestNameSearch<Fake>(route);
+            TestNameSearch<FakeProvider>(route);
+            TestNameSearch<FakeDiscoveryProvider>(route);
+            TestNameSearch<FakeServiceDiscoveryProvider>(route);
+
+        }
+
+        private void TestNameSearch<T>(DownstreamRoute route) 
+            where T : IServiceDiscoveryProvider, new()
+        {
+            var serviceConfig = new ServiceProviderConfigurationBuilder()
+                 .WithType(typeof(T).Name)
+                 .Build();
+
+            this.Given(x => x.GivenTheRoute(serviceConfig, route))
+                .And(x => GivenAFakeDelegate<T>())
+                .When(x => x.WhenIGetTheServiceProvider())
+                .Then(x => x.ThenTheDelegateIsCalled<T>())
+                .BDDfy();
+        }
+
 
         [Fact]
         public void should_not_return_provider_because_type_doesnt_match_reflected_type_from_delegate()
@@ -103,7 +133,7 @@ namespace Ocelot.UnitTests.ServiceDiscovery
                 .Build();
 
             this.Given(x => x.GivenTheRoute(serviceConfig, route))
-                .And(x => GivenAFakeDelegate())
+                .And(x => GivenAFakeDelegate<Fake>())
                 .When(x => x.WhenIGetTheServiceProvider())
                 .Then(x => x.ThenTheResultIsError())
                 .BDDfy();
@@ -127,9 +157,10 @@ namespace Ocelot.UnitTests.ServiceDiscovery
                 .BDDfy();
         }
 
-        private void GivenAFakeDelegate()
+        private void GivenAFakeDelegate<T>() 
+            where T : IServiceDiscoveryProvider, new()
         {
-            ServiceDiscoveryFinderDelegate fake = (provider, config, name) => new Fake();
+            ServiceDiscoveryFinderDelegate fake = (provider, config, name) => new T();
             _collection.AddSingleton(fake);
             _provider = _collection.BuildServiceProvider();
             _factory = new ServiceDiscoveryProviderFactory(_loggerFactory.Object, _provider);
@@ -143,9 +174,33 @@ namespace Ocelot.UnitTests.ServiceDiscovery
             }
         }
 
-        private void ThenTheDelegateIsCalled()
+        private class FakeProvider : IServiceDiscoveryProvider
         {
-            _result.Data.GetType().Name.ShouldBe("Fake");
+            public Task<List<Service>> Get()
+            {
+                return null;
+            }
+        }
+        private class FakeDiscoveryProvider : IServiceDiscoveryProvider
+        {
+            public Task<List<Service>> Get()
+            {
+                return null;
+            }
+        }
+
+        private class FakeServiceDiscoveryProvider : IServiceDiscoveryProvider
+        {
+            public Task<List<Service>> Get()
+            {
+                return null;
+            }
+        }
+
+        private void ThenTheDelegateIsCalled<T>()
+            where T : IServiceDiscoveryProvider
+        {
+            _result.Data.GetType().Name.ShouldBe(typeof(T).Name);
         }
 
         private void ThenTheResultIsError()
