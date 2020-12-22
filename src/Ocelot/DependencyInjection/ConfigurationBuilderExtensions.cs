@@ -10,6 +10,7 @@ namespace Ocelot.DependencyInjection
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Microsoft.Extensions.Hosting;
 
     public static class ConfigurationBuilderExtensions
     {
@@ -29,12 +30,12 @@ namespace Ocelot.DependencyInjection
             return builder;
         }
 
-        public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, IWebHostEnvironment env)
+        public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, IHostEnvironment env)
         {
             return builder.AddOcelot(".", env);
         }
 
-        public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, string folder, IWebHostEnvironment env)
+        public static IConfigurationBuilder AddOcelot(this IConfigurationBuilder builder, string folder, IHostEnvironment env)
         {
             const string primaryConfigFile = "ocelot.json";
 
@@ -47,9 +48,14 @@ namespace Ocelot.DependencyInjection
             var reg = new Regex(subConfigPattern, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
             var files = new DirectoryInfo(folder)
-                .EnumerateFiles()
-                .Where(fi => reg.IsMatch(fi.Name) && (fi.Name != excludeConfigName))
-                .ToList();
+               .EnumerateFiles()
+               .Where(fi => reg.IsMatch(fi.Name)
+                               && (fi.Name != excludeConfigName)
+                               
+                               // Added to support sub services maping ex: ocelot.order.{EnvironmentName}.json
+                               && (fi.Name.Contains(env.EnvironmentName) || fi.Name.Contains(globalConfigFile))
+                               )
+               .ToList();
 
             var fileConfiguration = new FileConfiguration();
 
