@@ -34,7 +34,7 @@ namespace Ocelot.UnitTests.Configuration
                 }
             };
 
-            var expected = new SecurityOptions(ipAllowedList, ipBlockedList);
+            var expected = new SecurityOptions(ipAllowedList, ipBlockedList, false);
 
             this.Given(x => x.GivenThe(fileRoute))
               .When(x => x.WhenICreate())
