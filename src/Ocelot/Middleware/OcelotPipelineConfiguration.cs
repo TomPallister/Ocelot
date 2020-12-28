@@ -57,6 +57,14 @@
         public Func<HttpContext, Func<Task>, Task> AuthorizationMiddleware { get; set; }
 
         /// <summary>
+        /// This allows the user to completely override the ocelot claims to headers middleware
+        /// </summary>
+        /// <value>
+        /// <placeholder>This allows the user to completely override the ocelot claims to headers middleware</placeholder>
+        /// </value>
+        public Func<HttpContext, Func<Task>, Task> ClaimsToHeadersMiddleware { get; set; }
+
+        /// <summary>
         /// This allows the user to implement there own query string manipulation logic
         /// </summary>
         /// <value>
