@@ -35,6 +35,8 @@ The user can set functions against the following.
 
 * AuthorizationMiddleware - This overrides Ocelots authorization middleware.
 
+* ClaimsToHeadersMiddleware - This overrides Ocelots claims to headers middleware.
+
 * PreQueryStringBuilderMiddleware - This allows the user to manipulate the query string on the http request before it is passed to Ocelots request creator.
 
 Obviously you can just add middleware as normal before the call to app.UseOcelot() It cannot be added
