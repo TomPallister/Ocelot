@@ -87,6 +87,7 @@ namespace Ocelot.DependencyInjection
             Services.TryAddSingleton<IFileConfigurationRepository, DiskFileConfigurationRepository>();
             Services.TryAddSingleton<IFileConfigurationSetter, FileAndInternalConfigurationSetter>();
             Services.TryAddSingleton<IServiceDiscoveryProviderFactory, ServiceDiscoveryProviderFactory>();
+            Services.TryAddSingleton<IStickySessionStorage, InMemoryStickySessionStorage>();
             Services.AddSingleton<ILoadBalancerCreator, NoLoadBalancerCreator>();
             Services.AddSingleton<ILoadBalancerCreator, RoundRobinCreator>();
             Services.AddSingleton<ILoadBalancerCreator, CookieStickySessionsCreator>();
@@ -151,7 +152,7 @@ namespace Ocelot.DependencyInjection
                   .AddApplicationPart(assembly)
                   .AddControllersAsServices()
                   .AddAuthorization()
-                  .AddNewtonsoftJson(); 
+                  .AddNewtonsoftJson();
 
             Services.AddLogging();
             Services.AddMiddlewareAnalysis();
@@ -178,8 +179,8 @@ namespace Ocelot.DependencyInjection
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) => new T());
             return this;
         }
-        
-        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc) 
+
+        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc)
             where T : ILoadBalancer
         {
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) =>
@@ -187,7 +188,7 @@ namespace Ocelot.DependencyInjection
             return this;
         }
 
-        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc) 
+        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc)
             where T : ILoadBalancer
         {
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) =>
@@ -208,7 +209,7 @@ namespace Ocelot.DependencyInjection
         {
             Services.AddSingleton<ILoadBalancerCreator>(provider =>
                 new DelegateInvokingLoadBalancerCreator<T>(
-                    (route, serviceDiscoveryProvider) => 
+                    (route, serviceDiscoveryProvider) =>
                         loadBalancerFactoryFunc(provider, route, serviceDiscoveryProvider)));
             return this;
         }
@@ -272,8 +273,8 @@ namespace Ocelot.DependencyInjection
 
             Services.Replace(ServiceDescriptor.Describe(
                 typeof(IPlaceholders),
-                s => (IPlaceholders) objectFactory(s,
-                    new[] {CreateInstance(s, wrappedDescriptor)}),
+                s => (IPlaceholders)objectFactory(s,
+                    new[] { CreateInstance(s, wrappedDescriptor) }),
                 wrappedDescriptor.Lifetime
             ));
 
