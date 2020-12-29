@@ -20,7 +20,8 @@
 
         public CookieStickySessionsCreatorTests()
         {
-            _creator = new CookieStickySessionsCreator();
+            var sessionStorage = new InMemoryStickySessionStorage();
+            _creator = new CookieStickySessionsCreator(sessionStorage);
             _serviceProvider = new Mock<IServiceDiscoveryProvider>();
         }
         
