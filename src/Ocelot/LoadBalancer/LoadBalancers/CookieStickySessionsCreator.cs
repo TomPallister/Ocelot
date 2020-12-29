@@ -12,8 +12,9 @@
         {
             var loadBalancer = new RoundRobin(async () => await serviceProvider.Get());
             var bus = new InMemoryBus<StickySession>();
+            var storage = new InMemoryStickySessionStorage();
             return new OkResponse<ILoadBalancer>(new CookieStickySessions(loadBalancer, route.LoadBalancerOptions.Key,
-                route.LoadBalancerOptions.ExpiryInMs, bus));
+                route.LoadBalancerOptions.ExpiryInMs, bus, storage));
         }
 
         public string Type => nameof(CookieStickySessions);

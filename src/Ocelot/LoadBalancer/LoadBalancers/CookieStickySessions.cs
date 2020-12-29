@@ -14,27 +14,27 @@ namespace Ocelot.LoadBalancer.LoadBalancers
         private readonly int _keyExpiryInMs;
         private readonly string _key;
         private readonly ILoadBalancer _loadBalancer;
-        private readonly ConcurrentDictionary<string, StickySession> _stored;
+        private readonly IStickySessionStorage _storage;
         private readonly IBus<StickySession> _bus;
         private readonly object _lock = new object();
 
-        public CookieStickySessions(ILoadBalancer loadBalancer, string key, int keyExpiryInMs, IBus<StickySession> bus)
+        public CookieStickySessions(ILoadBalancer loadBalancer, string key, int keyExpiryInMs, IBus<StickySession> bus, IStickySessionStorage storage)
         {
             _bus = bus;
             _key = key;
             _keyExpiryInMs = keyExpiryInMs;
             _loadBalancer = loadBalancer;
-            _stored = new ConcurrentDictionary<string, StickySession>();
+            _storage = storage;
             _bus.Subscribe(ss =>
             {
                 //todo - get test coverage for this.
-                if (_stored.TryGetValue(ss.Key, out var stickySession))
+                if (_storage.TryGetSession(ss.Key, out var stickySession))
                 {
                     lock (_lock)
                     {
                         if (stickySession.Expiry < DateTime.UtcNow)
                         {
-                            _stored.TryRemove(stickySession.Key, out _);
+                            _storage.TryRemove(stickySession.Key, out _);
                             _loadBalancer.Release(stickySession.HostAndPort);
                         }
                     }
@@ -48,13 +48,13 @@ namespace Ocelot.LoadBalancer.LoadBalancers
 
             lock (_lock)
             {
-                if (!string.IsNullOrEmpty(key) && _stored.ContainsKey(key))
+                if (!string.IsNullOrEmpty(key) && _storage.Contains(key))
                 {
-                    var cached = _stored[key];
+                    var cached = _storage.GetSession(key);
 
                     var updated = new StickySession(cached.HostAndPort, DateTime.UtcNow.AddMilliseconds(_keyExpiryInMs), key);
 
-                    _stored[key] = updated;
+                    _storage.SetSession(key, updated);
 
                     _bus.Publish(updated, _keyExpiryInMs);
 
@@ -71,10 +71,10 @@ namespace Ocelot.LoadBalancer.LoadBalancers
 
             lock (_lock)
             {
-                if (!string.IsNullOrEmpty(key) && !_stored.ContainsKey(key))
+                if (!string.IsNullOrEmpty(key) && !_storage.Contains(key))
                 {
                     var ss = new StickySession(next.Data, DateTime.UtcNow.AddMilliseconds(_keyExpiryInMs), key);
-                    _stored[key] = ss;
+                    _storage.SetSession(key, ss);
                     _bus.Publish(ss, _keyExpiryInMs);
                 }
             }

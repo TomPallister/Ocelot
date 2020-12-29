@@ -33,7 +33,8 @@ namespace Ocelot.UnitTests.LoadBalancer
             _bus = new FakeBus<StickySession>();
             _loadBalancer = new Mock<ILoadBalancer>();
             _defaultExpiryInMs = 0;
-            _stickySessions = new CookieStickySessions(_loadBalancer.Object, "sessionid", _defaultExpiryInMs, _bus);
+            var sessionStorage = new InMemoryStickySessionStorage();
+            _stickySessions = new CookieStickySessions(_loadBalancer.Object, "sessionid", _defaultExpiryInMs, _bus, sessionStorage);
         }
 
         [Fact]
