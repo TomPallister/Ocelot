@@ -8,19 +8,13 @@
 
     public class CookieStickySessionsCreator : ILoadBalancerCreator
     {
-        private readonly IStickySessionStorage _sessionStorage;
-
-        public CookieStickySessionsCreator(IStickySessionStorage sessionStorage)
-        {
-            _sessionStorage = sessionStorage;
-        }
-
         public Response<ILoadBalancer> Create(DownstreamRoute route, IServiceDiscoveryProvider serviceProvider)
         {
             var loadBalancer = new RoundRobin(async () => await serviceProvider.Get());
             var bus = new InMemoryBus<StickySession>();
+            var sessionStorage = new InMemoryStickySessionStorage();
             return new OkResponse<ILoadBalancer>(new CookieStickySessions(loadBalancer, route.LoadBalancerOptions.Key,
-                route.LoadBalancerOptions.ExpiryInMs, bus, _sessionStorage));
+                route.LoadBalancerOptions.ExpiryInMs, bus, sessionStorage));
         }
 
         public string Type => nameof(CookieStickySessions);
