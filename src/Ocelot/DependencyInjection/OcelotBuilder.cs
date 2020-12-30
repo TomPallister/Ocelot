@@ -152,7 +152,7 @@ namespace Ocelot.DependencyInjection
                   .AddApplicationPart(assembly)
                   .AddControllersAsServices()
                   .AddAuthorization()
-                  .AddNewtonsoftJson();
+                  .AddNewtonsoftJson(); 
 
             Services.AddLogging();
             Services.AddMiddlewareAnalysis();
@@ -188,7 +188,7 @@ namespace Ocelot.DependencyInjection
             return this;
         }
 
-        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc)
+        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc) 
             where T : ILoadBalancer
         {
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) =>
@@ -209,7 +209,7 @@ namespace Ocelot.DependencyInjection
         {
             Services.AddSingleton<ILoadBalancerCreator>(provider =>
                 new DelegateInvokingLoadBalancerCreator<T>(
-                    (route, serviceDiscoveryProvider) =>
+                    (route, serviceDiscoveryProvider) => 
                         loadBalancerFactoryFunc(provider, route, serviceDiscoveryProvider)));
             return this;
         }
@@ -274,7 +274,7 @@ namespace Ocelot.DependencyInjection
             Services.Replace(ServiceDescriptor.Describe(
                 typeof(IPlaceholders),
                 s => (IPlaceholders)objectFactory(s,
-                    new[] { CreateInstance(s, wrappedDescriptor) }),
+                    new[] { CreateInstance(s, wrappedDescriptor)}),
                 wrappedDescriptor.Lifetime
             ));
 
