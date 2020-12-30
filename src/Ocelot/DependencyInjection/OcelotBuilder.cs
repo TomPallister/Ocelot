@@ -179,14 +179,14 @@ namespace Ocelot.DependencyInjection
             return this;
         }
         
-        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc) 
+        public IOcelotBuilder AddCustomLoadBalancer<T>(Func<T> loadBalancerFactoryFunc)
             where T : ILoadBalancer
         {
             AddCustomLoadBalancer((provider, route, serviceDiscoveryProvider) =>
                 loadBalancerFactoryFunc());
             return this;
         }
-
+        
         public IOcelotBuilder AddCustomLoadBalancer<T>(Func<IServiceProvider, T> loadBalancerFactoryFunc) 
             where T : ILoadBalancer
         {
