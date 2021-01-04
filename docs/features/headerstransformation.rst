@@ -141,7 +141,7 @@ Ideally this feature would be able to support the fact that a header can have mu
 .. code-block:: json
 
     "DownstreamHeaderTransform": {
-        "Location": "[{one,one},{two,two}"
+        "Location": "[{one,one},{two,two}]"
     },
      "HttpHandlerOptions": {
         "AllowAutoRedirect": false,
