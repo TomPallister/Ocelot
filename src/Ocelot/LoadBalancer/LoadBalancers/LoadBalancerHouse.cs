@@ -25,8 +25,6 @@ namespace Ocelot.LoadBalancer.LoadBalancers
 
                 if (_loadBalancers.TryGetValue(route.LoadBalancerKey, out var loadBalancer))
                 {
-                    loadBalancer = _loadBalancers[route.LoadBalancerKey];
-
                     if (route.LoadBalancerOptions.Type != loadBalancer.GetType().Name)
                     {
                         result = _factory.Get(route, config);
