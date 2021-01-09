@@ -13,7 +13,7 @@ that need a unified point of entry into their system. However it will work with 
 
 In particular I want easy integration with IdentityServer reference and bearer tokens. 
 
-We have been unable to find this in my current workplacewithout having to write our own Javascript middlewares to handle the IdentityServer reference tokens. We would rather use the IdentityServer code that already existsto do this.
+We have been unable to find this in my current workplace without having to write our own Javascript middlewares to handle the IdentityServer reference tokens. We would rather use the IdentityServer code that already exists to do this.
 
 Ocelot is a bunch of middlewares in a specific order.
 
