@@ -11,16 +11,16 @@
     using System.Threading.Tasks;
     using Xunit;
 
-    public class HttpExeptionToErrorMapperTests
+    public class HttpExceptionToErrorMapperTests
     {
-        private HttpExeptionToErrorMapper _mapper;
+        private HttpExceptionToErrorMapper _mapper;
         private readonly ServiceCollection _services;
 
-        public HttpExeptionToErrorMapperTests()
+        public HttpExceptionToErrorMapperTests()
         {
             _services = new ServiceCollection();
             var provider = _services.BuildServiceProvider();
-            _mapper = new HttpExeptionToErrorMapper(provider);
+            _mapper = new HttpExceptionToErrorMapper(provider);
         }
 
         [Fact]
@@ -67,7 +67,7 @@
 
             var provider = _services.BuildServiceProvider();
 
-            _mapper = new HttpExeptionToErrorMapper(provider);
+            _mapper = new HttpExceptionToErrorMapper(provider);
 
             var error = _mapper.Map(new TaskCanceledException());
 
