@@ -113,7 +113,7 @@ Then in your Program.cs you will want to have the following. The main things to 
 
 **Install NuGet package**
 
-Install Ocelot and it's dependecies using nuget. You will need to create a netcoreapp1.0+ projct and bring the package into it. Then follow the Startup below and :doc:`../features/configuration` sections to get up and running. Please note you will need to choose one of the Ocelot packages from the NuGet feed.
+Install Ocelot and it's dependecies using nuget. You will need to create a netcoreapp1.0+ project and bring the package into it. Then follow the Startup below and :doc:`../features/configuration` sections to get up and running. Please note you will need to choose one of the Ocelot packages from the NuGet feed.
 
 All versions can be found `here <https://www.nuget.org/packages/Ocelot/>`_.
 
