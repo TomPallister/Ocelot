@@ -4,6 +4,7 @@ namespace Ocelot.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.Net;
+    using System.Threading.Tasks;
     using TestStack.BDDfy;
     using Xunit;
 
@@ -55,9 +56,10 @@ namespace Ocelot.AcceptanceTests
 
         private void GivenThereIsAServiceRunningOn(string baseUrl, string basePath, int statusCode)
         {
-            _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
+            _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, context =>
             {
                 context.Response.StatusCode = statusCode;
+                return Task.CompletedTask;
             });
         }
 
