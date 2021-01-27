@@ -80,7 +80,7 @@ namespace Ocelot.Configuration.Creator
             {
                 var endOfPlaceholder = replace.IndexOf("}", startOfPlaceholder);
 
-                var placeholder = replace.Substring(startOfPlaceholder, startOfPlaceholder + (endOfPlaceholder + 1));
+                var placeholder = replace.Substring(startOfPlaceholder, endOfPlaceholder + 1);
 
                 var value = _placeholders.Get(placeholder);
 
