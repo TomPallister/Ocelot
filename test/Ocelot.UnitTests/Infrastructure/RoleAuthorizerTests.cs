@@ -11,18 +11,18 @@ using Xunit;
 
 namespace Ocelot.UnitTests.Infrastructure
 {
-    public class ScopesAuthorizerTests
+    public class RoleAuthorizerTests
     {
-        private ScopesAuthorizer _authorizer;
+        private RolesAuthorizer _authorizer;
         public Mock<IClaimsParser> _parser;
         private ClaimsPrincipal _principal;
-        private List<string> _allowedScopes;
+        private List<string> _requiredRole;
         private Response<bool> _result;
 
-        public ScopesAuthorizerTests()
+        public RoleAuthorizerTests()
         {
             _parser = new Mock<IClaimsParser>();
-            _authorizer = new ScopesAuthorizer(_parser.Object);
+            _authorizer = new RolesAuthorizer(_parser.Object);
         }
 
         [Fact]
@@ -58,30 +58,30 @@ namespace Ocelot.UnitTests.Infrastructure
         }
 
         [Fact]
-        public void should_match_scopes_and_return_ok_result()
+        public void should_match_role_and_return_ok_result()
         {
             var claimsPrincipal = new ClaimsPrincipal();
-            var allowedScopes = new List<string>() { "someScope" };
+            var requiredRole = new List<string>() { "someRole" };
 
             this.Given(_ => GivenTheFollowing(claimsPrincipal))
-            .And(_ => GivenTheParserReturns(new OkResponse<List<string>>(allowedScopes)))
-            .And(_ => GivenTheFollowing(allowedScopes))
+            .And(_ => GivenTheParserReturns(new OkResponse<List<string>>(requiredRole)))
+            .And(_ => GivenTheFollowing(requiredRole))
             .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new OkResponse<bool>(true)))
             .BDDfy();
         }
 
         [Fact]
-        public void should_not_match_scopes_and_return_error_result()
+        public void should_not_match_role_and_return_error_result()
         {
             var fakeError = new FakeError();
             var claimsPrincipal = new ClaimsPrincipal();
-            var allowedScopes = new List<string>() { "someScope" };
-            var userScopes = new List<string>() { "anotherScope" };
+            var requiredRole = new List<string>() { "someRole" };
+            var userRoles = new List<string>() { "anotherRole" };
 
             this.Given(_ => GivenTheFollowing(claimsPrincipal))
-            .And(_ => GivenTheParserReturns(new OkResponse<List<string>>(userScopes)))
-            .And(_ => GivenTheFollowing(allowedScopes))
+            .And(_ => GivenTheParserReturns(new OkResponse<List<string>>(userRoles)))
+            .And(_ => GivenTheFollowing(requiredRole))
             .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new ErrorResponse<bool>(fakeError)))
             .BDDfy();
@@ -97,14 +97,14 @@ namespace Ocelot.UnitTests.Infrastructure
             _principal = principal;
         }
 
-        private void GivenTheFollowing(List<string> allowedScopes)
+        private void GivenTheFollowing(List<string> requiredRole)
         {
-            _allowedScopes = allowedScopes;
+            _requiredRole = requiredRole;
         }
 
         private void WhenIAuthorize()
         {
-            _result = _authorizer.Authorize(_principal, _allowedScopes, null);
+            _result = _authorizer.Authorize(_principal, _requiredRole, null);
         }
 
         private void ThenTheFollowingIsReturned(Response<bool> expected)
@@ -114,10 +114,4 @@ namespace Ocelot.UnitTests.Infrastructure
         }
     }
 
-    public class FakeError : Error
-    {
-        public FakeError() : base("fake error", OcelotErrorCode.CannotAddDataError, 404)
-        {
-        }
-    }
 }

@@ -10,21 +10,21 @@ namespace Ocelot.Authorization
     public class ScopesAuthorizer : IScopesAuthorizer
     {
         private readonly IClaimsParser _claimsParser;
-        private readonly string _scope = "scope";
 
         public ScopesAuthorizer(IClaimsParser claimsParser)
         {
             _claimsParser = claimsParser;
         }
 
-        public Response<bool> Authorize(ClaimsPrincipal claimsPrincipal, List<string> routeAllowedScopes)
+        public Response<bool> Authorize(ClaimsPrincipal claimsPrincipal, List<string> routeAllowedScopes, string scopeKey)
         {
             if (routeAllowedScopes == null || routeAllowedScopes.Count == 0)
             {
                 return new OkResponse<bool>(true);
             }
 
-            var values = _claimsParser.GetValuesByClaimType(claimsPrincipal.Claims, _scope);
+            scopeKey ??= "scope";
+            var values = _claimsParser.GetValuesByClaimType(claimsPrincipal.Claims, scopeKey);
 
             if (values.IsError)
             {

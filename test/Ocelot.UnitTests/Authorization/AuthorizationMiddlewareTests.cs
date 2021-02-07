@@ -27,17 +27,19 @@ namespace Ocelot.UnitTests.Authorization
         private readonly AuthorizationMiddleware _middleware;
         private RequestDelegate _next;
         private HttpContext _httpContext;
+        private readonly Mock<IRolesAuthorizer> _authRolesService;
 
         public AuthorizationMiddlewareTests()
         {
             _httpContext = new DefaultHttpContext();
             _authService = new Mock<IClaimsAuthorizer>();
             _authScopesService = new Mock<IScopesAuthorizer>();
+            _authRolesService = new Mock<IRolesAuthorizer>();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory.Setup(x => x.CreateLogger<AuthorizationMiddleware>()).Returns(_logger.Object);
             _next = context => Task.CompletedTask;
-            _middleware = new AuthorizationMiddleware(_next, _authService.Object, _authScopesService.Object, _loggerFactory.Object);
+            _middleware = new AuthorizationMiddleware(_next, _authService.Object, _authScopesService.Object,_authRolesService.Object, _loggerFactory.Object);
         }
 
         [Fact]
