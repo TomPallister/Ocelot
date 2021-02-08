@@ -28,7 +28,7 @@ namespace Ocelot.Request.Middleware
         {
             var downstreamRoute = httpContext.Items.DownstreamRoute();
 
-            var httpRequestMessage = await _requestMapper.Map(httpContext.Request, downstreamRoute);
+            var httpRequestMessage = _requestMapper.Map(httpContext.Request, downstreamRoute);
 
             if (httpRequestMessage.IsError)
             {

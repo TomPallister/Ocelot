@@ -15,7 +15,6 @@
     using Ocelot.Configuration;
     using TestStack.BDDfy;
     using Xunit;
-    using Ocelot.DownstreamRouteFinder.Middleware;
 
     public class DownstreamRequestInitialiserMiddlewareTests
     {
@@ -100,7 +99,7 @@
 
             _requestMapper
                 .Setup(rm => rm.Map(It.IsAny<HttpRequest>(), It.IsAny<DownstreamRoute>()))
-                .ReturnsAsync(_mappedRequest);
+                .Returns(_mappedRequest);
         }
 
         private void GivenTheMapperWillReturnAnError()
@@ -109,7 +108,7 @@
 
             _requestMapper
                 .Setup(rm => rm.Map(It.IsAny<HttpRequest>(), It.IsAny<DownstreamRoute>()))
-                .ReturnsAsync(_mappedRequest);
+                .Returns(_mappedRequest);
         }
 
         private void WhenTheMiddlewareIsInvoked()

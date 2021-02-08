@@ -18,7 +18,6 @@ namespace Ocelot.AcceptanceTests
     using Ocelot.Configuration.Creator;
     using Ocelot.Configuration.File;
     using Ocelot.DependencyInjection;
-    using Ocelot.Infrastructure;
     using Ocelot.Logging;
     using Ocelot.Middleware;
     using Ocelot.Multiplexer;
@@ -26,7 +25,7 @@ namespace Ocelot.AcceptanceTests
     using Ocelot.Provider.Eureka;
     using Ocelot.Provider.Polly;
     using Ocelot.Tracing.Butterfly;
-    using Requester;
+    using Ocelot.Requester;
     using Shouldly;
     using System;
     using System.Collections.Generic;
@@ -39,9 +38,9 @@ namespace Ocelot.AcceptanceTests
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Configuration;
-    using LoadBalancer.LoadBalancers;
-    using ServiceDiscovery.Providers;
+    using Ocelot.Configuration;
+    using Ocelot.LoadBalancer.LoadBalancers;
+    using Ocelot.ServiceDiscovery.Providers;
     using static Ocelot.AcceptanceTests.HttpDelegatingHandlersTests;
     using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
     using CookieHeaderValue = Microsoft.Net.Http.Headers.CookieHeaderValue;
@@ -947,9 +946,9 @@ namespace Ocelot.AcceptanceTests
             _response = _ocelotClient.GetAsync(url).Result;
         }
 
-        public void WhenIGetUrlOnTheApiGateway(string url, HttpContent content)
+        public void WhenIPutUrlOnTheApiGateway(string url, HttpContent content)
         {
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url) {Content = content};
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, url) { Content = content };
             _response = _ocelotClient.SendAsync(httpRequestMessage).Result;
         }
 
@@ -1185,7 +1184,7 @@ namespace Ocelot.AcceptanceTests
         {
             _changeToken.ChangeToken.HasChanged.ShouldBe(itShouldBeActive);
         }
-        
+
         public void GivenOcelotIsRunningWithLogger()
         {
             _webHostBuilder = new WebHostBuilder();

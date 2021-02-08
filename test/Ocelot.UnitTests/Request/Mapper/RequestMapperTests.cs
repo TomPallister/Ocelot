@@ -12,7 +12,6 @@
     using System.Net.Http;
     using System.Security.Cryptography;
     using System.Text;
-    using System.Threading.Tasks;
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using TestStack.BDDfy;
@@ -103,6 +102,44 @@
                 .BDDfy();
         }
 
+        [Theory]
+        [InlineData("PUT", "GET")]
+        [InlineData("POST", "HEAD")]
+        [InlineData("DELETE", "TRACE")]
+        [InlineData("OPTIONS", "GET")]
+        public void Should_strip_body_when_downstream_method_does_not_support_body(
+            string upstreamMethod,
+            string downstreamMethod)
+        {
+            this.Given(_ => GivenTheInputRequestHasMethod(upstreamMethod))
+                .And(_ => GivenTheDownstreamRouteMethodIs(downstreamMethod))
+                .And(_ => GivenTheInputRequestHasAValidUri())
+                .And(_ => GivenTheInputRequestHasContent("this should be stripped"))
+                .When(_ => WhenMapped())
+                .Then(_ => ThenNoErrorIsReturned())
+                .And(_ => ThenTheMappedRequestHasNoContent())
+                .BDDfy();
+        }
+
+        [Theory]
+        [InlineData("POST", "PUT")]
+        [InlineData("DELETE", "POST")]
+        [InlineData("POST", "OPTIONS")]
+        public void Should_not_strip_body_when_downstream_method_supports_body(
+            string upstreamMethod,
+            string downstreamMethod)
+        {
+            string expectedContent = "this is the content";
+            this.Given(_ => GivenTheInputRequestHasMethod(upstreamMethod))
+                .And(_ => GivenTheDownstreamRouteMethodIs(downstreamMethod))
+                .And(_ => GivenTheInputRequestHasAValidUri())
+                .And(_ => GivenTheInputRequestHasContent(expectedContent))
+                .When(_ => WhenMapped())
+                .Then(_ => ThenNoErrorIsReturned())
+                .And(_ => ThenTheMappedRequestHasContent(expectedContent))
+                .BDDfy();
+        }
+
         [Fact]
         public void Should_map_all_headers()
         {
@@ -133,7 +170,7 @@
         public void Should_map_content()
         {
             this.Given(_ => GivenTheInputRequestHasContent("This is my content"))
-                .And(_ => GivenTheInputRequestHasMethod("GET"))
+                .And(_ => GivenTheInputRequestHasMethod("DELETE"))
                 .And(_ => GivenTheInputRequestHasAValidUri())
                 .And(_ => GivenTheDownstreamRoute())
                 .When(_ => WhenMapped())
@@ -198,7 +235,7 @@
                 .And(_ => GivenTheContentRangeIs("bytes 1-2/*"))
                 .And(_ => GivenTheContentDispositionIs("inline"))
                 .And(_ => GivenTheContentMD5Is(md5bytes))
-                .And(_ => GivenTheInputRequestHasMethod("GET"))
+                .And(_ => GivenTheInputRequestHasMethod("DELETE"))
                 .And(_ => GivenTheInputRequestHasAValidUri())
                 .And(_ => GivenTheDownstreamRoute())
                 .When(_ => WhenMapped())
@@ -421,9 +458,9 @@
             _inputRequest.Body = null;
         }
 
-        private async Task WhenMapped()
+        private void WhenMapped()
         {
-            _mappedRequest = await _requestMapper.Map(_inputRequest, _downstreamRoute);
+            _mappedRequest = _requestMapper.Map(_inputRequest, _downstreamRoute);
         }
 
         private void ThenNoErrorIsReturned()

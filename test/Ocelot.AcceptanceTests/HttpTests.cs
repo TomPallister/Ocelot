@@ -112,7 +112,7 @@ namespace Ocelot.AcceptanceTests
                         DownstreamPathTemplate = "/{url}",
                         DownstreamScheme = "https",
                         UpstreamPathTemplate = "/{url}",
-                        UpstreamHttpMethod = new List<string> { "Get" },
+                        UpstreamHttpMethod = new List<string> { "Put" },
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
                             new FileHostAndPort
@@ -134,7 +134,7 @@ namespace Ocelot.AcceptanceTests
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}/", "/", port, HttpProtocols.Http2))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
-                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/", httpContent))
+                .When(x => _steps.WhenIPutUrlOnTheApiGateway("/", httpContent))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(_ => _steps.ThenTheResponseBodyShouldBe(expected))
                 .BDDfy();
@@ -154,7 +154,7 @@ namespace Ocelot.AcceptanceTests
                         DownstreamPathTemplate = "/{url}",
                         DownstreamScheme = "https",
                         UpstreamPathTemplate = "/{url}",
-                        UpstreamHttpMethod = new List<string> { "Get" },
+                        UpstreamHttpMethod = new List<string> { "Put" },
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
                             new FileHostAndPort
@@ -176,7 +176,7 @@ namespace Ocelot.AcceptanceTests
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}/", "/", port, HttpProtocols.Http2))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
-                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/", httpContent))
+                .When(x => _steps.WhenIPutUrlOnTheApiGateway("/", httpContent))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.BadGateway))
                 .BDDfy();
         }
@@ -195,7 +195,7 @@ namespace Ocelot.AcceptanceTests
                         DownstreamPathTemplate = "/{url}",
                         DownstreamScheme = "https",
                         UpstreamPathTemplate = "/{url}",
-                        UpstreamHttpMethod = new List<string> { "Get" },
+                        UpstreamHttpMethod = new List<string> { "Put" },
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
                             new FileHostAndPort
@@ -217,7 +217,7 @@ namespace Ocelot.AcceptanceTests
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}/", "/", port, HttpProtocols.Http1))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
-                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/", httpContent))
+                .When(x => _steps.WhenIPutUrlOnTheApiGateway("/", httpContent))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(_ => _steps.ThenTheResponseBodyShouldBe(expected))
                 .BDDfy();

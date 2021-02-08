@@ -58,7 +58,7 @@ namespace Ocelot.AcceptanceTests
         }
 
         [Fact]
-        public void should_return_response_200_when_get_converted_to_post_with_content()
+        public void should_return_response_200_when_put_converted_to_post_with_content()
         {
             var port = RandomPortFinder.GetRandomPort();
 
@@ -71,7 +71,7 @@ namespace Ocelot.AcceptanceTests
                         DownstreamPathTemplate = "/{url}",
                         DownstreamScheme = "http",
                         UpstreamPathTemplate = "/{url}",
-                        UpstreamHttpMethod = new List<string> { "Get" },
+                        UpstreamHttpMethod = new List<string> { "Put" },
                         DownstreamHostAndPorts = new List<FileHostAndPort>
                         {
                             new FileHostAndPort
@@ -91,14 +91,14 @@ namespace Ocelot.AcceptanceTests
             this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}/", "/", "POST"))
                 .And(x => _steps.GivenThereIsAConfiguration(configuration))
                 .And(x => _steps.GivenOcelotIsRunning())
-                .When(x => _steps.WhenIGetUrlOnTheApiGateway("/", httpContent))
+                .When(x => _steps.WhenIPutUrlOnTheApiGateway("/", httpContent))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(_ => _steps.ThenTheResponseBodyShouldBe(expected))
                 .BDDfy();
         }
 
         [Fact]
-        public void should_return_response_200_when_get_converted_to_get_with_content()
+        public void should_return_response_200_and_remove_content_when_post_with_content_converted_to_get()
         {
             var port = RandomPortFinder.GetRandomPort();
 
@@ -133,7 +133,7 @@ namespace Ocelot.AcceptanceTests
                 .And(x => _steps.GivenOcelotIsRunning())
                 .When(x => _steps.WhenIPostUrlOnTheApiGateway("/", httpContent))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
-                .And(_ => _steps.ThenTheResponseBodyShouldBe(expected))
+                .And(_ => _steps.ThenTheContentLengthIs(0))
                 .BDDfy();
         }
 
