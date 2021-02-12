@@ -1,24 +1,25 @@
 NAME ?= ocelot
 
-build:
-	./build.sh
+build: tool_restore
+	dotnet cake
 
-build_and_run_tests:
-	./build.sh --target=RunTests
+build_and_run_tests: tool_restore
+	dotnet cake --target=RunTests
 
-release:
-	./build.sh --target=Release
+release: tool_restore
+	dotnet cake --target=Release
 
-run_acceptance_tests:
-	./build.sh --target=RunAcceptanceTests
+run_acceptance_tests: tool_restore
+	dotnet cake --target=RunAcceptanceTests
 
-run_benchmarks:
-	./build.sh --target=RunBenchmarkTests
+run_benchmarks: tool_restore
+	dotnet cake --target=RunBenchmarkTests
 
-run_unit_tests:
-	./build.sh --target=RunUnitTests
+run_unit_tests: tool_restore
+	dotnet cake --target=RunUnitTests
 
-release_notes:
-	./build.sh --target=ReleaseNotes
+release_notes: tool_restore
+	dotnet cake --target=ReleaseNotes
 
-	
+tool_restore:
+	dotnet tool restore
