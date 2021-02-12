@@ -16,6 +16,9 @@
     {
         private readonly List<ServiceDiscoveryFinderDelegate> _serviceDiscoveryFinderDelegates;
 
+        private static readonly Regex _regExPlaceholder =
+            new Regex("{[^}]+}", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+
         public FileConfigurationFluentValidator(IServiceProvider provider, RouteFluentValidator routeFluentValidator, FileGlobalConfigurationFluentValidator fileGlobalConfigurationFluentValidator)
         {
             _serviceDiscoveryFinderDelegates = provider
@@ -116,8 +119,7 @@
 
         private bool IsPlaceholderNotDuplicatedIn(string upstreamPathTemplate)
         {
-            Regex regExPlaceholder = new Regex("{[^}]+}");
-            var matches = regExPlaceholder.Matches(upstreamPathTemplate);
+            var matches = _regExPlaceholder.Matches(upstreamPathTemplate);
             var upstreamPathPlaceholders = matches.Select(m => m.Value);
             return upstreamPathPlaceholders.Count() == upstreamPathPlaceholders.Distinct().Count();
         }

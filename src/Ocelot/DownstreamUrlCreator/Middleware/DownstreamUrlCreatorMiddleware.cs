@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace Ocelot.DownstreamUrlCreator.Middleware
 {
     using System.Collections.Generic;
@@ -19,6 +21,7 @@ namespace Ocelot.DownstreamUrlCreator.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IDownstreamPathPlaceholderReplacer _replacer;
+        private static ConcurrentDictionary<string, Regex> _regex = new ConcurrentDictionary<string, Regex>();
 
         public DownstreamUrlCreatorMiddleware(RequestDelegate next,
             IOcelotLoggerFactory loggerFactory,
@@ -107,8 +110,11 @@ namespace Ocelot.DownstreamUrlCreator.Middleware
                     var questionMarkOrAmpersand = downstreamRequest.Query.IndexOf(name, StringComparison.Ordinal);
                     downstreamRequest.Query = downstreamRequest.Query.Remove(questionMarkOrAmpersand - 1, 1);
 
-                    var rgx = new Regex($@"\b{name}={nAndV.Value}\b");
-                    downstreamRequest.Query = rgx.Replace(downstreamRequest.Query, "");
+                    var pattern = $@"\b{name}={nAndV.Value}\b";
+                    var regex = _regex.AddOrUpdate(pattern, new Regex(pattern, RegexOptions.Compiled, TimeSpan.FromMilliseconds(100)),
+                        (key, oldValue) => oldValue);
+                    
+                    downstreamRequest.Query = regex.Replace(downstreamRequest.Query, "");
 
                     if (!string.IsNullOrEmpty(downstreamRequest.Query))
                     {
