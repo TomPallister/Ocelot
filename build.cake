@@ -55,7 +55,7 @@ string gitHubPassword = Environment.GetEnvironmentVariable("OCELOT_GITHUB_API_KE
 var target = Argument("target", "Default");
 
 Information("target is " + target);
-Information("Build configuration is " + compileConfig);	
+Information("Build configuration is " + compileConfig);
 
 Task("Default")
 	.IsDependentOn("Build");
@@ -75,48 +75,50 @@ Task("Release")
 	.IsDependentOn("Build")
 	.IsDependentOn("CreateArtifacts")
 	.IsDependentOn("PublishGitHubRelease")
-    .IsDependentOn("PublishToNuget");
+	.IsDependentOn("PublishToNuget");
 
 Task("Compile")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Version")
 	.Does(() =>
-	{	
+	{
 		var settings = new DotNetCoreBuildSettings
 		{
 			Configuration = compileConfig,
 		};
-		
+
 		DotNetCoreBuild(slnFile, settings);
 	});
 
 Task("Clean")
 	.Does(() =>
 	{
-        if (DirectoryExists(artifactsDir))
-        {
-            DeleteDirectory(artifactsDir, recursive:true);
-        }
-        CreateDirectory(artifactsDir);
+		if (DirectoryExists(artifactsDir))
+		{
+			DeleteDirectory(artifactsDir, new DeleteDirectorySettings {
+				Recursive = true
+			});
+		}
+		CreateDirectory(artifactsDir);
 	});
 
 Task("CreateReleaseNotes")
 	.Does(() =>
-	{	
+	{
 		Information("Generating release notes at " + releaseNotesFile);
 
 		IEnumerable<string> lastReleaseTag;
 
 		var lastReleaseTagExitCode = StartProcess(
-			"git", 
-			new ProcessSettings { 
+			"git",
+			new ProcessSettings {
 				Arguments = "describe --tags --abbrev=0",
-             	RedirectStandardOutput = true
+				RedirectStandardOutput = true
 			},
 			out lastReleaseTag
 		);
 
-		if (lastReleaseTagExitCode != 0) 
+		if (lastReleaseTagExitCode != 0)
 		{
 			throw new Exception("Failed to get latest release tag");
 		}
@@ -128,15 +130,15 @@ Task("CreateReleaseNotes")
 		IEnumerable<string> releaseNotes;
 
 		var releaseNotesExitCode = StartProcess(
-			"git", 
-			new ProcessSettings { 
+			"git",
+			new ProcessSettings {
 				Arguments = $"log --pretty=format:\"%h - %an - %s\" {lastRelease}..HEAD",
-             	RedirectStandardOutput = true
+				RedirectStandardOutput = true
 			},
 			out releaseNotes
 		);
 
-		if (releaseNotesExitCode != 0) 
+		if (releaseNotesExitCode != 0)
 		{
 			throw new Exception("Failed to generate release notes");
 		}
@@ -152,7 +154,7 @@ Task("CreateReleaseNotes")
 
 		Information("Release notes are\r\n" + System.IO.File.ReadAllText(releaseNotesFile));
 	});
-	
+
 Task("Version")
 	.IsDependentOn("CreateReleaseNotes")
 	.Does(() =>
@@ -195,7 +197,7 @@ Task("RunUnitTests")
 		// todo bring back report generator to get a friendly report
 		// ReportGenerator(coverageSummaryFile, artifactsForUnitTestsDir);
 		// https://github.com/danielpalme/ReportGenerator
-		
+
 		if (IsRunningOnCircleCI() && IsMaster())
 		{
 			var repoToken = EnvironmentVariable(coverallsRepoToken);
@@ -219,7 +221,7 @@ Task("RunUnitTests")
 		var branchCoverage = XmlPeek(coverageSummaryFile, "//coverage/@line-rate");
 
 		Information("Sequence Coverage: " + sequenceCoverage);
-	
+
 		if(double.Parse(sequenceCoverage) < minCodeCoverage)
 		{
 			var whereToCheck = !IsRunningOnCircleCI() ? coverallsRepo : artifactsForUnitTestsDir;
@@ -261,7 +263,7 @@ Task("RunIntegrationTests")
 
 Task("CreateArtifacts")
 	.IsDependentOn("Compile")
-	.Does(() => 
+	.Does(() =>
 	{
 		EnsureDirectoryExists(packagesDir);
 
@@ -280,7 +282,7 @@ Task("CreateArtifacts")
 		var artifacts = System.IO.File
 			.ReadAllLines(artifactsFile)
 			.Distinct();
-		
+
 		foreach(var artifact in artifacts)
 		{
 			var codePackage = packagesDir + File(artifact);
@@ -291,7 +293,7 @@ Task("CreateArtifacts")
 
 Task("PublishGitHubRelease")
 	.IsDependentOn("CreateArtifacts")
-	.Does(() => 
+	.Does(() =>
 	{
 		if (IsRunningOnCircleCI())
 		{
@@ -309,21 +311,21 @@ Task("PublishGitHubRelease")
 	});
 
 Task("EnsureStableReleaseRequirements")
-    .Does(() =>	
-    {
+	.Does(() =>
+	{
 		Information("Check if stable release...");
 
-        if (!IsRunningOnCircleCI())
+		if (!IsRunningOnCircleCI())
 		{
-           throw new Exception("Stable release should happen via circleci");
+			throw new Exception("Stable release should happen via circleci");
 		}
 
 		Information("Release is stable...");
-    });
+	});
 
 Task("DownloadGitHubReleaseArtifacts")
-    .Does(() =>
-    {
+	.Does(() =>
+	{
 
 		try
 		{
@@ -334,7 +336,7 @@ Task("DownloadGitHubReleaseArtifacts")
 
 			var releaseUrl = tagsUrl + versioning.NuGetVersion;
 
-        	var assets_url = Newtonsoft.Json.Linq.JObject.Parse(GetResource(releaseUrl))
+			var assets_url = Newtonsoft.Json.Linq.JObject.Parse(GetResource(releaseUrl))
 				.Value<string>("assets_url");
 
 			var assets = GetResource(assets_url);
@@ -350,27 +352,27 @@ Task("DownloadGitHubReleaseArtifacts")
 			Information("There was an exception " + exception);
 			throw;
 		}
-    });
+	});
 
 Task("PublishToNuget")
-    .IsDependentOn("DownloadGitHubReleaseArtifacts")
-    .Does(() =>
-    {
+	.IsDependentOn("DownloadGitHubReleaseArtifacts")
+	.Does(() =>
+	{
 		if (IsRunningOnCircleCI())
 		{
 			PublishPackages(packagesDir, artifactsFile, nugetFeedStableKey, nugetFeedStableUploadUrl, nugetFeedStableSymbolsUploadUrl);
 		}
-    });
+	});
 
 RunTarget(target);
 
 /// Gets unique nuget version for this commit
 private GitVersion GetNuGetVersionForCommit()
 {
-    GitVersion(new GitVersionSettings{
-        UpdateAssemblyInfo = false,
-        OutputType = GitVersionOutput.BuildServer
-    });
+	GitVersion(new GitVersionSettings{
+		UpdateAssemblyInfo = false,
+		OutputType = GitVersionOutput.BuildServer
+	});
 
     return GitVersion(new GitVersionSettings{ OutputType = GitVersionOutput.Json });
 }
@@ -385,7 +387,7 @@ private void PersistVersion(string committedVersion, string newVersion)
 	foreach(var projectFile in projectFiles)
 	{
 		var file = projectFile.ToString();
- 
+
 		Information(string.Format("Updating {0}...", file));
 
 		var updatedProjectFile = System.IO.File.ReadAllText(file)
@@ -399,13 +401,13 @@ private void PersistVersion(string committedVersion, string newVersion)
 private void PublishPackages(ConvertableDirectoryPath packagesDir, ConvertableFilePath artifactsFile, string feedApiKey, string codeFeedUrl, string symbolFeedUrl)
 {
 		Information("PublishPackages");
-        var artifacts = System.IO.File
-            .ReadAllLines(artifactsFile)
+		var artifacts = System.IO.File
+			.ReadAllLines(artifactsFile)
 			.Distinct();
-		
+
 		foreach(var artifact in artifacts)
 		{
-			if (artifact == "releasenotes.md") 
+			if (artifact == "releasenotes.md")
 			{
 				continue;
 			}
@@ -413,7 +415,7 @@ private void PublishPackages(ConvertableDirectoryPath packagesDir, ConvertableFi
 			var codePackage = packagesDir + File(artifact);
 
 			Information("Pushing package " + codePackage);
-			
+
 			Information("Calling NuGetPush");
 
 			NuGetPush(
@@ -428,21 +430,21 @@ private void PublishPackages(ConvertableDirectoryPath packagesDir, ConvertableFi
 private void CreateGitHubRelease()
 {
 	var json = $"{{ \"tag_name\": \"{versioning.NuGetVersion}\", \"target_commitish\": \"master\", \"name\": \"{versioning.NuGetVersion}\", \"body\": \"{ReleaseNotesAsJson()}\", \"draft\": true, \"prerelease\": true }}";
-	
+
 	var content = new System.Net.Http.StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
 	using(var client = new System.Net.Http.HttpClient())
-	{	
-			client.DefaultRequestHeaders.Authorization = 
-    new System.Net.Http.Headers.AuthenticationHeaderValue(
-        "Basic", Convert.ToBase64String(
-            System.Text.ASCIIEncoding.ASCII.GetBytes(
-               $"{gitHubUsername}:{gitHubPassword}")));
+	{
+			client.DefaultRequestHeaders.Authorization =
+	new System.Net.Http.Headers.AuthenticationHeaderValue(
+		"Basic", Convert.ToBase64String(
+			System.Text.ASCIIEncoding.ASCII.GetBytes(
+				$"{gitHubUsername}:{gitHubPassword}")));
 
 		client.DefaultRequestHeaders.Add("User-Agent", "Ocelot Release");
 
 		var result = client.PostAsync("https://api.github.com/repos/ThreeMammals/Ocelot/releases", content).Result;
-		if(result.StatusCode != System.Net.HttpStatusCode.Created) 
+		if(result.StatusCode != System.Net.HttpStatusCode.Created)
 		{
 			throw new Exception("CreateGitHubRelease result.StatusCode = " + result.StatusCode);
 		}
@@ -464,17 +466,17 @@ private void UploadFileToGitHubRelease(FilePath file)
 	content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
 
 	using(var client = new System.Net.Http.HttpClient())
-	{	
-			client.DefaultRequestHeaders.Authorization = 
-    new System.Net.Http.Headers.AuthenticationHeaderValue(
-        "Basic", Convert.ToBase64String(
-            System.Text.ASCIIEncoding.ASCII.GetBytes(
-               $"{gitHubUsername}:{gitHubPassword}")));
+	{
+			client.DefaultRequestHeaders.Authorization =
+	new System.Net.Http.Headers.AuthenticationHeaderValue(
+		"Basic", Convert.ToBase64String(
+			System.Text.ASCIIEncoding.ASCII.GetBytes(
+				$"{gitHubUsername}:{gitHubPassword}")));
 
 		client.DefaultRequestHeaders.Add("User-Agent", "Ocelot Release");
 
 		var result = client.PostAsync($"https://uploads.github.com/repos/ThreeMammals/Ocelot/releases/{releaseId}/assets?name={file.GetFilename()}", content).Result;
-		if(result.StatusCode != System.Net.HttpStatusCode.Created) 
+		if(result.StatusCode != System.Net.HttpStatusCode.Created)
 		{
 			throw new Exception("UploadFileToGitHubRelease result.StatusCode = " + result.StatusCode);
 		}
@@ -488,17 +490,17 @@ private void CompleteGitHubRelease()
 	request.Content = new System.Net.Http.StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
 	using(var client = new System.Net.Http.HttpClient())
-	{	
-			client.DefaultRequestHeaders.Authorization = 
-    new System.Net.Http.Headers.AuthenticationHeaderValue(
-        "Basic", Convert.ToBase64String(
-            System.Text.ASCIIEncoding.ASCII.GetBytes(
-               $"{gitHubUsername}:{gitHubPassword}")));
+	{
+			client.DefaultRequestHeaders.Authorization =
+	new System.Net.Http.Headers.AuthenticationHeaderValue(
+		"Basic", Convert.ToBase64String(
+			System.Text.ASCIIEncoding.ASCII.GetBytes(
+				$"{gitHubUsername}:{gitHubPassword}")));
 
 		client.DefaultRequestHeaders.Add("User-Agent", "Ocelot Release");
 
 		var result = client.SendAsync(request).Result;
-		if(result.StatusCode != System.Net.HttpStatusCode.OK) 
+		if(result.StatusCode != System.Net.HttpStatusCode.OK)
 		{
 			throw new Exception("CompleteGitHubRelease result.StatusCode = " + result.StatusCode);
 		}
@@ -525,7 +527,7 @@ private string GetResource(string url)
 			var response =  assetsReader.ReadToEnd();
 
 			Information("Response is " + response);
-			
+
 			return response;
 		}
 	}
@@ -538,10 +540,10 @@ private string GetResource(string url)
 
 private bool IsRunningOnCircleCI()
 {
-    return !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CIRCLECI"));
+	return !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("CIRCLECI"));
 }
 
 private bool IsMaster()
 {
-    return Environment.GetEnvironmentVariable("CIRCLE_BRANCH").ToLower() == "master";
+	return Environment.GetEnvironmentVariable("CIRCLE_BRANCH").ToLower() == "master";
 }
