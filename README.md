@@ -30,7 +30,7 @@ A quick list of Ocelot's capabilities for more information see the [documentatio
 * Kubernetes 
 * WebSockets
 * Authentication
-* Authorisation
+* Authorization
 * Rate Limiting
 * Caching
 * Retry policies / QoS

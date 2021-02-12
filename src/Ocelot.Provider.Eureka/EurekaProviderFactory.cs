@@ -1,8 +1,8 @@
 ﻿namespace Ocelot.Provider.Eureka
 {
     using Microsoft.Extensions.DependencyInjection;
-    using ServiceDiscovery;
-    using Steeltoe.Common.Discovery;
+    using Ocelot.ServiceDiscovery;
+    using Steeltoe.Discovery;
 
     public static class EurekaProviderFactory
     {

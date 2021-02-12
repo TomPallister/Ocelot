@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Version>0.0.0-dev</Version>
     <Authors>Kjell-Åke Gafvelin</Authors>
     <Description>This package provides OpenTracing support to Ocelot.</Description>

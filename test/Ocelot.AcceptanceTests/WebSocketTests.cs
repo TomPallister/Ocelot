@@ -57,7 +57,7 @@ namespace Ocelot.AcceptanceTests
                 .And(_ => _steps.StartFakeOcelotWithWebSockets())
                 .And(_ => StartFakeDownstreamService($"http://{downstreamHost}:{downstreamPort}", "/ws"))
                 .When(_ => StartClient("ws://localhost:5000/"))
-                .Then(_ => _firstRecieved.Count.ShouldBe(10))
+                .Then(_ => ThenTheReceivedCountIs(10))
                 .BDDfy();
         }
 
@@ -325,6 +325,10 @@ namespace Ocelot.AcceptanceTests
             }
         }
 
+        private void ThenTheReceivedCountIs(int count)
+        {
+            _firstRecieved.Count.ShouldBe(count);
+        }
         public void Dispose()
         {
             _serviceHandler?.Dispose();

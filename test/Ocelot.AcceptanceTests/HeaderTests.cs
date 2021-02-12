@@ -413,9 +413,18 @@ namespace Ocelot.AcceptanceTests
                     return Task.CompletedTask;
                 }
 
-                if (context.Request.Cookies.TryGetValue("test", out var cookieValue) || context.Request.Headers.TryGetValue("Set-Cookie", out var headerValue))
+                if (context.Request.Cookies.TryGetValue("test", out var cookieValue))
                 {
-                    if (cookieValue == "0" || headerValue == "test=1; path=/")
+                    if (cookieValue == "0")
+                    {
+                        context.Response.StatusCode = statusCode;
+                        return Task.CompletedTask;
+                    }
+                }
+
+                if (context.Request.Headers.TryGetValue("Set-Cookie", out var headerValue))
+                {
+                    if (headerValue == "test=1; path=/")
                     {
                         context.Response.StatusCode = statusCode;
                         return Task.CompletedTask;

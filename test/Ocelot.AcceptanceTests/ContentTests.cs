@@ -147,7 +147,7 @@ namespace Ocelot.AcceptanceTests
 
         private void ThenTheContentLengthShouldBeZero()
         {
-            _contentLength.ShouldBeEquivalentTo(0L);
+            _contentLength.ShouldBeNull();
         }
 
         private void ThenTheContentLengthIs(int expected)

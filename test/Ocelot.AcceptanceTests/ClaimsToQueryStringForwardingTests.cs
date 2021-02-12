@@ -1,23 +1,22 @@
-﻿using IdentityServer4.AccessTokenValidation;
-using IdentityServer4.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
-using Ocelot.Configuration.File;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Security.Claims;
-using TestStack.BDDfy;
-using Xunit;
-
-namespace Ocelot.AcceptanceTests
+﻿namespace Ocelot.AcceptanceTests
 {
     using IdentityServer4.Test;
     using Shouldly;
+    using IdentityServer4.AccessTokenValidation;
+    using IdentityServer4.Models;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Primitives;
+    using Ocelot.Configuration.File;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Net;
+    using System.Security.Claims;
+    using TestStack.BDDfy;
+    using Xunit;
 
     public class ClaimsToQueryStringForwardingTests : IDisposable
     {
@@ -52,10 +51,10 @@ namespace Ocelot.AcceptanceTests
                 Password = "test",
                 SubjectId = "registered|1231231",
                 Claims = new List<Claim>
-               {
-                   new Claim("CustomerId", "123"),
-                   new Claim("LocationId", "1")
-               }
+                {
+                    new Claim("CustomerId", "123"),
+                    new Claim("LocationId", "1"),
+                },
             };
 
             int port = RandomPortFinder.GetRandomPort();
@@ -63,38 +62,38 @@ namespace Ocelot.AcceptanceTests
             var configuration = new FileConfiguration
             {
                 Routes = new List<FileRoute>
-                   {
-                       new FileRoute
-                       {
-                           DownstreamPathTemplate = "/",
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
-                           {
-                               new FileHostAndPort
-                               {
-                                   Host = "localhost",
-                                   Port = port,
-                               }
-                           },
-                           DownstreamScheme = "http",
-                           UpstreamPathTemplate = "/",
-                           UpstreamHttpMethod = new List<string> { "Get" },
-                           AuthenticationOptions = new FileAuthenticationOptions
-                           {
-                               AuthenticationProviderKey = "Test",
-                               AllowedScopes = new List<string>
-                               {
-                                   "openid", "offline_access", "api"
-                               },
-                           },
-                           AddQueriesToRequest =
-                           {
-                               {"CustomerId", "Claims[CustomerId] > value"},
-                               {"LocationId", "Claims[LocationId] > value"},
-                               {"UserType", "Claims[sub] > value[0] > |"},
-                               {"UserId", "Claims[sub] > value[1] > |"}
-                           }
-                       }
-                   }
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "localhost",
+                                Port = port,
+                            },
+                        },
+                        DownstreamScheme = "http",
+                        UpstreamPathTemplate = "/",
+                        UpstreamHttpMethod = new List<string> { "Get" },
+                        AuthenticationOptions = new FileAuthenticationOptions
+                        {
+                            AuthenticationProviderKey = "Test",
+                            AllowedScopes = new List<string>
+                            {
+                                "openid", "offline_access", "api",
+                            },
+                        },
+                        AddQueriesToRequest =
+                        {
+                            {"CustomerId", "Claims[CustomerId] > value"},
+                            {"LocationId", "Claims[LocationId] > value"},
+                            {"UserType", "Claims[sub] > value[0] > |"},
+                            {"UserId", "Claims[sub] > value[1] > |"},
+                        },
+                    },
+                },
             };
 
             this.Given(x => x.GivenThereIsAnIdentityServerOn(_identityServerRootUrl, "api", AccessTokenType.Jwt, user))
@@ -118,10 +117,10 @@ namespace Ocelot.AcceptanceTests
                 Password = "test",
                 SubjectId = "registered|1231231",
                 Claims = new List<Claim>
-               {
-                   new Claim("CustomerId", "123"),
-                   new Claim("LocationId", "1")
-               }
+                {
+                    new Claim("CustomerId", "123"),
+                    new Claim("LocationId", "1"),
+                },
             };
 
             int port = RandomPortFinder.GetRandomPort();
@@ -129,38 +128,38 @@ namespace Ocelot.AcceptanceTests
             var configuration = new FileConfiguration
             {
                 Routes = new List<FileRoute>
-                   {
-                       new FileRoute
-                       {
-                           DownstreamPathTemplate = "/",
-                           DownstreamHostAndPorts = new List<FileHostAndPort>
-                           {
-                               new FileHostAndPort
-                               {
-                                   Host = "localhost",
-                                   Port = port,
-                               }
-                           },
-                           DownstreamScheme = "http",
-                           UpstreamPathTemplate = "/",
-                           UpstreamHttpMethod = new List<string> { "Get" },
-                           AuthenticationOptions = new FileAuthenticationOptions
-                           {
-                               AuthenticationProviderKey = "Test",
-                               AllowedScopes = new List<string>
-                               {
-                                   "openid", "offline_access", "api"
-                               },
-                           },
-                           AddQueriesToRequest =
-                           {
-                               {"CustomerId", "Claims[CustomerId] > value"},
-                               {"LocationId", "Claims[LocationId] > value"},
-                               {"UserType", "Claims[sub] > value[0] > |"},
-                               {"UserId", "Claims[sub] > value[1] > |"}
-                           }
-                       }
-                   }
+                {
+                    new FileRoute
+                    {
+                        DownstreamPathTemplate = "/",
+                        DownstreamHostAndPorts = new List<FileHostAndPort>
+                        {
+                            new FileHostAndPort
+                            {
+                                Host = "localhost",
+                                Port = port,
+                            },
+                        },
+                        DownstreamScheme = "http",
+                        UpstreamPathTemplate = "/",
+                        UpstreamHttpMethod = new List<string> { "Get" },
+                        AuthenticationOptions = new FileAuthenticationOptions
+                        {
+                            AuthenticationProviderKey = "Test",
+                            AllowedScopes = new List<string>
+                            {
+                                "openid", "offline_access", "api",
+                            },
+                        },
+                        AddQueriesToRequest =
+                        {
+                            {"CustomerId", "Claims[CustomerId] > value"},
+                            {"LocationId", "Claims[LocationId] > value"},
+                            {"UserType", "Claims[sub] > value[0] > |"},
+                            {"UserId", "Claims[sub] > value[1] > |"},
+                        },
+                    },
+                },
             };
 
             this.Given(x => x.GivenThereIsAnIdentityServerOn(_identityServerRootUrl, "api", AccessTokenType.Jwt, user))
@@ -172,8 +171,13 @@ namespace Ocelot.AcceptanceTests
                 .When(x => _steps.WhenIGetUrlOnTheApiGateway("/?test=1&test=2"))
                 .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(x => _steps.ThenTheResponseBodyShouldBe("CustomerId: 123 LocationId: 1 UserType: registered UserId: 1231231"))
-                .And(_ => _downstreamQueryString.ShouldBe("?test=1&test=2&CustomerId=123&LocationId=1&UserId=1231231&UserType=registered"))
+                .And(_ => ThenTheQueryStringIs("?test=1&test=2&CustomerId=123&LocationId=1&UserId=1231231&UserType=registered"))
                 .BDDfy();
+        }
+
+        private void ThenTheQueryStringIs(string queryString)
+        {
+            _downstreamQueryString.ShouldBe(queryString);
         }
 
         private void GivenThereIsAServiceRunningOn(string url, int statusCode)
@@ -225,6 +229,13 @@ namespace Ocelot.AcceptanceTests
                     services.AddLogging();
                     services.AddIdentityServer()
                         .AddDeveloperSigningCredential()
+                        .AddInMemoryApiScopes(new List<ApiScope>
+                        {
+                            new ApiScope(apiName, "test"),
+                            new ApiScope("openid", "test"),
+                            new ApiScope("offline_access", "test"),
+                            new ApiScope("api.readOnly", "test"),
+                        })
                         .AddInMemoryApiResources(new List<ApiResource>
                         {
                             new ApiResource
@@ -233,24 +244,24 @@ namespace Ocelot.AcceptanceTests
                                 Description = "My API",
                                 Enabled = true,
                                 DisplayName = "test",
-                                Scopes = new List<Scope>()
+                                Scopes = new List<string>()
                                 {
-                                    new Scope("api"),
-                                    new Scope("openid"),
-                                    new Scope("offline_access")
+                                    "api",
+                                    "openid",
+                                    "offline_access",
                                 },
                                 ApiSecrets = new List<Secret>()
                                 {
                                     new Secret
                                     {
-                                        Value = "secret".Sha256()
-                                    }
+                                        Value = "secret".Sha256(),
+                                    },
                                 },
                                 UserClaims = new List<string>()
                                 {
-                                    "CustomerId", "LocationId", "UserType", "UserId"
-                                }
-                            }
+                                    "CustomerId", "LocationId", "UserType", "UserId",
+                                },
+                            },
                         })
                         .AddInMemoryClients(new List<Client>
                         {
@@ -262,12 +273,12 @@ namespace Ocelot.AcceptanceTests
                                 AllowedScopes = new List<string> { apiName, "openid", "offline_access" },
                                 AccessTokenType = tokenType,
                                 Enabled = true,
-                                RequireClientSecret = false
-                            }
+                                RequireClientSecret = false,
+                            },
                         })
                         .AddTestUsers(new List<TestUser>
                         {
-                            user
+                            user,
                         });
                 })
                 .Configure(app =>

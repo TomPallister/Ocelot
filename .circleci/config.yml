@@ -4,13 +4,13 @@ orbs:
 jobs:
   build:
     docker:
-      - image: mijitt0m/ocelot-build:0.0.1
+      - image: mijitt0m/ocelot-build:0.0.3
     steps:
       - checkout
       - run: make build
   release:
     docker:
-      - image: mijitt0m/ocelot-build:0.0.1
+      - image: mijitt0m/ocelot-build:0.0.3
     steps:
       - checkout
       - run: make release
@@ -27,6 +27,12 @@ workflows:
           filters:
             branches:
               only: master
+  develop:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: develop
   pr:
     jobs:
       - build:
@@ -34,3 +40,4 @@ workflows:
             branches:
               ignore: 
                 - master
+                - develop

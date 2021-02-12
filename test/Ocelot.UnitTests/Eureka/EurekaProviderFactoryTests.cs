@@ -5,7 +5,7 @@
     using Ocelot.Configuration.Builder;
     using Provider.Eureka;
     using Shouldly;
-    using Steeltoe.Common.Discovery;
+    using Steeltoe.Discovery;
     using Xunit;
 
     public class EurekaProviderFactoryTests

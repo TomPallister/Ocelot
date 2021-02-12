@@ -119,7 +119,7 @@ namespace Ocelot.Configuration.Creator
                 .WithClaimsToHeaders(claimsToHeaders)
                 .WithClaimsToClaims(claimsToClaims)
                 .WithRouteClaimsRequirement(fileRoute.RouteClaimsRequirement)
-                .WithIsAuthorised(fileRouteOptions.IsAuthorised)
+                .WithIsAuthorized(fileRouteOptions.IsAuthorized)
                 .WithClaimsToQueries(claimsToQueries)
                 .WithClaimsToDownstreamPath(claimsToDownstreamPath)
                 .WithRequestIdKey(requestIdKey)

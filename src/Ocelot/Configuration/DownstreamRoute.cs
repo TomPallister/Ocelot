@@ -31,7 +31,7 @@ namespace Ocelot.Configuration
             List<ClaimToThing> claimsToClaims,
             List<ClaimToThing> claimsToPath,
             bool isAuthenticated,
-            bool isAuthorised,
+            bool isAuthorized,
             AuthenticationOptions authenticationOptions,
             DownstreamPathTemplate downstreamPathTemplate,
             string loadBalancerKey,
@@ -69,7 +69,7 @@ namespace Ocelot.Configuration
             ClaimsToClaims = claimsToClaims ?? new List<ClaimToThing>();
             ClaimsToPath = claimsToPath ?? new List<ClaimToThing>();
             IsAuthenticated = isAuthenticated;
-            IsAuthorised = isAuthorised;
+            IsAuthorized = isAuthorized;
             AuthenticationOptions = authenticationOptions;
             DownstreamPathTemplate = downstreamPathTemplate;
             LoadBalancerKey = loadBalancerKey;
@@ -102,7 +102,7 @@ namespace Ocelot.Configuration
         public List<ClaimToThing> ClaimsToClaims { get; }
         public List<ClaimToThing> ClaimsToPath { get; }
         public bool IsAuthenticated { get; }
-        public bool IsAuthorised { get; }
+        public bool IsAuthorized { get; }
         public AuthenticationOptions AuthenticationOptions { get; }
         public DownstreamPathTemplate DownstreamPathTemplate { get; }
         public string LoadBalancerKey { get; }

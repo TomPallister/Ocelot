@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <Description>Provides Ocelot extensions to use Polly.NET</Description>
     <AssemblyTitle>Ocelot.Provider.Polly</AssemblyTitle>
@@ -30,7 +30,7 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.164">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="Polly" Version="7.2.1" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />

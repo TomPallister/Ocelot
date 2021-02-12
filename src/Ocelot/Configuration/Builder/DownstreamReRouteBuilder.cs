@@ -18,7 +18,7 @@ namespace Ocelot.Configuration.Builder
         private List<ClaimToThing> _claimsToHeaders;
         private List<ClaimToThing> _claimToClaims;
         private Dictionary<string, string> _routeClaimRequirement;
-        private bool _isAuthorised;
+        private bool _isAuthorized;
         private List<ClaimToThing> _claimToQueries;
         private List<ClaimToThing> _claimToDownstreamPath;
         private string _requestIdHeaderKey;
@@ -101,9 +101,9 @@ namespace Ocelot.Configuration.Builder
             return this;
         }
 
-        public DownstreamRouteBuilder WithIsAuthorised(bool input)
+        public DownstreamRouteBuilder WithIsAuthorized(bool input)
         {
-            _isAuthorised = input;
+            _isAuthorized = input;
             return this;
         }
 
@@ -289,7 +289,7 @@ namespace Ocelot.Configuration.Builder
                 _claimToClaims,
                 _claimToDownstreamPath,
                 _isAuthenticated,
-                _isAuthorised,
+                _isAuthorized,
                 _authenticationOptions,
                 new DownstreamPathTemplate(_downstreamPathTemplate),
                 _loadBalancerKey,

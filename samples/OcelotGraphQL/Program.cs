@@ -45,11 +45,14 @@ namespace OcelotGraphQL
 
     public class GraphQlDelegatingHandler : DelegatingHandler
     {
-        private readonly ISchema _schema;
+        //private readonly ISchema _schema;
+        private readonly IDocumentExecuter _executer;
+        private readonly IDocumentWriter _writer;
 
-        public GraphQlDelegatingHandler(ISchema schema)
+        public GraphQlDelegatingHandler(IDocumentExecuter executer, IDocumentWriter writer)
         {
-            _schema = schema;
+            _executer = executer;
+            _writer = writer;
         }
 
         protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -64,15 +67,17 @@ namespace OcelotGraphQL
                 query = decoded.Replace("?query=", "");
             }
 
-            var result = _schema.Execute(_ =>
+            var result = await _executer.ExecuteAsync(_ =>
             {
                 _.Query = query;
             });
 
+            var responseBody = await _writer.WriteToStringAsync(result);
+
             //maybe check for errors and headers etc in real world?
             var response = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent(result)
+                Content = new StringContent(responseBody)
             };
 
             //ocelot will treat this like any other http request...
