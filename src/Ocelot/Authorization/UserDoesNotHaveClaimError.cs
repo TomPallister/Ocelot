@@ -1,4 +1,4 @@
-﻿namespace Ocelot.Authorisation
+﻿namespace Ocelot.Authorization
 {
     using Ocelot.Errors;
 

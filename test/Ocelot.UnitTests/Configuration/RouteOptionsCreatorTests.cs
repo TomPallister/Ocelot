@@ -46,7 +46,7 @@ namespace Ocelot.UnitTests.Configuration
 
             var expected = new RouteOptionsBuilder()
                 .WithIsAuthenticated(true)
-                .WithIsAuthorised(true)
+                .WithIsAuthorized(true)
                 .WithIsCached(true)
                 .WithRateLimiting(true)
                 .WithUseServiceDiscovery(true)
@@ -71,7 +71,7 @@ namespace Ocelot.UnitTests.Configuration
         private void ThenTheFollowingIsReturned(RouteOptions expected)
         {
             _result.IsAuthenticated.ShouldBe(expected.IsAuthenticated);
-            _result.IsAuthorised.ShouldBe(expected.IsAuthorised);
+            _result.IsAuthorized.ShouldBe(expected.IsAuthorized);
             _result.IsCached.ShouldBe(expected.IsCached);
             _result.EnableRateLimiting.ShouldBe(expected.EnableRateLimiting);
             _result.UseServiceDiscovery.ShouldBe(expected.UseServiceDiscovery);

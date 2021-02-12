@@ -44,8 +44,8 @@ Below is an example of the logging when set at Debug level for a normal request.
           requestId: asdf, previousRequestId: no previous request id, message: downstream template is {downstreamRoute.Data.Route.DownstreamPath},
     dbug: Ocelot.RateLimit.Middleware.ClientRateLimitMiddleware[0]
           requestId: asdf, previousRequestId: no previous request id, message: EndpointRateLimiting is not enabled for Ocelot.Values.PathTemplate,
-    dbug: Ocelot.Authorisation.Middleware.AuthorisationMiddleware[0]
-          requestId: 1234, previousRequestId: asdf, message: /posts/{postId} route does not require user to be authorised,
+    dbug: Ocelot.Authorization.Middleware.AuthorizationMiddleware[0]
+          requestId: 1234, previousRequestId: asdf, message: /posts/{postId} route does not require user to be authorized,
     dbug: Ocelot.DownstreamUrlCreator.Middleware.DownstreamUrlCreatorMiddleware[0]
           requestId: 1234, previousRequestId: asdf, message: downstream url is {downstreamUrl.Data.Value},
     dbug: Ocelot.Request.Middleware.HttpRequestBuilderMiddleware[0]

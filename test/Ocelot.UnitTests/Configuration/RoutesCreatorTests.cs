@@ -218,7 +218,7 @@
         {
             _result[routeIndex].DownstreamRoute[0].DownstreamHttpVersion.ShouldBe(_expectedVersion);
             _result[routeIndex].DownstreamRoute[0].IsAuthenticated.ShouldBe(_rro.IsAuthenticated);
-            _result[routeIndex].DownstreamRoute[0].IsAuthorised.ShouldBe(_rro.IsAuthorised);
+            _result[routeIndex].DownstreamRoute[0].IsAuthorized.ShouldBe(_rro.IsAuthorized);
             _result[routeIndex].DownstreamRoute[0].IsCached.ShouldBe(_rro.IsCached);
             _result[routeIndex].DownstreamRoute[0].EnableEndpointEndpointRateLimiting.ShouldBe(_rro.EnableRateLimiting);
             _result[routeIndex].DownstreamRoute[0].RequestIdKey.ShouldBe(_requestId);

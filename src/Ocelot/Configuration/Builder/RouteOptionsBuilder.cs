@@ -3,7 +3,7 @@ namespace Ocelot.Configuration.Builder
     public class RouteOptionsBuilder
     {
         private bool _isAuthenticated;
-        private bool _isAuthorised;
+        private bool _isAuthorized;
         private bool _isCached;
         private bool _enableRateLimiting;
         private bool _useServiceDiscovery;
@@ -20,9 +20,9 @@ namespace Ocelot.Configuration.Builder
             return this;
         }
 
-        public RouteOptionsBuilder WithIsAuthorised(bool isAuthorised)
+        public RouteOptionsBuilder WithIsAuthorized(bool isAuthorized)
         {
-            _isAuthorised = isAuthorised;
+            _isAuthorized = isAuthorized;
             return this;
         }
 
@@ -40,7 +40,7 @@ namespace Ocelot.Configuration.Builder
 
         public RouteOptions Build()
         {
-            return new RouteOptions(_isAuthenticated, _isAuthorised, _isCached, _enableRateLimiting, _useServiceDiscovery);
+            return new RouteOptions(_isAuthenticated, _isAuthorized, _isCached, _enableRateLimiting, _useServiceDiscovery);
         }
     }
 }

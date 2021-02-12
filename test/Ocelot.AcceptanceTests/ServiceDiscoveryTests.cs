@@ -322,7 +322,7 @@
                 .When(_ => _steps.WhenIGetUrlOnTheApiGateway("/home"))
                 .Then(_ => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
                 .And(_ => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
-                .And(_ => _receivedToken.ShouldBe(token))
+                .And(_ => ThenTheTokenIs(token))
                 .BDDfy();
         }
 
@@ -462,6 +462,11 @@
             .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
             .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
             .BDDfy();
+        }
+
+        private void ThenTheTokenIs(string token)
+        {
+            _receivedToken.ShouldBe(token);
         }
 
         private void WhenIAddAServiceBackIn(ServiceEntry serviceEntryTwo)

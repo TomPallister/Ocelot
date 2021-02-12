@@ -92,8 +92,13 @@ namespace Ocelot.UnitTests.Kubernetes
                 .And(x => GivenTheServicesAreRegisteredWithKube(endPointEntryOne))
                 .When(x => WhenIGetTheServices())
                 .Then(x => ThenTheCountIs(1))
-                .And(_ => _receivedToken.ShouldBe(token))
+                .And(_ => ThenTheTokenIs(token))
                 .BDDfy();
+        }
+
+        private void ThenTheTokenIs(string token)
+        {
+            _receivedToken.ShouldBe(token);
         }
 
         private void ThenTheCountIs(int count)
