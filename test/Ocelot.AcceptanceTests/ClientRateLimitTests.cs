@@ -6,7 +6,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using TestStack.BDDfy;
-    using Xunit;
+    using Xunit; 
 
     public class ClientRateLimitTests : IDisposable
     {
@@ -19,6 +19,7 @@
             _serviceHandler = new ServiceHandler();
             _steps = new Steps();
         }
+
 
         [Fact]
         public void should_call_withratelimiting()

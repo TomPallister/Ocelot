@@ -116,7 +116,7 @@
             var route = new RouteBuilder()
                 .WithDownstreamRoute(new DownstreamRouteBuilder()
                     .WithIsCached(true)
-                    .WithCacheOptions(new CacheOptions(100, "kanken"))
+                    .WithCacheOptions(new CacheOptions(100, "kanken", null))
                     .WithUpstreamHttpMethod(new List<string> { "Get" })
                     .Build())
                 .WithUpstreamHttpMethod(new List<string> { "Get" })

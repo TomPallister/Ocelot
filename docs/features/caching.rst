@@ -25,9 +25,9 @@ Finally in order to use caching on a route in your Route configuration add this 
 
 .. code-block:: json
 
-    "FileCacheOptions": { "TtlSeconds": 15, "Region": "somename" }
+    "FileCacheOptions": { "TtlSeconds": 15, "Region": "somename", "Header": "Authorization" }
 
-In this example ttl seconds is set to 15 which means the cache will expire after 15 seconds.
+In this example ttl seconds is set to 15 which means the cache will expire after 15 seconds. Each word should be in the HEader field. That key is searched in the requested header and if it is found, it will appear in the program cache. This causes the cache to become invalid by changing the key in the header
 
 If you look at the example `here <https://github.com/ThreeMammals/Ocelot/blob/master/test/Ocelot.ManualTest/Program.cs>`_ you can see how the cache manager is setup and then passed into the Ocelot AddCacheManager configuration method. You can use any settings supported by the CacheManager package and just pass them in.
 
