@@ -72,7 +72,7 @@ namespace Ocelot.UnitTests.Infrastructure
         private void ThenTheResultIsAnErrorReposnse<T>(object resultValue)
         {
             _result.ShouldBeOfType<ErrorResponse<T>>();
-            ((ErrorResponse<T>)_result).Data.ShouldBeNull();
+            ((ErrorResponse<T>)_result).Data.ShouldBe(default(T));
             ((ErrorResponse<T>)_result).IsError.ShouldBe(true);
             ((ErrorResponse<T>)_result).Errors.ShouldHaveSingleItem()
                 .ShouldBeOfType<CannotFindDataError>()

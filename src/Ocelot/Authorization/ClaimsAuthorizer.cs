@@ -10,17 +10,17 @@ namespace Ocelot.Authorisation
     using System.Security.Claims;
     using System.Text.RegularExpressions;
 
-    public class ClaimsAuthoriser : IClaimsAuthoriser
+    public class ClaimsAuthorizer : IClaimsAuthorizer
     {
         private readonly IClaimsParser _claimsParser;
         private static readonly Regex _regexAuthorize = new Regex(@"^{(?<variable>.+)}$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
-        public ClaimsAuthoriser(IClaimsParser claimsParser)
+        public ClaimsAuthorizer(IClaimsParser claimsParser)
         {
             _claimsParser = claimsParser;
         }
 
-        public Response<bool> Authorise(
+        public Response<bool> Authorize(
             ClaimsPrincipal claimsPrincipal,
             Dictionary<string, string> routeClaimsRequirement,
             List<PlaceholderNameAndValue> urlPathPlaceholderNameAndValues
@@ -48,10 +48,10 @@ namespace Ocelot.Authorisation
                         {
                             // match
                             var actualValue = matchingPlaceholders[0].Value;
-                            var authorised = values.Data.Contains(actualValue);
-                            if (!authorised)
+                            var authorized = values.Data.Contains(actualValue);
+                            if (!authorized)
                             {
-                                return new ErrorResponse<bool>(new ClaimValueNotAuthorisedError(
+                                return new ErrorResponse<bool>(new ClaimValueNotAuthorizedError(
                                     $"dynamic claim value for {variableName} of {string.Join(", ", values.Data)} is not the same as required value: {actualValue}"));
                             }
                         }
@@ -60,12 +60,12 @@ namespace Ocelot.Authorisation
                             // config error
                             if (matchingPlaceholders.Length == 0)
                             {
-                                return new ErrorResponse<bool>(new ClaimValueNotAuthorisedError(
+                                return new ErrorResponse<bool>(new ClaimValueNotAuthorizedError(
                                     $"config error: requires variable claim value: {variableName} placeholders does not contain that variable: {string.Join(", ", urlPathPlaceholderNameAndValues.Select(p => p.Name))}"));
                             }
                             else
                             {
-                                return new ErrorResponse<bool>(new ClaimValueNotAuthorisedError(
+                                return new ErrorResponse<bool>(new ClaimValueNotAuthorizedError(
                                     $"config error: requires variable claim value: {required.Value} but placeholders are ambiguous: {string.Join(", ", urlPathPlaceholderNameAndValues.Where(p => p.Name.Equals(variableName)).Select(p => p.Value))}"));
                             }
                         }
@@ -73,10 +73,10 @@ namespace Ocelot.Authorisation
                     else
                     {
                         // static claim
-                        var authorised = values.Data.Contains(required.Value);
-                        if (!authorised)
+                        var authorized = values.Data.Contains(required.Value);
+                        if (!authorized)
                         {
-                            return new ErrorResponse<bool>(new ClaimValueNotAuthorisedError(
+                            return new ErrorResponse<bool>(new ClaimValueNotAuthorizedError(
                                        $"claim value: {string.Join(", ", values.Data)} is not the same as required value: {required.Value} for type: {required.Key}"));
                         }
                     }

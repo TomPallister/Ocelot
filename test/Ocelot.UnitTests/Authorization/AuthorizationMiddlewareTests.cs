@@ -3,8 +3,8 @@ namespace Ocelot.UnitTests.Authorization
 {
     using Microsoft.AspNetCore.Http;
     using Moq;
-    using Ocelot.Authorisation;
-    using Ocelot.Authorisation.Middleware;
+    using Ocelot.Authorization;
+    using Ocelot.Authorization.Middleware;
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using Ocelot.DownstreamRouteFinder.Middleware;
@@ -18,35 +18,35 @@ namespace Ocelot.UnitTests.Authorization
     using TestStack.BDDfy;
     using Xunit;
 
-    public class AuthorisationMiddlewareTests
+    public class AuthorizationMiddlewareTests
     {
-        private readonly Mock<IClaimsAuthoriser> _authService;
-        private readonly Mock<IScopesAuthoriser> _authScopesService;
+        private readonly Mock<IClaimsAuthorizer> _authService;
+        private readonly Mock<IScopesAuthorizer> _authScopesService;
         private Mock<IOcelotLoggerFactory> _loggerFactory;
         private Mock<IOcelotLogger> _logger;
-        private readonly AuthorisationMiddleware _middleware;
+        private readonly AuthorizationMiddleware _middleware;
         private RequestDelegate _next;
         private HttpContext _httpContext;
 
-        public AuthorisationMiddlewareTests()
+        public AuthorizationMiddlewareTests()
         {
             _httpContext = new DefaultHttpContext();
-            _authService = new Mock<IClaimsAuthoriser>();
-            _authScopesService = new Mock<IScopesAuthoriser>();
+            _authService = new Mock<IClaimsAuthorizer>();
+            _authScopesService = new Mock<IScopesAuthorizer>();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
-            _loggerFactory.Setup(x => x.CreateLogger<AuthorisationMiddleware>()).Returns(_logger.Object);
+            _loggerFactory.Setup(x => x.CreateLogger<AuthorizationMiddleware>()).Returns(_logger.Object);
             _next = context => Task.CompletedTask;
-            _middleware = new AuthorisationMiddleware(_next, _authService.Object, _authScopesService.Object, _loggerFactory.Object);
+            _middleware = new AuthorizationMiddleware(_next, _authService.Object, _authScopesService.Object, _loggerFactory.Object);
         }
 
         [Fact]
-        public void should_call_authorisation_service()
+        public void should_call_authorization_service()
         {
             this.Given(x => x.GivenTheDownStreamRouteIs(new List<PlaceholderNameAndValue>(),
                 new DownstreamRouteBuilder()
                     .WithUpstreamPathTemplate(new UpstreamPathTemplateBuilder().Build())
-                    .WithIsAuthorised(true)
+                    .WithIsAuthorized(true)
                     .WithUpstreamHttpMethod(new List<string> { "Get" })
                     .Build()))
                 .And(x => x.GivenTheAuthServiceReturns(new OkResponse<bool>(true)))
@@ -69,7 +69,7 @@ namespace Ocelot.UnitTests.Authorization
         private void GivenTheAuthServiceReturns(Response<bool> expected)
         {
             _authService
-                .Setup(x => x.Authorise(
+                .Setup(x => x.Authorize(
                            It.IsAny<ClaimsPrincipal>(),
                            It.IsAny<Dictionary<string, string>>(),
                            It.IsAny<List<PlaceholderNameAndValue>>()))
@@ -79,7 +79,7 @@ namespace Ocelot.UnitTests.Authorization
         private void ThenTheAuthServiceIsCalledCorrectly()
         {
             _authService
-                .Verify(x => x.Authorise(
+                .Verify(x => x.Authorize(
                     It.IsAny<ClaimsPrincipal>(),
                     It.IsAny<Dictionary<string, string>>(),
                     It.IsAny<List<PlaceholderNameAndValue>>())

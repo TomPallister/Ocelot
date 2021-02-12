@@ -39,22 +39,22 @@
         public Func<HttpContext, Func<Task>, Task> AuthenticationMiddleware { get; set; }
 
         /// <summary>
-        /// This is to allow the user to run any extra authorisation before the Ocelot authentication
+        /// This is to allow the user to run any extra authorization before the Ocelot authentication
         /// kicks in
         /// </summary>
         /// <value>
-        /// <placeholder>This is to allow the user to run any extra authorisation before the Ocelot authentication
+        /// <placeholder>This is to allow the user to run any extra authorization before the Ocelot authentication
         /// kicks in</placeholder>
         /// </value>
-        public Func<HttpContext, Func<Task>, Task> PreAuthorisationMiddleware { get; set; }
+        public Func<HttpContext, Func<Task>, Task> PreAuthorizationMiddleware { get; set; }
 
         /// <summary>
-        /// This allows the user to completely override the ocelot authorisation middleware
+        /// This allows the user to completely override the ocelot authorization middleware
         /// </summary>
         /// <value>
-        /// <placeholder>This allows the user to completely override the ocelot authorisation middleware</placeholder>
+        /// <placeholder>This allows the user to completely override the ocelot authorization middleware</placeholder>
         /// </value>
-        public Func<HttpContext, Func<Task>, Task> AuthorisationMiddleware { get; set; }
+        public Func<HttpContext, Func<Task>, Task> AuthorizationMiddleware { get; set; }
 
         /// <summary>
         /// This allows the user to implement there own query string manipulation logic

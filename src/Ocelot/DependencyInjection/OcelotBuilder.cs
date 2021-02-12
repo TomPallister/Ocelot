@@ -5,7 +5,7 @@ namespace Ocelot.DependencyInjection
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection.Extensions;
     using Microsoft.Extensions.Options;
-    using Ocelot.Authorisation;
+    using Ocelot.Authorization;
     using Ocelot.Cache;
     using Ocelot.Claims;
     using Ocelot.Configuration;
@@ -96,8 +96,8 @@ namespace Ocelot.DependencyInjection
             Services.TryAddSingleton<IOcelotLoggerFactory, AspDotNetLoggerFactory>();
             Services.TryAddSingleton<IRemoveOutputHeaders, RemoveOutputHeaders>();
             Services.TryAddSingleton<IClaimToThingConfigurationParser, ClaimToThingConfigurationParser>();
-            Services.TryAddSingleton<IClaimsAuthoriser, ClaimsAuthoriser>();
-            Services.TryAddSingleton<IScopesAuthoriser, ScopesAuthoriser>();
+            Services.TryAddSingleton<IClaimsAuthorizer, ClaimsAuthorizer>();
+            Services.TryAddSingleton<IScopesAuthorizer, ScopesAuthorizer>();
             Services.TryAddSingleton<IAddClaimsToRequest, AddClaimsToRequest>();
             Services.TryAddSingleton<IAddHeadersToRequest, AddHeadersToRequest>();
             Services.TryAddSingleton<IAddQueriesToRequest, AddQueriesToRequest>();

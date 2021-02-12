@@ -1,8 +1,8 @@
 #tool "nuget:?package=GitVersion.CommandLine&version=5.0.1"
 #addin nuget:?package=Cake.Json
 #addin nuget:?package=Newtonsoft.Json
-#addin nuget:?package=System.Net.Http
-#addin nuget:?package=System.Text.Encodings.Web
+#addin nuget:?package=System.Net.Http&version=4.3.4
+#addin nuget:?package=System.Text.Encodings.Web&version=4.7.1
 #tool "nuget:?package=ReportGenerator"
 #tool "nuget:?package=coveralls.net&version=0.7.0"
 #addin Cake.Coveralls&version=0.10.1
@@ -18,7 +18,7 @@ var artifactsDir = Directory("artifacts");
 // unit testing
 var artifactsForUnitTestsDir = artifactsDir + Directory("UnitTests");
 var unitTestAssemblies = @"./test/Ocelot.UnitTests/Ocelot.UnitTests.csproj";
-var minCodeCoverage = 80d;
+var minCodeCoverage = 0.80d;
 var coverallsRepoToken = "OCELOT_COVERALLS_TOKEN";
 var coverallsRepo = "https://coveralls.io/github/ThreeMammals/Ocelot";
 
@@ -180,15 +180,15 @@ Task("RunUnitTests")
 		{
 			Configuration = compileConfig,
 			ResultsDirectory = artifactsForUnitTestsDir,
-			ArgumentCustomization = args => args
-				// this create the code coverage report
-				.Append("--settings test/Ocelot.UnitTests/UnitTests.runsettings")
+				ArgumentCustomization = args => args
+					// this create the code coverage report
+					.Append("--collect:\"XPlat Code Coverage\"")
 		};
 
 		EnsureDirectoryExists(artifactsForUnitTestsDir);
 		DotNetCoreTest(unitTestAssemblies, testSettings);
 
-		var coverageSummaryFile = GetSubDirectories(artifactsForUnitTestsDir).First().CombineWithFilePath(File("coverage.opencover.xml"));
+		var coverageSummaryFile = GetSubDirectories(artifactsForUnitTestsDir).First().CombineWithFilePath(File("coverage.cobertura.xml"));
 		Information(coverageSummaryFile);
 		Information(artifactsForUnitTestsDir);
 
@@ -215,8 +215,8 @@ Task("RunUnitTests")
 			Information("We are not running on the build server so we won't publish the coverage report to coveralls.io");
 		}
 
-		var sequenceCoverage = XmlPeek(coverageSummaryFile, "//CoverageSession/Summary/@sequenceCoverage");
-		var branchCoverage = XmlPeek(coverageSummaryFile, "//CoverageSession/Summary/@branchCoverage");
+		var sequenceCoverage = XmlPeek(coverageSummaryFile, "//coverage/@line-rate");
+		var branchCoverage = XmlPeek(coverageSummaryFile, "//coverage/@line-rate");
 
 		Information("Sequence Coverage: " + sequenceCoverage);
 	

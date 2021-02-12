@@ -2,7 +2,7 @@ namespace Ocelot.UnitTests.Headers
 {
     using Microsoft.AspNetCore.Http;
     using Moq;
-    using Ocelot.Authorisation.Middleware;
+    using Ocelot.Authorization.Middleware;
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using Ocelot.DownstreamRouteFinder;
@@ -38,7 +38,7 @@ namespace Ocelot.UnitTests.Headers
             _postReplacer = new Mock<IHttpResponseHeaderReplacer>();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _logger = new Mock<IOcelotLogger>();
-            _loggerFactory.Setup(x => x.CreateLogger<AuthorisationMiddleware>()).Returns(_logger.Object);
+            _loggerFactory.Setup(x => x.CreateLogger<AuthorizationMiddleware>()).Returns(_logger.Object);
             _next = context => Task.CompletedTask;
             _addHeadersToResponse = new Mock<IAddHeadersToResponse>();
             _addHeadersToRequest = new Mock<IAddHeadersToRequest>();

@@ -1,11 +1,10 @@
 namespace Ocelot.AcceptanceTests
 {
     using Butterfly.Client.AspNetCore;
-    using Configuration.File;
+    using Ocelot.Configuration.File;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
-    using Rafty.Infrastructure;
     using Shouldly;
     using System;
     using System.Collections.Generic;

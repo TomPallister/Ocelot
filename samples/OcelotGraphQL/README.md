@@ -1,7 +1,7 @@
 # Ocelot using GraphQL example
 
 Loads of people keep asking me if Ocelot will every support GraphQL, in my mind Ocelot and GraphQL are two different things that can work together. 
-I would not try and implement GraphQL in Ocelot instead I would either have Ocelot in front of GraphQL to handle things like authorisation / authentication or I would 
+I would not try and implement GraphQL in Ocelot instead I would either have Ocelot in front of GraphQL to handle things like authorization / authentication or I would 
 bring in the awesome [graphql-dotnet](https://github.com/graphql-dotnet/graphql-dotnet) library and use it in a [DelegatingHandler](http://ocelot.readthedocs.io/en/latest/features/delegatinghandlers.html). This way you could have Ocelot and GraphQL without the extra hop to GraphQL. This same is an example of how to do that. 
 
 ## Example

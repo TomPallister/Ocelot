@@ -12,19 +12,22 @@ This will bring down everything needed by the admin API.
 Providing your own IdentityServer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
 All you need to do to hook into your own IdentityServer is add the following to your ConfigureServices method.
 
 .. code-block:: csharp
 
     public virtual void ConfigureServices(IServiceCollection services)
     {
-        Action<IdentityServerAuthenticationOptions> options = o => {
-                // o.Authority = ;
-                // o.ApiName = ;
-                // etc....
+        Action<JwtBearerOptions> options = o =>
+        {
+            o.Authority = identityServerRootUrl;
+            o.RequireHttpsMetadata = false;
+            o.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
             };
+            // etc....
+        };
 
         services
             .AddOcelot()
