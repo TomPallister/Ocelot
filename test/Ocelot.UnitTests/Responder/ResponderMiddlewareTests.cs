@@ -57,6 +57,17 @@ namespace Ocelot.UnitTests.Responder
                 .BDDfy();
         }
 
+        [Fact]
+        public void should_not_call_responder_when_null_downstream_response()
+        {
+            this._responder.Reset();
+            this.Given(x => x.GivenTheHttpResponseMessageIs(null))
+                .When(x => x.WhenICallTheMiddleware())
+                .Then(x => x.ThenThereAreNoErrors())
+                .Then(x => x._responder.VerifyNoOtherCalls())
+                .BDDfy();
+        }
+
         private void WhenICallTheMiddleware()
         {
             _middleware.Invoke(_httpContext).GetAwaiter().GetResult();
