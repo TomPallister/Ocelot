@@ -452,7 +452,7 @@
             foreach (var header in _mappedRequest.Data.Headers)
             {
                 var inputHeader = _inputHeaders.First(h => h.Key == header.Key);
-                inputHeader.ShouldNotBeNull();
+                inputHeader.ShouldNotBe(default(KeyValuePair<string, StringValues>));
                 inputHeader.Value.Count().ShouldBe(header.Value.Count());
                 foreach (var inputHeaderValue in inputHeader.Value)
                 {

@@ -1,10 +1,10 @@
-﻿namespace Ocelot.Authorisation
+﻿namespace Ocelot.Authorization
 {
     using Ocelot.Errors;
 
-    public class UnauthorisedError : Error
+    public class UnauthorizedError : Error
     {
-        public UnauthorisedError(string message)
+        public UnauthorizedError(string message)
             : base(message, OcelotErrorCode.UnauthorizedError, 403)
         {
         }

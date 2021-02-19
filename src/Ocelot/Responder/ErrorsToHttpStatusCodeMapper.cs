@@ -14,8 +14,8 @@ namespace Ocelot.Responder
             }
 
             if (errors.Any(e => e.Code == OcelotErrorCode.UnauthorizedError
-                || e.Code == OcelotErrorCode.ClaimValueNotAuthorisedError
-                || e.Code == OcelotErrorCode.ScopeNotAuthorisedError
+                || e.Code == OcelotErrorCode.ClaimValueNotAuthorizedError
+                || e.Code == OcelotErrorCode.ScopeNotAuthorizedError
                 || e.Code == OcelotErrorCode.UserDoesNotHaveClaimError
                 || e.Code == OcelotErrorCode.CannotFindClaimError))
             {

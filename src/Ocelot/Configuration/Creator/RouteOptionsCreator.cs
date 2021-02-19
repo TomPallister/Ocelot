@@ -8,14 +8,14 @@ namespace Ocelot.Configuration.Creator
         public RouteOptions Create(FileRoute fileRoute)
         {
             var isAuthenticated = IsAuthenticated(fileRoute);
-            var isAuthorised = IsAuthorised(fileRoute);
+            var isAuthorized = IsAuthorized(fileRoute);
             var isCached = IsCached(fileRoute);
             var enableRateLimiting = IsEnableRateLimiting(fileRoute);
             var useServiceDiscovery = !string.IsNullOrEmpty(fileRoute.ServiceName);
 
             var options = new RouteOptionsBuilder()
                 .WithIsAuthenticated(isAuthenticated)
-                .WithIsAuthorised(isAuthorised)
+                .WithIsAuthorized(isAuthorized)
                 .WithIsCached(isCached)
                 .WithRateLimiting(enableRateLimiting)
                 .WithUseServiceDiscovery(useServiceDiscovery)
@@ -34,7 +34,7 @@ namespace Ocelot.Configuration.Creator
             return !string.IsNullOrEmpty(fileRoute.AuthenticationOptions?.AuthenticationProviderKey);
         }
 
-        private bool IsAuthorised(FileRoute fileRoute)
+        private bool IsAuthorized(FileRoute fileRoute)
         {
             return fileRoute.RouteClaimsRequirement?.Count > 0;
         }

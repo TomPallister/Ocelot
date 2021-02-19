@@ -1,4 +1,4 @@
-﻿using Ocelot.Authorisation;
+﻿using Ocelot.Authorization;
 using Ocelot.DownstreamRouteFinder.UrlMatcher;
 using Ocelot.Responses;
 using Shouldly;
@@ -11,21 +11,21 @@ namespace Ocelot.UnitTests.Authorization
 {
     using Ocelot.Infrastructure.Claims.Parser;
 
-    public class ClaimsAuthoriserTests
+    public class ClaimsAuthorizerTests
     {
-        private readonly ClaimsAuthoriser _claimsAuthoriser;
+        private readonly ClaimsAuthorizer _claimsAuthorizer;
         private ClaimsPrincipal _claimsPrincipal;
         private Dictionary<string, string> _requirement;
         private List<PlaceholderNameAndValue> _urlPathPlaceholderNameAndValues;
         private Response<bool> _result;
 
-        public ClaimsAuthoriserTests()
+        public ClaimsAuthorizerTests()
         {
-            _claimsAuthoriser = new ClaimsAuthoriser(new ClaimsParser());
+            _claimsAuthorizer = new ClaimsAuthorizer(new ClaimsParser());
         }
 
         [Fact]
-        public void should_authorise_user()
+        public void should_authorize_user()
         {
             this.Given(x => x.GivenAClaimsPrincipal(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
@@ -35,8 +35,8 @@ namespace Ocelot.UnitTests.Authorization
                 {
                     {"UserType", "registered"}
                 }))
-                .When(x => x.WhenICallTheAuthoriser())
-                .Then(x => x.ThenTheUserIsAuthorised())
+                .When(x => x.WhenICallTheAuthorizer())
+                .Then(x => x.ThenTheUserIsAuthorized())
                 .BDDfy();
         }
 
@@ -55,8 +55,8 @@ namespace Ocelot.UnitTests.Authorization
                 {
                    new PlaceholderNameAndValue("{userId}", "14")
                 }))
-               .When(x => x.WhenICallTheAuthoriser())
-               .Then(x => x.ThenTheUserIsAuthorised())
+               .When(x => x.WhenICallTheAuthorizer())
+               .Then(x => x.ThenTheUserIsAuthorized())
                .BDDfy();
         }
 
@@ -75,13 +75,13 @@ namespace Ocelot.UnitTests.Authorization
                 {
                     new PlaceholderNameAndValue("{userId}", "14")
                 }))
-               .When(x => x.WhenICallTheAuthoriser())
-               .Then(x => x.ThenTheUserIsntAuthorised())
+               .When(x => x.WhenICallTheAuthorizer())
+               .Then(x => x.ThenTheUserIsntAuthorized())
                .BDDfy();
         }
 
         [Fact]
-        public void should_authorise_user_multiple_claims_of_same_type()
+        public void should_authorize_user_multiple_claims_of_same_type()
         {
             this.Given(x => x.GivenAClaimsPrincipal(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
@@ -92,21 +92,21 @@ namespace Ocelot.UnitTests.Authorization
                 {
                     {"UserType", "registered"}
                 }))
-                .When(x => x.WhenICallTheAuthoriser())
-                .Then(x => x.ThenTheUserIsAuthorised())
+                .When(x => x.WhenICallTheAuthorizer())
+                .Then(x => x.ThenTheUserIsAuthorized())
                 .BDDfy();
         }
 
         [Fact]
-        public void should_not_authorise_user()
+        public void should_not_authorize_user()
         {
             this.Given(x => x.GivenAClaimsPrincipal(new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>()))))
             .And(x => x.GivenARouteClaimsRequirement(new Dictionary<string, string>
                 {
                     { "UserType", "registered" }
                 }))
-            .When(x => x.WhenICallTheAuthoriser())
-            .Then(x => x.ThenTheUserIsntAuthorised())
+            .When(x => x.WhenICallTheAuthorizer())
+            .Then(x => x.ThenTheUserIsntAuthorized())
             .BDDfy();
         }
 
@@ -125,17 +125,17 @@ namespace Ocelot.UnitTests.Authorization
             _urlPathPlaceholderNameAndValues = urlPathPlaceholderNameAndValues;
         }
 
-        private void WhenICallTheAuthoriser()
+        private void WhenICallTheAuthorizer()
         {
-            _result = _claimsAuthoriser.Authorise(_claimsPrincipal, _requirement, _urlPathPlaceholderNameAndValues);
+            _result = _claimsAuthorizer.Authorize(_claimsPrincipal, _requirement, _urlPathPlaceholderNameAndValues);
         }
 
-        private void ThenTheUserIsAuthorised()
+        private void ThenTheUserIsAuthorized()
         {
             _result.Data.ShouldBe(true);
         }
 
-        private void ThenTheUserIsntAuthorised()
+        private void ThenTheUserIsntAuthorized()
         {
             _result.Data.ShouldBe(false);
         }

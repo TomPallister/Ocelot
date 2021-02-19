@@ -1,6 +1,7 @@
 ﻿namespace Ocelot.UnitTests.Headers
 {
     using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Primitives;
     using Moq;
     using Ocelot.Configuration.Creator;
     using Ocelot.Headers;
@@ -114,7 +115,7 @@
             var requestHeaders = _context.Request.Headers;
             requestHeaders.ContainsKey(_addedHeader.Key).ShouldBeTrue($"Header {_addedHeader.Key} was expected but not there.");
             var value = requestHeaders[_addedHeader.Key];
-            value.ShouldNotBeNull($"Value of header {_addedHeader.Key} was expected to not be null.");
+            value.ShouldNotBe(default(StringValues), $"Value of header {_addedHeader.Key} was expected to not be null.");
             value.ToString().ShouldBe(_addedHeader.Value);
         }
 

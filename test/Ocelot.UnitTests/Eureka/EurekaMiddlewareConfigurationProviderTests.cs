@@ -6,10 +6,10 @@
     using Ocelot.Configuration;
     using Ocelot.Configuration.Builder;
     using Ocelot.Configuration.Repository;
-    using Provider.Eureka;
-    using Responses;
+    using Ocelot.Provider.Eureka;
+    using Ocelot.Responses;
     using Shouldly;
-    using Steeltoe.Common.Discovery;
+    using Steeltoe.Discovery;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -25,7 +25,7 @@
             services.AddSingleton<IInternalConfigurationRepository>(configRepo.Object);
             var sp = services.BuildServiceProvider();
             var provider = EurekaMiddlewareConfigurationProvider.Get(new ApplicationBuilder(sp));
-            provider.ShouldBeOfType<Task>();
+            provider.Status.ShouldBe(TaskStatus.RanToCompletion);
         }
 
         [Fact]
@@ -41,7 +41,7 @@
             services.AddSingleton<IDiscoveryClient>(client.Object);
             var sp = services.BuildServiceProvider();
             var provider = EurekaMiddlewareConfigurationProvider.Get(new ApplicationBuilder(sp));
-            provider.ShouldBeOfType<Task>();
+            provider.Status.ShouldBe(TaskStatus.RanToCompletion);
         }
     }
 }

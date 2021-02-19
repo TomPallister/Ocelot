@@ -1,5 +1,5 @@
 using Moq;
-using Ocelot.Authorisation;
+using Ocelot.Authorization;
 using Ocelot.Errors;
 using Ocelot.Infrastructure.Claims.Parser;
 using Ocelot.Responses;
@@ -11,18 +11,18 @@ using Xunit;
 
 namespace Ocelot.UnitTests.Infrastructure
 {
-    public class ScopesAuthoriserTests
+    public class ScopesAuthorizerTests
     {
-        private ScopesAuthoriser _authoriser;
+        private ScopesAuthorizer _authorizer;
         public Mock<IClaimsParser> _parser;
         private ClaimsPrincipal _principal;
         private List<string> _allowedScopes;
         private Response<bool> _result;
 
-        public ScopesAuthoriserTests()
+        public ScopesAuthorizerTests()
         {
             _parser = new Mock<IClaimsParser>();
-            _authoriser = new ScopesAuthoriser(_parser.Object);
+            _authorizer = new ScopesAuthorizer(_parser.Object);
         }
 
         [Fact]
@@ -30,7 +30,7 @@ namespace Ocelot.UnitTests.Infrastructure
         {
             this.Given(_ => GivenTheFollowing(new ClaimsPrincipal()))
             .And(_ => GivenTheFollowing(new List<string>()))
-            .When(_ => WhenIAuthorise())
+            .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new OkResponse<bool>(true)))
             .BDDfy();
         }
@@ -40,7 +40,7 @@ namespace Ocelot.UnitTests.Infrastructure
         {
             this.Given(_ => GivenTheFollowing(new ClaimsPrincipal()))
             .And(_ => GivenTheFollowing((List<string>)null))
-            .When(_ => WhenIAuthorise())
+            .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new OkResponse<bool>(true)))
             .BDDfy();
         }
@@ -52,7 +52,7 @@ namespace Ocelot.UnitTests.Infrastructure
             this.Given(_ => GivenTheFollowing(new ClaimsPrincipal()))
             .And(_ => GivenTheParserReturns(new ErrorResponse<List<string>>(fakeError)))
             .And(_ => GivenTheFollowing(new List<string>() { "doesntmatter" }))
-            .When(_ => WhenIAuthorise())
+            .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new ErrorResponse<bool>(fakeError)))
             .BDDfy();
         }
@@ -66,7 +66,7 @@ namespace Ocelot.UnitTests.Infrastructure
             this.Given(_ => GivenTheFollowing(claimsPrincipal))
             .And(_ => GivenTheParserReturns(new OkResponse<List<string>>(allowedScopes)))
             .And(_ => GivenTheFollowing(allowedScopes))
-            .When(_ => WhenIAuthorise())
+            .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new OkResponse<bool>(true)))
             .BDDfy();
         }
@@ -82,7 +82,7 @@ namespace Ocelot.UnitTests.Infrastructure
             this.Given(_ => GivenTheFollowing(claimsPrincipal))
             .And(_ => GivenTheParserReturns(new OkResponse<List<string>>(userScopes)))
             .And(_ => GivenTheFollowing(allowedScopes))
-            .When(_ => WhenIAuthorise())
+            .When(_ => WhenIAuthorize())
             .Then(_ => ThenTheFollowingIsReturned(new ErrorResponse<bool>(fakeError)))
             .BDDfy();
         }
@@ -102,9 +102,9 @@ namespace Ocelot.UnitTests.Infrastructure
             _allowedScopes = allowedScopes;
         }
 
-        private void WhenIAuthorise()
+        private void WhenIAuthorize()
         {
-            _result = _authoriser.Authorise(_principal, _allowedScopes);
+            _result = _authorizer.Authorize(_principal, _allowedScopes);
         }
 
         private void ThenTheFollowingIsReturned(Response<bool> expected)

@@ -20,4 +20,5 @@ run_unit_tests:
 
 release_notes:
 	./build.sh --target=ReleaseNotes
+
 	

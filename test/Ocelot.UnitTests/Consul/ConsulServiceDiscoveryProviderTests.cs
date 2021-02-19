@@ -87,7 +87,7 @@
                     Address = "localhost",
                     Port = 50881,
                     ID = Guid.NewGuid().ToString(),
-                    Tags = new string[0]
+                    Tags = new string[0],
                 },
             };
 
@@ -95,7 +95,7 @@
                 .And(_ => GivenTheServicesAreRegisteredWithConsul(serviceEntryOne))
                 .When(_ => WhenIGetTheServices())
                 .Then(_ => ThenTheCountIs(1))
-                .And(_ => _receivedToken.ShouldBe(token))
+                .And(_ => ThenTheTokenIs(token))
                 .BDDfy();
         }
 
@@ -251,6 +251,11 @@
         private void WhenIGetTheServices()
         {
             _services = _provider.Get().GetAwaiter().GetResult();
+        }
+
+        private void ThenTheTokenIs(string token)
+        {
+            _receivedToken.ShouldBe(token);
         }
 
         private void GivenTheServicesAreRegisteredWithConsul(params ServiceEntry[] serviceEntries)
