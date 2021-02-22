@@ -11,13 +11,17 @@ namespace Ocelot.Requester
     {
         public HttpClient Client { get; }
 
-        public HttpClientWrapper(HttpClient client)
+        public bool ConnectionClose { get; }
+
+        public HttpClientWrapper(HttpClient client, bool connectionClose = false)
         {
             Client = client;
+            ConnectionClose = connectionClose;
         }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
         {
+            request.Headers.ConnectionClose = ConnectionClose;
             return Client.SendAsync(request, cancellationToken);
         }
     }
