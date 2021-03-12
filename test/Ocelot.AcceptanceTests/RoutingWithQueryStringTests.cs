@@ -245,6 +245,47 @@ namespace Ocelot.AcceptanceTests
                 .BDDfy();
         }
 
+        // to reproduce 1288: query string should contain the placeholder name and value
+        [Fact]
+        public void should_copy_query_string_to_downstream_path_issue_1288()
+        {
+            var idName = "id";
+            var idValue = "3";
+            var queryName = idName + "1";
+            var queryValue = "2" + idValue + "12";
+            var port = RandomPortFinder.GetRandomPort();
+
+            var configuration = new FileConfiguration
+            {
+                Routes = new List<FileRoute>
+                    {
+                        new FileRoute
+                        {
+                            DownstreamPathTemplate = $"/cpx/t1/{{{idName}}}",
+                            DownstreamScheme = "http",
+                            DownstreamHostAndPorts = new List<FileHostAndPort>
+                            {
+                                new FileHostAndPort
+                                {
+                                    Host = "localhost",
+                                    Port = port,
+                                },
+                            },
+                            UpstreamPathTemplate = $"/safe/{{{idName}}}",
+                            UpstreamHttpMethod = new List<string> { "Get" },
+                        },
+                    },
+            };
+
+            this.Given(x => x.GivenThereIsAServiceRunningOn($"http://localhost:{port}", $"/cpx/t1/{idValue}", $"?{queryName}={queryValue}", 200, "Hello from Laura"))
+                .And(x => _steps.GivenThereIsAConfiguration(configuration))
+                .And(x => _steps.GivenOcelotIsRunning())
+                .When(x => _steps.WhenIGetUrlOnTheApiGateway($"/safe/{idValue}?{queryName}={queryValue}"))
+                .Then(x => _steps.ThenTheStatusCodeShouldBe(HttpStatusCode.OK))
+                .And(x => _steps.ThenTheResponseBodyShouldBe("Hello from Laura"))
+                .BDDfy();
+        }
+
         private void GivenThereIsAServiceRunningOn(string baseUrl, string basePath, string queryString, int statusCode, string responseBody)
         {
             _serviceHandler.GivenThereIsAServiceRunningOn(baseUrl, basePath, async context =>
