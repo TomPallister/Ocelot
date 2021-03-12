@@ -130,7 +130,39 @@
                             .WithDownstreamRoute(downstreamRoute)
                             .WithUpstreamHttpMethod(new List<string> { "Get" })
                             .Build())))
-                .And(x => x.GivenTheDownstreamRequestUriIs("http://localhost:5000/api/subscriptions/1/updates?unitId=2&productId=2"))
+                .And(x => x.GivenTheDownstreamRequestUriIs("http://localhost:5000/api/subscriptions/1/updates?unitId=2&productId=2")) // unitId is the first
+                .And(x => GivenTheServiceProviderConfigIs(config))
+                .And(x => x.GivenTheUrlReplacerWillReturn("api/units/1/2/updates"))
+                .When(x => x.WhenICallTheMiddleware())
+                .Then(x => x.ThenTheDownstreamRequestUriIs("https://localhost:5000/api/units/1/2/updates?productId=2"))
+                .And(x => ThenTheQueryStringIs("?productId=2"))
+                .BDDfy();
+        }
+
+        [Fact]
+        public void should_replace_query_string_but_leave_non_placeholder_queries_2()
+        {
+            var downstreamRoute = new DownstreamRouteBuilder()
+                .WithDownstreamPathTemplate("/api/units/{subscriptionId}/{unitId}/updates")
+                .WithUpstreamHttpMethod(new List<string> { "Get" })
+                .WithDownstreamScheme("https")
+                .Build();
+
+            var config = new ServiceProviderConfigurationBuilder()
+                .Build();
+
+            this.Given(x => x.GivenTheDownStreamRouteIs(
+                    new DownstreamRouteHolder(
+                        new List<PlaceholderNameAndValue>
+                        {
+                            new PlaceholderNameAndValue("{subscriptionId}", "1"),
+                            new PlaceholderNameAndValue("{unitId}", "2")
+                        },
+                        new RouteBuilder()
+                            .WithDownstreamRoute(downstreamRoute)
+                            .WithUpstreamHttpMethod(new List<string> { "Get" })
+                            .Build())))
+                .And(x => x.GivenTheDownstreamRequestUriIs("http://localhost:5000/api/subscriptions/1/updates?productId=2&unitId=2")) // unitId is the second
                 .And(x => GivenTheServiceProviderConfigIs(config))
                 .And(x => x.GivenTheUrlReplacerWillReturn("api/units/1/2/updates"))
                 .When(x => x.WhenICallTheMiddleware())

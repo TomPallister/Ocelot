@@ -105,9 +105,9 @@ namespace Ocelot.DownstreamUrlCreator.Middleware
 
                 if (rgx.IsMatch(downstreamRequest.Query))
                 {
-                    var questionMarkOrAmpersand = downstreamRequest.Query.IndexOf(name, StringComparison.Ordinal);
-                    downstreamRequest.Query = downstreamRequest.Query.Remove(questionMarkOrAmpersand - 1, 1);
+                    var questionMarkOrAmpersand = downstreamRequest.Query.IndexOf(name, StringComparison.Ordinal);                    
                     downstreamRequest.Query = rgx.Replace(downstreamRequest.Query, "");
+                    downstreamRequest.Query = downstreamRequest.Query.Remove(questionMarkOrAmpersand - 1, 1);
 
                     if (!string.IsNullOrEmpty(downstreamRequest.Query))
                     {
