@@ -5,6 +5,6 @@ Building
 
 * You'll can run the `./build.ps1` or `./build.sh` script depending on your OS. This will compile, run unit and acceptance tests and build the output packages locally. Output will got to the `./artifacts` directory.
 
-* There is a Makefile to make it easier to call the various targers in `build.cake`. The scripts are called with .sh but can be easily changed to ps1 if you are using Windows.
+* There is a Makefile to make it easier to call the various targets in `build.cake`. The scripts are called with .sh but can be easily changed to ps1 if you are using Windows.
 
 * Alternatively you can build the project in VS2019 with the latest .NET Core SDK.
