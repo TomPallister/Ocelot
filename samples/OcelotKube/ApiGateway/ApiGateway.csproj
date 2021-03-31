@@ -8,8 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.8" />
-    <PackageReference Include="Ocelot" Version="14.0.9" />
-    <PackageReference Include="Ocelot.Provider.Kubernetes" Version="14.0.9" />
+    <PackageReference Include="Ocelot" Version="17.0.0" />
+    <PackageReference Include="Ocelot.Provider.Kubernetes" Version="17.0.0" />
   </ItemGroup>
 
 </Project>

@@ -9,10 +9,10 @@
     <PackageTargetFallback>$(PackageTargetFallback)</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric" Version="7.2.434" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.2.434" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="7.2.445" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.2.445" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.2.434" />
+    <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="4.2.445" />
   </ItemGroup>
 </Project>

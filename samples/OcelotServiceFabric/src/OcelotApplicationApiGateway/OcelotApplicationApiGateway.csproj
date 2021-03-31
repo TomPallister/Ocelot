@@ -13,8 +13,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric" Version="7.2.434" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.2.434" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="7.2.445" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="4.2.445" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Ocelot\Ocelot.csproj" />
