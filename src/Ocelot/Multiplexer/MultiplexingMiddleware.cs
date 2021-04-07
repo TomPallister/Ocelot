@@ -34,6 +34,15 @@
                 return;
             }
 
+            // don't do anything extra if downstream route is single
+            if (httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute.Count == 1)
+            {
+                httpContext.Items.UpsertDownstreamRoute(httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute[0]);
+                var singleResponse = await Fire(httpContext, _next);
+                MapNotAggregate(httpContext, singleResponse);
+                return;
+            }
+
             var routeKeysConfigs = httpContext.Items.DownstreamRouteHolder().Route.DownstreamRouteConfig;
             if (routeKeysConfigs == null || !routeKeysConfigs.Any())
             {
@@ -73,12 +82,6 @@
             {
                 httpContext.Items.UpsertDownstreamRoute(httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute[0]);
                 var mainResponse = await Fire(httpContext, _next);
-
-                if (httpContext.Items.DownstreamRouteHolder().Route.DownstreamRoute.Count == 1)
-                {
-                    MapNotAggregate(httpContext, new List<HttpContext>() { mainResponse });
-                    return;
-                }
 
                 var tasks = new List<Task<HttpContext>>();
 
@@ -184,6 +187,7 @@
             target.Request.RouteValues = source.Request.RouteValues;
             target.Connection.RemoteIpAddress = source.Connection.RemoteIpAddress;
             target.RequestServices = source.RequestServices;
+            target.User = source.User;
             return target;
         }
 
@@ -196,15 +200,13 @@
             }
             else
             {
-                MapNotAggregate(httpContext, contexts);
+                //assume at least one..if this errors then it will be caught by global exception handler
+                MapNotAggregate(httpContext, contexts.First());
             }
         }
 
-        private void MapNotAggregate(HttpContext httpContext, List<HttpContext> downstreamContexts)
+        private void MapNotAggregate(HttpContext httpContext, HttpContext finished)
         {
-            //assume at least one..if this errors then it will be caught by global exception handler
-            var finished = downstreamContexts.First();
-
             httpContext.Items.UpsertErrors(finished.Items.Errors());
 
             httpContext.Items.UpsertDownstreamRequest(finished.Items.DownstreamRequest());
