@@ -23,6 +23,12 @@
         public async Task<Response<ServiceHostAndPort>> Lease(HttpContext httpContext)
         {
             var services = await _services();
+
+            if (services == null || services.Count == 0)
+            {
+                return new ErrorResponse<ServiceHostAndPort>(new ServicesAreEmptyError("There were no services in RoundRobin"));
+            }
+
             lock (_lock)
             {
                 if (_last >= services.Count)

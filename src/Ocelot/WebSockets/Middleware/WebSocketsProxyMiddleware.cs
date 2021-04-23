@@ -1,10 +1,11 @@
-// Copyright (c) .NET Foundation. All rights reserved.
+﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Modified https://github.com/aspnet/Proxy websockets class to use in Ocelot.
 
 namespace Ocelot.WebSockets.Middleware
 {
     using Microsoft.AspNetCore.Http;
+    using Ocelot.Configuration;
     using Ocelot.DownstreamRouteFinder.Middleware;
     using Ocelot.Logging;
     using Ocelot.Middleware;
@@ -71,10 +72,11 @@ namespace Ocelot.WebSockets.Middleware
         public async Task Invoke(HttpContext httpContext)
         {
             var uri = httpContext.Items.DownstreamRequest().ToUri();
-            await Proxy(httpContext, uri);
+            var downstreamRoute = httpContext.Items.DownstreamRoute();
+            await Proxy(httpContext, uri, downstreamRoute);
         }
 
-        private async Task Proxy(HttpContext context, string serverEndpoint)
+        private async Task Proxy(HttpContext context, string serverEndpoint, DownstreamRoute downstreamRoute)
         {
             if (context == null)
             {
@@ -92,6 +94,15 @@ namespace Ocelot.WebSockets.Middleware
             }
 
             var client = new ClientWebSocket();
+
+            if (downstreamRoute.DangerousAcceptAnyServerCertificateValidator)
+            {
+                client.Options.RemoteCertificateValidationCallback = (request, certificate, chain, errors) => true;
+
+                Logger
+                    .LogWarning($"You have ignored all SSL warnings by using DangerousAcceptAnyServerCertificateValidator for this DownstreamRoute, UpstreamPathTemplate: {downstreamRoute.UpstreamPathTemplate}, DownstreamPathTemplate: {downstreamRoute.DownstreamPathTemplate}");
+            }
+
             foreach (var protocol in context.WebSockets.WebSocketRequestedProtocols)
             {
                 client.Options.AddSubProtocol(protocol);
