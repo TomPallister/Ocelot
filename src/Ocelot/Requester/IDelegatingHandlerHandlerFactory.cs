@@ -1,5 +1,6 @@
 namespace Ocelot.Requester
 {
+    using Microsoft.AspNetCore.Http;
     using Ocelot.Configuration;
     using Ocelot.Responses;
     using System;
@@ -8,6 +9,6 @@ namespace Ocelot.Requester
 
     public interface IDelegatingHandlerHandlerFactory
     {
-        Response<List<Func<DelegatingHandler>>> Get(DownstreamRoute downstreamRoute);
+        Response<List<Func<DelegatingHandler>>> Get(DownstreamRoute downstreamRoute, HttpContext httpContext);
     }
 }

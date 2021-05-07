@@ -11,9 +11,12 @@ namespace Ocelot.Requester
     {
         public HttpClient Client { get; }
 
-        public HttpClientWrapper(HttpClient client)
+        public DelegatingHandler ClientMainHandler { get; }
+
+        public HttpClientWrapper(HttpClient client, DelegatingHandler clientMainHandler)
         {
             Client = client;
+            ClientMainHandler = clientMainHandler;
         }
 
         public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)

@@ -1,6 +1,7 @@
 namespace Ocelot.Requester
 {
     using Logging;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Ocelot.Configuration;
     using Ocelot.Responses;
@@ -29,7 +30,7 @@ namespace Ocelot.Requester
             _qoSFactory = qoSFactory;
         }
 
-        public Response<List<Func<DelegatingHandler>>> Get(DownstreamRoute downstreamRoute)
+        public Response<List<Func<DelegatingHandler>>> Get(DownstreamRoute downstreamRoute, HttpContext httpContext)
         {
             var globalDelegatingHandlers = _serviceProvider
                 .GetServices<GlobalDelegatingHandler>()
@@ -83,7 +84,19 @@ namespace Ocelot.Requester
                 }
             }
 
-            return new OkResponse<List<Func<DelegatingHandler>>>(handlers);
+            // attach HttpContext if necessary
+            var finalHandlers = handlers.Select<Func<DelegatingHandler>, Func<DelegatingHandler>>(originalHandlerFunc => () =>
+            {
+                DelegatingHandler delegatingHandler = originalHandlerFunc();
+                if (delegatingHandler is IDelegatingHandlerWithHttpContext innerContext)
+                {
+                    innerContext.HttpContext = httpContext;
+                }
+
+                return delegatingHandler;
+            }).ToList();
+
+            return new OkResponse<List<Func<DelegatingHandler>>>(finalHandlers);
         }
 
         private List<DelegatingHandler> SortByConfigOrder(DownstreamRoute request, List<DelegatingHandler> routeSpecificHandlers)

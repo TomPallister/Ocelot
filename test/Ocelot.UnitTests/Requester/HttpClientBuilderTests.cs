@@ -396,7 +396,7 @@ namespace Ocelot.UnitTests.Requester
             var handlers = new List<Func<DelegatingHandler>>() { () => new FakeDelegatingHandler() };
 
             _factory
-                .Setup(x => x.Get(It.IsAny<DownstreamRoute>()))
+                .Setup(x => x.Get(It.IsAny<DownstreamRoute>(), It.IsAny<HttpContext>()))
                 .Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
         }
 
@@ -405,31 +405,31 @@ namespace Ocelot.UnitTests.Requester
             var handlers = new List<Func<DelegatingHandler>>();
 
             _factory
-                .Setup(x => x.Get(It.IsAny<DownstreamRoute>()))
+                .Setup(x => x.Get(It.IsAny<DownstreamRoute>(), It.IsAny<HttpContext>()))
                 .Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
         }
 
         private void GivenTheFactoryReturns(List<Func<DelegatingHandler>> handlers)
         {
             _factory
-               .Setup(x => x.Get(It.IsAny<DownstreamRoute>()))
+               .Setup(x => x.Get(It.IsAny<DownstreamRoute>(), It.IsAny<HttpContext>()))
                .Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
         }
 
         private void WhenIBuild()
         {
-            _httpClient = _builder.Create(_context.Items.DownstreamRoute());
+            _httpClient = _builder.Create(_context.Items.DownstreamRoute(), It.IsAny<HttpContext>());
         }
 
         private void WhenIBuildTheFirstTime()
         {
-            _firstHttpClient = _builder.Create(_context.Items.DownstreamRoute());
+            _firstHttpClient = _builder.Create(_context.Items.DownstreamRoute(), It.IsAny<HttpContext>());
         }
 
         private void WhenIBuildAgain()
         {
             _builder = new HttpClientBuilder(_factory.Object, _realCache, _logger.Object);
-            _againHttpClient = _builder.Create(_context.Items.DownstreamRoute());
+            _againHttpClient = _builder.Create(_context.Items.DownstreamRoute(), It.IsAny<HttpContext>());
         }
 
         private void ThenTheHttpClientShouldNotBeNull()

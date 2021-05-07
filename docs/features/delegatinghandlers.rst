@@ -61,4 +61,9 @@ You can have as many DelegatingHandlers as you want and they are run in the foll
 4. QoS DelegatingHandler if enabled (see QoS docs).
 5. The HttpClient sends the HttpRequestMessage.
 
+Access to HttpContext
+^^^^^^^^^^^^^^^^^^^^^
+
+If you need a HttpContext instance in your delegating handler, don't use HttpContextAccessor to obtain it (it will not contain all the information, for example, it will not contain authenticated user data or claims). Instead, implement IDelegatingHandlerWithHttpContext interface, then a valid HttpContext will appear as a property of the delegating handler class.
+
 Hopefully other people will find this feature useful!

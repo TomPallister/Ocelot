@@ -551,7 +551,7 @@ namespace Ocelot.AcceptanceTests
             _ocelotClient = _ocelotServer.CreateClient();
         }
 
-        public void GivenOcelotIsRunningWithSpecficHandlersRegisteredInDi<TOne, TWo>()
+        public void GivenOcelotIsRunningWithSpecficHandlersRegisteredInDi<TOne, TWo>(Action<IdentityServerAuthenticationOptions> options, string authenticationProviderKey)
             where TOne : DelegatingHandler
             where TWo : DelegatingHandler
         {
@@ -573,10 +573,47 @@ namespace Ocelot.AcceptanceTests
                     s.AddOcelot()
                         .AddDelegatingHandler<TOne>()
                         .AddDelegatingHandler<TWo>();
+                    if (authenticationProviderKey != null && options != null)
+                    {
+                        s.AddAuthentication()
+                         .AddIdentityServerAuthentication(authenticationProviderKey, options);
+                    }
                 })
                 .Configure(a =>
                 {
                     a.UseOcelot().Wait();
+                });
+
+            _ocelotServer = new TestServer(_webHostBuilder);
+
+            _ocelotClient = _ocelotServer.CreateClient();
+        }
+
+        public void GivenOcelotIsRunningWithSpecificHandlerRegisteredInDi<TOne>(Action<IdentityServerAuthenticationOptions> options, string authenticationProviderKey)
+            where TOne : DelegatingHandler
+        {
+            _webHostBuilder = new WebHostBuilder();
+
+            _webHostBuilder
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
+                    var env = hostingContext.HostingEnvironment;
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: false);
+                    config.AddJsonFile("ocelot.json", optional: true, reloadOnChange: false);
+                    config.AddEnvironmentVariables();
+                })
+                .ConfigureServices(s =>
+                {
+                    s.AddOcelot()
+                     .AddDelegatingHandler<TOne>();
+                    s.AddAuthentication()
+                     .AddIdentityServerAuthentication(authenticationProviderKey, options);
+                })
+                .Configure(app =>
+                {
+                    app.UseOcelot().Wait();
                 });
 
             _ocelotServer = new TestServer(_webHostBuilder);
@@ -713,6 +750,38 @@ namespace Ocelot.AcceptanceTests
             _ocelotClient = _ocelotServer.CreateClient();
         }
 
+        public void GivenOcelotIsRunningWithGlobalHandlerRegisteredInDi<TOne>(Action<IdentityServerAuthenticationOptions> options, string authenticationProviderKey)
+            where TOne : DelegatingHandler
+        {
+            _webHostBuilder = new WebHostBuilder();
+
+            _webHostBuilder
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.SetBasePath(hostingContext.HostingEnvironment.ContentRootPath);
+                    var env = hostingContext.HostingEnvironment;
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: false);
+                    config.AddJsonFile("ocelot.json", optional: true, reloadOnChange: false);
+                    config.AddEnvironmentVariables();
+                })
+                .ConfigureServices(s =>
+                {
+                    s.AddOcelot()
+                     .AddDelegatingHandler<TOne>(true);
+                    s.AddAuthentication()
+                     .AddIdentityServerAuthentication(authenticationProviderKey, options);
+                })
+                .Configure(app =>
+                {
+                    app.UseOcelot().Wait();
+                });
+
+            _ocelotServer = new TestServer(_webHostBuilder);
+
+            _ocelotClient = _ocelotServer.CreateClient();
+        }
+
         internal void GivenIAddCookieToMyRequest(string cookie)
         {
             _ocelotClient.DefaultRequestHeaders.Add("Set-Cookie", cookie);
@@ -806,13 +875,18 @@ namespace Ocelot.AcceptanceTests
 
         public void GivenIHaveAToken(string url)
         {
+            GivenIHaveAToken(url, "test");
+        }
+
+        public void GivenIHaveAToken(string url, string username)
+        {
             var tokenUrl = $"{url}/connect/token";
             var formData = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("client_id", "client"),
                 new KeyValuePair<string, string>("client_secret", "secret"),
                 new KeyValuePair<string, string>("scope", "api"),
-                new KeyValuePair<string, string>("username", "test"),
+                new KeyValuePair<string, string>("username", username),
                 new KeyValuePair<string, string>("password", "test"),
                 new KeyValuePair<string, string>("grant_type", "password"),
             };

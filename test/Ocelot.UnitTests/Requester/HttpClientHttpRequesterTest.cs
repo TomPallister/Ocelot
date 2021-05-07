@@ -34,7 +34,7 @@ namespace Ocelot.UnitTests.Requester
         {
             _httpContext = new DefaultHttpContext();
             _factory = new Mock<IDelegatingHandlerHandlerFactory>();
-            _factory.Setup(x => x.Get(It.IsAny<DownstreamRoute>())).Returns(new OkResponse<List<Func<DelegatingHandler>>>(new List<Func<DelegatingHandler>>()));
+            _factory.Setup(x => x.Get(It.IsAny<DownstreamRoute>(), It.IsAny<HttpContext>())).Returns(new OkResponse<List<Func<DelegatingHandler>>>(new List<Func<DelegatingHandler>>()));
             _logger = new Mock<IOcelotLogger>();
             _loggerFactory = new Mock<IOcelotLoggerFactory>();
             _loggerFactory
@@ -163,7 +163,7 @@ namespace Ocelot.UnitTests.Requester
                 () => new OkDelegatingHandler()
             };
 
-            _factory.Setup(x => x.Get(It.IsAny<DownstreamRoute>())).Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
+            _factory.Setup(x => x.Get(It.IsAny<DownstreamRoute>(), It.IsAny<HttpContext>())).Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
         }
 
         private void GivenTheHouseReturnsTimeoutHandler()
@@ -173,7 +173,7 @@ namespace Ocelot.UnitTests.Requester
                 () => new TimeoutDelegatingHandler()
             };
 
-            _factory.Setup(x => x.Get(It.IsAny<DownstreamRoute>())).Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
+            _factory.Setup(x => x.Get(It.IsAny<DownstreamRoute>(), It.IsAny<HttpContext>())).Returns(new OkResponse<List<Func<DelegatingHandler>>>(handlers));
 
             _mapper.Setup(x => x.Map(It.IsAny<Exception>())).Returns(new UnableToCompleteRequestError(new Exception()));
         }

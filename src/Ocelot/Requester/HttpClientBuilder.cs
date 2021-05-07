@@ -1,5 +1,6 @@
 ﻿namespace Ocelot.Requester
 {
+    using Microsoft.AspNetCore.Http;
     using Ocelot.Configuration;
     using Ocelot.Logging;
     using System;
@@ -31,7 +32,7 @@
             _defaultTimeout = TimeSpan.FromSeconds(90);
         }
 
-        public IHttpClient Create(DownstreamRoute downstreamRoute)
+        public IHttpClient Create(DownstreamRoute downstreamRoute, HttpContext httpContext)
         {
             _cacheKey = downstreamRoute;
 
@@ -40,6 +41,18 @@
             if (httpClient != null)
             {
                 _client = httpClient;
+
+                var clientHandler = _client.ClientMainHandler;
+                while (clientHandler != null)
+                {
+                    if (clientHandler is IDelegatingHandlerWithHttpContext contextClientHandler)
+                    {
+                        contextClientHandler.HttpContext = httpContext;
+                    }
+
+                    clientHandler = clientHandler.InnerHandler as DelegatingHandler;
+                }
+
                 return httpClient;
             }
 
@@ -57,12 +70,13 @@
                 ? _defaultTimeout
                 : TimeSpan.FromMilliseconds(downstreamRoute.QosOptions.TimeoutValue);
 
-            _httpClient = new HttpClient(CreateHttpMessageHandler(handler, downstreamRoute))
+            var clientMainHandler = CreateHttpMessageHandler(handler, downstreamRoute, httpContext);
+            _httpClient = new HttpClient(clientMainHandler)
             {
                 Timeout = timeout
             };
 
-            _client = new HttpClientWrapper(_httpClient);
+            _client = new HttpClientWrapper(_httpClient, clientMainHandler as DelegatingHandler);
 
             return _client;
         }
@@ -104,10 +118,11 @@
             _cacheHandlers.Set(_cacheKey, _client, TimeSpan.FromHours(24));
         }
 
-        private HttpMessageHandler CreateHttpMessageHandler(HttpMessageHandler httpMessageHandler, DownstreamRoute request)
+        private HttpMessageHandler CreateHttpMessageHandler(HttpMessageHandler httpMessageHandler, 
+            DownstreamRoute request, HttpContext httpContext)
         {
             //todo handle error
-            var handlers = _factory.Get(request).Data;
+            var handlers = _factory.Get(request, httpContext).Data;
 
             handlers
                 .Select(handler => handler)

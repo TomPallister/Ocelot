@@ -32,31 +32,31 @@ namespace Ocelot.Benchmarks
         {
             _downstreamRouteKey = new DownstreamRouteBuilder().Build();
             _stringKey = "test";
-            _client = new HttpClientWrapper(new HttpClient());
+            _client = new HttpClientWrapper(new HttpClient(), null);
             _downstreamRouteDictionary = new ConcurrentDictionary<DownstreamRoute, IHttpClient>();
 
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
-            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient()));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
+            _downstreamRouteDictionary.TryAdd(new DownstreamRouteBuilder().Build(), new HttpClientWrapper(new HttpClient(), null));
 
             _stringRouteDictionary = new ConcurrentDictionary<string, IHttpClient>();
-            _stringRouteDictionary.TryAdd("1", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("2", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("3", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("4", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("5", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("6", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("7", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("8", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("9", new HttpClientWrapper(new HttpClient()));
-            _stringRouteDictionary.TryAdd("10", new HttpClientWrapper(new HttpClient()));
+            _stringRouteDictionary.TryAdd("1", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("2", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("3", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("4", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("5", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("6", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("7", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("8", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("9", new HttpClientWrapper(new HttpClient(), null));
+            _stringRouteDictionary.TryAdd("10", new HttpClientWrapper(new HttpClient(), null));
         }
 
         [Benchmark(Baseline = true)]
