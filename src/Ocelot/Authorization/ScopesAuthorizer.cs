@@ -1,21 +1,14 @@
-﻿using Ocelot.Responses;
+using Ocelot.Responses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
 namespace Ocelot.Authorization
 {
-    using Infrastructure.Claims.Parser;
-
     public class ScopesAuthorizer : IScopesAuthorizer
     {
-        private readonly IClaimsParser _claimsParser;
-        private readonly string _scope = "scope";
-
-        public ScopesAuthorizer(IClaimsParser claimsParser)
-        {
-            _claimsParser = claimsParser;
-        }
+        private const string ScopeClaimKey = "scope";
 
         public Response<bool> Authorize(ClaimsPrincipal claimsPrincipal, List<string> routeAllowedScopes)
         {
@@ -24,21 +17,28 @@ namespace Ocelot.Authorization
                 return new OkResponse<bool>(true);
             }
 
-            var values = _claimsParser.GetValuesByClaimType(claimsPrincipal.Claims, _scope);
+            var userScopes =
+                claimsPrincipal.Claims
+                    .Where(x => x.Type == ScopeClaimKey)
+                    .Select(x => x.Value)
+                    .ToArray();
 
-            if (values.IsError)
+            if (userScopes.Length == 1)
             {
-                return new ErrorResponse<bool>(values.Errors);
+                var userScope = userScopes[0];
+
+                var hasMultipleValues = userScope.Contains(" ");
+
+                if (hasMultipleValues)
+                {
+                    userScopes = userScope.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                }
             }
 
-            var userScopes = values.Data;
-
-            var matchesScopes = routeAllowedScopes.Intersect(userScopes).ToList();
-
-            if (matchesScopes.Count == 0)
+            if (routeAllowedScopes.Any(s => !userScopes.Contains(s)))
             {
                 return new ErrorResponse<bool>(
-                    new ScopeNotAuthorizedError($"no one user scope: '{string.Join(",", userScopes)}' match with some allowed scope: '{string.Join(",", routeAllowedScopes)}'"));
+                    new ScopeNotAuthorizedError($"User scopes: '{string.Join(",", userScopes)}' do not have all allowed scopes: '{string.Join(",", routeAllowedScopes)}'"));
             }
 
             return new OkResponse<bool>(true);
