@@ -32,7 +32,7 @@
                 _polling = true;
                 await Poll();
                 _polling = false;
-            }, null, pollingInterval, pollingInterval);
+            }, null, 0, pollingInterval);
         }
 
         public void Dispose()
