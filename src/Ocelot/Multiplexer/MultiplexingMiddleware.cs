@@ -160,7 +160,7 @@
             }
         }
 
-        private HttpContext Copy(HttpContext source)
+        private static HttpContext Copy(HttpContext source)
         {
             var target = new DefaultHttpContext();
 
@@ -182,7 +182,21 @@
             target.Request.Scheme = source.Request.Scheme;
             target.Request.IsHttps = source.Request.IsHttps;
             target.Request.RouteValues = source.Request.RouteValues;
+            target.Request.Cookies = source.Request.Cookies;
+            target.Request.Form = source.Request.Form;
+
+            target.Connection.ClientCertificate = source.Connection.ClientCertificate;
+            target.Connection.LocalIpAddress = source.Connection.LocalIpAddress;
+            target.Connection.LocalPort = source.Connection.LocalPort;
             target.Connection.RemoteIpAddress = source.Connection.RemoteIpAddress;
+            target.Connection.RemotePort = source.Connection.RemotePort;
+
+            target.Items = source.Items;
+
+            target.RequestAborted = source.RequestAborted;
+            target.TraceIdentifier = source.TraceIdentifier;
+            target.User = source.User;
+
             target.RequestServices = source.RequestServices;
             return target;
         }
